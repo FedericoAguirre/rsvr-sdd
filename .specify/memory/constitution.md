@@ -1,50 +1,93 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!--
+  Sync Impact Report
+  Version change: 1.0.0 → 2.0.0
+  Modified principles:
+    - I. Library-First → I. Code Quality
+    - II. CLI Interface → II. Testing Standards
+    - III. Test-First (NON-NEGOTIABLE) → (removed — folded into II)
+    - IV. Integration Testing → (removed — folded into II)
+    - V. Observability / VI. Versioning / VII. Simplicity → (split: Observability → IV, Versioning → Governance, Simplicity → I)
+    - (new) III. User Experience Consistency
+    - (new) IV. Performance Requirements
+  Added sections: None
+  Removed sections: None (principles restructured)
+  Templates requiring updates:
+    - .specify/templates/plan-template.md ✅ (no change needed — generic)
+    - .specify/templates/spec-template.md ✅ (no change needed — generic)
+    - .specify/templates/tasks-template.md ✅ (no change needed — generic)
+  Follow-up TODOs: None
+-->
+
+# rsvr-sdd Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. Code Quality
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+All code MUST pass automated linting and static analysis before merge.
+No dead code, commented-out code, or unresolved TODOs may be committed.
+Code review is REQUIRED for every change. Simplicity is paramount —
+apply YAGNI rigorously; every complexity addition MUST be justified in
+the Complexity Tracking section of the implementation plan. Formatting
+MUST be consistent across the entire codebase (enforced by formatter).
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+### II. Testing Standards (NON-NEGOTIABLE)
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+TDD is mandatory. Tests MUST be written and reviewed by the user FIRST,
+and MUST fail before implementation begins. The Red-Green-Refactor cycle
+MUST be strictly enforced. Integration tests are REQUIRED for new
+library contracts, contract changes, inter-module communication, and
+shared schema changes. Unit tests alone are INSUFFICIENT for boundary-
+crossing changes. Test coverage MUST be measured and reviewed; untested
+paths block merge.
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+### III. User Experience Consistency
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+All user-facing interfaces MUST follow consistent conventions for:
+output formatting, error messages, exit codes, and help text. Error
+messages MUST be actionable (state what went wrong AND how to fix it).
+CLI output MUST support both human-readable and JSON formats. Every
+feature MUST include user-facing documentation updated in the same PR.
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+### IV. Performance Requirements
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+Every feature MUST define measurable performance criteria before
+implementation. All services and libraries MUST use structured logging
+for observability. Response latencies and resource usage MUST be
+documented as constraints in the implementation plan. Performance
+regressions MUST be caught before merge via automated benchmarks or
+profiling gates. Profiling data MUST accompany any performance-
+sensitive change.
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+## Technology Constraints
+
+This project uses opencode as its AI integration. Runtime targets are
+POSIX-compatible (Linux/macOS). All dependencies MUST be declared
+explicitly. No proprietary or closed-source build tools are permitted.
+
+## Development Workflow
+
+All work follows the Specify → Plan → Tasks → Implement cycle with
+review gates at each stage. Feature branches MUST use sequential
+numbering (`###-feature-name`). Commits MUST be atomic and descriptive.
+Each user story MUST be independently testable and deliverable as an MVP
+increment. Code quality, UX, and performance checks MUST pass before
+merge.
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+This constitution supersedes all other practices and is the single source
+of truth for project governance. Amendments require:
+1. Documented rationale describing the need for change
+2. Stakeholder approval before implementation
+3. A migration plan for any transitional impacts
+4. A constitution version bump following semantic versioning
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+All PRs and reviews MUST verify constitutional compliance. Complexity
+additions MUST be justified in the Complexity Tracking section of the
+plan. Non-negotiable principles (Testing Standards) cannot be amended —
+only clarified. All project artifacts follow MAJOR.MINOR.PATCH semantic
+versioning. Breaking changes MUST increment MAJOR; new backward-
+compatible functionality increments MINOR; bug fixes increment PATCH.
+
+**Version**: 2.0.0 | **Ratified**: 2026-06-07 | **Last Amended**: 2026-06-07
