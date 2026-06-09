@@ -1,0 +1,25 @@
+[project]
+name = "rsvr-sdd"
+version = "0.1.0"
+description = "Cardio equipment reservation system"
+requires-python = ">=3.12"
+dependencies = [
+    "django>=5.0,<5.1",
+    "psycopg2-binary>=2.9",
+    "gunicorn>=22.0",
+    "whitenoise>=6.6",
+]
+
+[tool.ruff]
+line-length = 88
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "D"]
+
+[tool.ruff.format]
+quote-style = "double"
+
+[tool.pytest.ini_options]
+pythonpath = ["backend"]
+DJANGO_SETTINGS_MODULE = "config.settings"
