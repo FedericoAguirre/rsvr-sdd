@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Equipment{% endblock %}
+{% block content %}
+<h2 class="mb-4">Equipment</h2>
+<a href="{% url 'equipment:equipment-create' %}" class="btn btn-primary mb-3">Add Equipment</a>
+<table class="table table-striped">
+    <thead><tr><th>Name</th><th>Type</th><th>Status</th><th></th></tr></thead>
+    <tbody>
+    {% for e in equipments %}
+    <tr>
+        <td>{{ e.name }}</td>
+        <td>{{ e.get_equipment_type_display }}</td>
+        <td><span class="badge {% if e.status == 'in-service' %}bg-success{% else %}bg-danger{% endif %}">{{ e.get_status_display }}</span></td>
+        <td>
+            <a href="{% url 'equipment:equipment-detail' e.pk %}" class="btn btn-sm btn-outline-primary">View</a>
+            <a href="{% url 'equipment:equipment-edit' e.pk %}" class="btn btn-sm btn-outline-secondary">Edit</a>
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Class Schedule{% endblock %}
+{% block content %}
+<h2 class="mb-4">Class Schedule</h2>
+<table class="table table-striped">
+    <thead><tr><th>Day</th><th>Time</th><th>Status</th><th></th></tr></thead>
+    <tbody>
+    {% for slot in slots %}
+    <tr>
+        <td>{{ slot.get_day_of_week_display }}</td>
+        <td>{{ slot.time|time:"H:i" }}</td>
+        <td>
+            <span class="badge {% if slot.is_active %}bg-success{% else %}bg-secondary{% endif %}">
+                {{ slot.is_active|yesno:"Active,Inactive" }}
+            </span>
+        </td>
+        <td>
+            <a href="{% url 'classes:class-toggle' slot.pk %}" class="btn btn-sm btn-outline-warning">
+                {{ slot.is_active|yesno:"Deactivate,Activate" }}
+            </a>
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
