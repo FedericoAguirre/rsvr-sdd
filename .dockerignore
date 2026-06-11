@@ -7,3 +7,8 @@ __pycache__/
 .DS_Store
 .vscode/
 .idea/
+specs/
+@ai/
+.specify/
+AGENTS.md
+mitigation_plan.md
