@@ -24,7 +24,7 @@ def equipment_create(request):
         if form.is_valid():
             form.save()
             messages.success(request, "Equipment added.")
-            return redirect("equipment-list")
+            return redirect("equipment:equipment-list")
     else:
         form = EquipmentForm()
     return render(request, "equipment/equipment_form.html", {"form": form, "title": "Add Equipment"})
@@ -38,7 +38,7 @@ def equipment_edit(request, pk):
         if form.is_valid():
             form.save()
             messages.success(request, "Equipment updated.")
-            return redirect("equipment-list")
+            return redirect("equipment:equipment-list")
     else:
         form = EquipmentForm(instance=equipment)
     return render(request, "equipment/equipment_form.html", {"form": form, "title": "Edit Equipment"})

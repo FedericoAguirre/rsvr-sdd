@@ -4,7 +4,7 @@
 <h2 class="mb-4">Reservations</h2>
 <div class="row mb-3">
     <div class="col-md-4">
-        <a href="{% url 'reservation-create' %}" class="btn btn-primary">New Reservation</a>
+        <a href="{% url 'reservations:reservation-create' %}" class="btn btn-primary">New Reservation</a>
     </div>
     <div class="col-md-4">
         <form method="get" class="d-flex">
@@ -23,7 +23,7 @@
         <td>{{ r.client }}</td>
         <td>{{ r.class_slot }}</td>
         <td>{{ r.equipment }}</td>
-        <td><a href="{% url 'reservation-detail' r.pk %}" class="btn btn-sm btn-outline-primary">View</a></td>
+        <td><a href="{% url 'reservations:reservation-detail' r.pk %}" class="btn btn-sm btn-outline-primary">View</a></td>
     </tr>
     {% endfor %}
     </tbody>

@@ -15,7 +15,7 @@
             </span>
         </td>
         <td>
-            <a href="{% url 'class-toggle' slot.pk %}" class="btn btn-sm btn-outline-warning">
+            <a href="{% url 'classes:class-toggle' slot.pk %}" class="btn btn-sm btn-outline-warning">
                 {{ slot.is_active|yesno:"Deactivate,Activate" }}
             </a>
         </td>

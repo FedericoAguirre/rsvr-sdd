@@ -10,6 +10,6 @@
     <dt class="col-sm-2">Notes</dt>
     <dd class="col-sm-10">{{ equipment.notes|default:"—" }}</dd>
 </dl>
-<a href="{% url 'equipment-edit' equipment.pk %}" class="btn btn-primary">Edit</a>
-<a href="{% url 'equipment-list' %}" class="btn btn-secondary">Back</a>
+<a href="{% url 'equipment:equipment-edit' equipment.pk %}" class="btn btn-primary">Edit</a>
+<a href="{% url 'equipment:equipment-list' %}" class="btn btn-secondary">Back</a>
 {% endblock %}

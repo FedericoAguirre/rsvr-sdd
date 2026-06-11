@@ -44,7 +44,7 @@ def reservation_create(request):
             reservation.created_by = request.user
             reservation.save()
             messages.success(request, "Reservation created.")
-            return redirect("reservation-detail", pk=reservation.pk)
+            return redirect("reservations:reservation-detail", pk=reservation.pk)
     else:
         form = ReservationForm(initial=initial)
     return render(request, "reservations/reservation_form.html", {"form": form})

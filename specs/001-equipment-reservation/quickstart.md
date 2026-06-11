@@ -14,7 +14,8 @@ git clone <repo-url> && cd rsvr-sdd
 # 2. Start services
 docker compose up -d
 
-# 3. Run migrations
+# 3. Create and apply migrations
+docker compose exec web python manage.py makemigrations clients equipment classes reservations
 docker compose exec web python manage.py migrate
 
 # 4. Seed initial data (class schedule + sample equipment)

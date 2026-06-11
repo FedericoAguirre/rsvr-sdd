@@ -4,7 +4,7 @@
 <h2>Reservation #{{ reservation.pk }}</h2>
 <dl class="row">
     <dt class="col-sm-2">Client</dt>
-    <dd class="col-sm-10"><a href="{% url 'client-detail' reservation.client.pk %}">{{ reservation.client }}</a></dd>
+    <dd class="col-sm-10"><a href="{% url 'clients:client-detail' reservation.client.pk %}">{{ reservation.client }}</a></dd>
     <dt class="col-sm-2">Equipment</dt>
     <dd class="col-sm-10">{{ reservation.equipment }}</dd>
     <dt class="col-sm-2">Class</dt>
@@ -16,5 +16,5 @@
     <dt class="col-sm-2">Notes</dt>
     <dd class="col-sm-10">{{ reservation.notes|default:"—" }}</dd>
 </dl>
-<a href="{% url 'reservation-list' %}" class="btn btn-secondary">Back</a>
+<a href="{% url 'reservations:reservation-list' %}" class="btn btn-secondary">Back</a>
 {% endblock %}

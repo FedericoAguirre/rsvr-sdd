@@ -17,4 +17,4 @@ def class_toggle(request, pk):
     slot.save()
     status = "activated" if slot.is_active else "deactivated"
     messages.success(request, f"Class slot {slot} {status}.")
-    return redirect("class-schedule")
+    return redirect("classes:class-schedule")

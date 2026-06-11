@@ -4,7 +4,7 @@ from django.shortcuts import redirect
 
 
 def home_redirect(request):
-    return redirect("reservation-list")
+    return redirect("reservations:reservation-list")
 
 
 urlpatterns = [

@@ -12,13 +12,13 @@
             <a class="navbar-brand" href="/">Cardio Reservation</a>
             {% if user.is_authenticated %}
             <ul class="navbar-nav ms-auto">
-                <li class="nav-item"><a class="nav-link" href="{% url 'reservation-list' %}">Reservations</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'client-search' %}">Clients</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'reservations:reservation-list' %}">Reservations</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'clients:client-search' %}">Clients</a></li>
                 {% if perms.equipment.view_equipment %}
-                <li class="nav-item"><a class="nav-link" href="{% url 'equipment-list' %}">Equipment</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'equipment:equipment-list' %}">Equipment</a></li>
                 {% endif %}
                 {% if perms.classes.view_classslot %}
-                <li class="nav-item"><a class="nav-link" href="{% url 'class-schedule' %}">Schedule</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'classes:class-schedule' %}">Schedule</a></li>
                 {% endif %}
                 <li class="nav-item"><a class="nav-link" href="{% url 'admin:index' %}">Admin</a></li>
                 <li class="nav-item">
