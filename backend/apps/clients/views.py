@@ -33,7 +33,7 @@ def client_create(request):
         if form.is_valid():
             client = form.save()
             messages.success(request, f"Client {client} created.")
-            return redirect("client-detail", pk=client.pk)
+            return redirect("clients:client-detail", pk=client.pk)
     else:
         form = ClientForm()
     return render(request, "clients/client_form.html", {"form": form})

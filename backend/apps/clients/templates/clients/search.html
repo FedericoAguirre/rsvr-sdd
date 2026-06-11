@@ -5,7 +5,7 @@
 <form method="get" class="row g-3 mb-4">
     <div class="col-md-6">{{ form.q }}</div>
     <div class="col-md-2"><button type="submit" class="btn btn-primary">Search</button></div>
-    <div class="col-md-2"><a href="{% url 'client-create' %}" class="btn btn-success">New Client</a></div>
+    <div class="col-md-2"><a href="{% url 'clients:client-create' %}" class="btn btn-success">New Client</a></div>
 </form>
 {% if q %}
 <h5>Results for "{{ q }}"</h5>
@@ -18,7 +18,7 @@
         <td>{{ c.first_name }} {{ c.last_name }}</td>
         <td>{{ c.email|default:"—" }}</td>
         <td>{{ c.mobile|default:"—" }}</td>
-        <td><a href="{% url 'client-detail' c.pk %}" class="btn btn-sm btn-outline-primary">View</a></td>
+        <td><a href="{% url 'clients:client-detail' c.pk %}" class="btn btn-sm btn-outline-primary">View</a></td>
     </tr>
     {% endfor %}
     </tbody>

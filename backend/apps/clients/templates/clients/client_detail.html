@@ -8,7 +8,7 @@
     <dt class="col-sm-2">Mobile</dt>
     <dd class="col-sm-10">{{ client.mobile|default:"—" }}</dd>
 </dl>
-<a href="{% url 'reservation-create' %}?client={{ client.pk }}" class="btn btn-primary mb-3">New Reservation</a>
+<a href="{% url 'reservations:reservation-create' %}?client={{ client.pk }}" class="btn btn-primary mb-3">New Reservation</a>
 <h4>Reservation History</h4>
 {% if reservations %}
 <table class="table table-striped">
@@ -26,5 +26,5 @@
 {% else %}
 <p class="text-muted">No reservations yet.</p>
 {% endif %}
-<a href="{% url 'client-search' %}" class="btn btn-secondary">Back to Search</a>
+<a href="{% url 'clients:client-search' %}" class="btn btn-secondary">Back to Search</a>
 {% endblock %}
