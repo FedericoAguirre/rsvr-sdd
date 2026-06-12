@@ -8,6 +8,7 @@ venv/
 dist/
 build/
 *.sqlite3
+backend/staticfiles/
 .DS_Store
 *.log
 .vscode/

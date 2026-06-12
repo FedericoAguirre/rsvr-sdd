@@ -1,13 +1,14 @@
 {% extends "base.html" %}
-{% block title %}Login{% endblock %}
+{% load i18n %}
+{% block title %}{% translate "Login" %}{% endblock %}
 {% block content %}
 <div class="row justify-content-center mt-5">
     <div class="col-md-4">
-        <h2 class="mb-4">Login</h2>
+        <h2 class="mb-4">{% translate "Login" %}</h2>
         <form method="post">
             {% csrf_token %}
             {{ form.as_p }}
-            <button type="submit" class="btn btn-primary w-100">Login</button>
+            <button type="submit" class="btn btn-primary w-100">{% translate "Login" %}</button>
         </form>
     </div>
 </div>

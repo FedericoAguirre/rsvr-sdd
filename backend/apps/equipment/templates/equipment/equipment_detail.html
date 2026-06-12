@@ -1,15 +1,16 @@
 {% extends "base.html" %}
+{% load i18n %}
 {% block title %}{{ equipment.name }}{% endblock %}
 {% block content %}
 <h2>{{ equipment.name }}</h2>
 <dl class="row">
-    <dt class="col-sm-2">Type</dt>
+    <dt class="col-sm-2">{% translate "Type" %}</dt>
     <dd class="col-sm-10">{{ equipment.get_equipment_type_display }}</dd>
-    <dt class="col-sm-2">Status</dt>
+    <dt class="col-sm-2">{% translate "Status" %}</dt>
     <dd class="col-sm-10"><span class="badge {% if equipment.status == 'in-service' %}bg-success{% else %}bg-danger{% endif %}">{{ equipment.get_status_display }}</span></dd>
-    <dt class="col-sm-2">Notes</dt>
+    <dt class="col-sm-2">{% translate "Notes" %}</dt>
     <dd class="col-sm-10">{{ equipment.notes|default:"—" }}</dd>
 </dl>
-<a href="{% url 'equipment:equipment-edit' equipment.pk %}" class="btn btn-primary">Edit</a>
-<a href="{% url 'equipment:equipment-list' %}" class="btn btn-secondary">Back</a>
+<a href="{% url 'equipment:equipment-edit' equipment.pk %}" class="btn btn-primary">{% translate "Edit" %}</a>
+<a href="{% url 'equipment:equipment-list' %}" class="btn btn-secondary">{% translate "Back" %}</a>
 {% endblock %}

@@ -1,9 +1,10 @@
 {% extends "base.html" %}
-{% block title %}Class Schedule{% endblock %}
+{% load i18n %}
+{% block title %}{% translate "Class Schedule" %}{% endblock %}
 {% block content %}
-<h2 class="mb-4">Class Schedule</h2>
+<h2 class="mb-4">{% translate "Class Schedule" %}</h2>
 <table class="table table-striped">
-    <thead><tr><th>Day</th><th>Time</th><th>Status</th><th></th></tr></thead>
+    <thead><tr><th>{% translate "Day" %}</th><th>{% translate "Time" %}</th><th>{% translate "Status" %}</th><th></th></tr></thead>
     <tbody>
     {% for slot in slots %}
     <tr>
@@ -11,12 +12,12 @@
         <td>{{ slot.time|time:"H:i" }}</td>
         <td>
             <span class="badge {% if slot.is_active %}bg-success{% else %}bg-secondary{% endif %}">
-                {{ slot.is_active|yesno:"Active,Inactive" }}
+                {% if slot.is_active %}{% translate "Active" %}{% else %}{% translate "Inactive" %}{% endif %}
             </span>
         </td>
         <td>
             <a href="{% url 'classes:class-toggle' slot.pk %}" class="btn btn-sm btn-outline-warning">
-                {{ slot.is_active|yesno:"Deactivate,Activate" }}
+                {% if slot.is_active %}{% translate "Deactivate" %}{% else %}{% translate "Activate" %}{% endif %}
             </a>
         </td>
     </tr>

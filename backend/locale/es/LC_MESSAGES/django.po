@@ -1,0 +1,297 @@
+# Spanish translations for rsvr-sdd.
+# Copyright (C) 2026
+# This file is distributed under the same license as the rsvr-sdd package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: rsvr-sdd\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-06-11 10:33-0600\n"
+"PO-Revision-Date: 2026-06-11 10:30-0600\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Monday"
+msgstr "Lunes"
+
+msgid "Tuesday"
+msgstr "Martes"
+
+msgid "Wednesday"
+msgstr "Miércoles"
+
+msgid "Thursday"
+msgstr "Jueves"
+
+msgid "Friday"
+msgstr "Viernes"
+
+msgid "17:30"
+msgstr "17:30"
+
+msgid "18:30"
+msgstr "18:30"
+
+msgid " (inactive)"
+msgstr " (inactivo)"
+
+#, python-format
+msgid "%(day)s %(time)s%(status)s"
+msgstr "%(day)s %(time)s%(status)s"
+
+msgid "Class Schedule"
+msgstr "Horario de Clases"
+
+msgid "Day"
+msgstr "Día"
+
+msgid "Time"
+msgstr "Hora"
+
+msgid "Status"
+msgstr "Estado"
+
+msgid "Active"
+msgstr "Activo"
+
+msgid "Inactive"
+msgstr "Inactivo"
+
+msgid "Deactivate"
+msgstr "Desactivar"
+
+msgid "Activate"
+msgstr "Activar"
+
+#, python-format
+msgid "Class slot %s activated."
+msgstr "Bloque de clase %s activado."
+
+#, python-format
+msgid "Class slot %s deactivated."
+msgstr "Bloque de clase %s desactivado."
+
+msgid "Search by email or mobile"
+msgstr "Buscar por correo electrónico o móvil"
+
+msgid "Email or mobile number..."
+msgstr "Correo electrónico o número móvil..."
+
+msgid "Email"
+msgstr "Correo electrónico"
+
+msgid "Mobile"
+msgstr "Móvil"
+
+msgid "New Reservation"
+msgstr "Nueva Reserva"
+
+msgid "Reservation History"
+msgstr "Historial de Reservas"
+
+msgid "Date"
+msgstr "Fecha"
+
+msgid "Class"
+msgstr "Clase"
+
+msgid "Equipment"
+msgstr "Equipos"
+
+msgid "No reservations yet."
+msgstr "Sin reservas aún."
+
+msgid "Back to Search"
+msgstr "Volver a Búsqueda"
+
+msgid "New Client"
+msgstr "Nuevo Cliente"
+
+msgid "Save"
+msgstr "Guardar"
+
+msgid "Cancel"
+msgstr "Cancelar"
+
+msgid "Search Clients"
+msgstr "Buscar Clientes"
+
+msgid "Search"
+msgstr "Buscar"
+
+#, python-format
+msgid "Results for \"%(q)s\""
+msgstr "Resultados para \"%(q)s\""
+
+msgid "Name"
+msgstr "Nombre"
+
+msgid "View"
+msgstr "Ver"
+
+msgid "No clients found."
+msgstr "No se encontraron clientes."
+
+#, python-format
+msgid "Client %s created."
+msgstr "Cliente %s creado."
+
+msgid "Treadmill"
+msgstr "Cinta de correr"
+
+msgid "Stationary Bike"
+msgstr "Bicicleta estacionaria"
+
+msgid "Elliptical"
+msgstr "Elíptica"
+
+msgid "Rowing Machine"
+msgstr "Máquina de remo"
+
+msgid "Other"
+msgstr "Otro"
+
+msgid "In Service"
+msgstr "En servicio"
+
+msgid "Out of Service"
+msgstr "Fuera de servicio"
+
+msgid "equipment"
+msgstr "equipos"
+
+msgid "Type"
+msgstr "Tipo"
+
+msgid "Notes"
+msgstr "Notas"
+
+msgid "Equipment type"
+msgstr "Tipo de equipo"
+
+msgid "Edit"
+msgstr "Editar"
+
+msgid "Back"
+msgstr "Volver"
+
+msgid "Add Equipment"
+msgstr "Agregar Equipo"
+
+msgid "Equipment added."
+msgstr "Equipo agregado."
+
+msgid "Equipment updated."
+msgstr "Equipo actualizado."
+
+msgid "Edit Equipment"
+msgstr "Editar Equipo"
+
+msgid "Seed initial data: class slots, equipment, and sample clients"
+msgstr "Datos iniciales: bloques de clase, equipos y clientes de ejemplo"
+
+msgid "Data seeded successfully."
+msgstr "Datos sembrados exitosamente."
+
+msgid "  Class slots already exist, skipping."
+msgstr "  Los bloques de clase ya existen, omitiendo."
+
+#, python-format
+msgid "  Created %(count)s class slots."
+msgstr "  Creados %(count)s bloques de clase."
+
+msgid "  Equipment already exists, skipping."
+msgstr "  Los equipos ya existen, omitiendo."
+
+#, python-format
+msgid "  Created %(count)s equipment items."
+msgstr "  Creados %(count)s equipos."
+
+msgid "  Clients already exist, skipping."
+msgstr "  Los clientes ya existen, omitiendo."
+
+#, python-format
+msgid "  Created %(count)s clients."
+msgstr "  Creados %(count)s clientes."
+
+#, python-format
+msgid "%(client)s – %(equipment)s – %(date)s"
+msgstr "%(client)s – %(equipment)s – %(date)s"
+
+#, python-format
+msgid "Reservation #%(pk)s"
+msgstr "Reserva #%(pk)s"
+
+msgid "Client"
+msgstr "Cliente"
+
+msgid "Created by"
+msgstr "Creado por"
+
+msgid "Create Reservation"
+msgstr "Crear Reserva"
+
+msgid "Reservations"
+msgstr "Reservaciones"
+
+msgid "Filter"
+msgstr "Filtrar"
+
+msgid "No reservations found."
+msgstr "No se encontraron reservaciones."
+
+msgid "Reservation created."
+msgstr "Reserva creada."
+
+msgid "Cardio Equipment Reservation"
+msgstr "Reserva de Equipo de Cardio"
+
+msgid "Cardio Reservation"
+msgstr "Reserva de Cardio"
+
+msgid "Clients"
+msgstr "Clientes"
+
+msgid "Schedule"
+msgstr "Horario"
+
+msgid "Admin"
+msgstr "Admin"
+
+msgid "Logout"
+msgstr "Cerrar sesión"
+
+msgid "Login"
+msgstr "Iniciar sesión"
+
+msgid "Classes"
+msgstr "Clases"
+
+msgid "Class slot"
+msgstr "Bloque de clase"
+
+msgid "Class slots"
+msgstr "Bloques de clase"
+
+msgid "Reservation"
+msgstr "Reserva"
+
+msgid "Day of week"
+msgstr "Día de la semana"
+
+msgid "Is active"
+msgstr "Activo"
+
+msgid "First name"
+msgstr "Nombre"
+
+msgid "Last name"
+msgstr "Apellido"
+
+msgid "Created at"
+msgstr "Creado en"

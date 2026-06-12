@@ -1,6 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
+from django.utils.translation import gettext as _
 from .models import Client
 from .forms import ClientSearchForm, ClientForm
 
@@ -32,7 +33,7 @@ def client_create(request):
         form = ClientForm(request.POST)
         if form.is_valid():
             client = form.save()
-            messages.success(request, f"Client {client} created.")
+            messages.success(request, _("Client %s created.") % client)
             return redirect("clients:client-detail", pk=client.pk)
     else:
         form = ClientForm()
