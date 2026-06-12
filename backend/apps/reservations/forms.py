@@ -1,4 +1,5 @@
 from django import forms
+from django.utils.translation import gettext_lazy as _
 from .models import Reservation
 from apps.equipment.models import Equipment
 from apps.classes.models import ClassSlot
@@ -9,6 +10,13 @@ class ReservationForm(forms.ModelForm):
     class Meta:
         model = Reservation
         fields = ["client", "equipment", "class_slot", "date", "notes"]
+        labels = {
+            "client": _("Client"),
+            "equipment": _("Equipment"),
+            "class_slot": _("Class slot"),
+            "date": _("Date"),
+            "notes": _("Notes"),
+        }
         widgets = {
             "client": forms.Select(attrs={"class": "form-control"}),
             "equipment": forms.Select(attrs={"class": "form-control"}),

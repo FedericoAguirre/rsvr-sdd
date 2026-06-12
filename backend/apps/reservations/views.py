@@ -2,6 +2,7 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.utils import timezone
+from django.utils.translation import gettext as _
 from .models import Reservation
 from .forms import ReservationForm
 
@@ -43,7 +44,7 @@ def reservation_create(request):
             reservation = form.save(commit=False)
             reservation.created_by = request.user
             reservation.save()
-            messages.success(request, "Reservation created.")
+            messages.success(request, _("Reservation created."))
             return redirect("reservations:reservation-detail", pk=reservation.pk)
     else:
         form = ReservationForm(initial=initial)

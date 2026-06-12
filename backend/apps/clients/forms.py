@@ -1,13 +1,14 @@
 from django import forms
+from django.utils.translation import gettext_lazy as _
 from .models import Client
 
 
 class ClientSearchForm(forms.Form):
     q = forms.CharField(
-        label="Search by email or mobile",
+        label=_("Search by email or mobile"),
         max_length=100,
         required=False,
-        widget=forms.TextInput(attrs={"class": "form-control", "placeholder": "Email or mobile number..."}),
+        widget=forms.TextInput(attrs={"class": "form-control", "placeholder": _("Email or mobile number...")}),
     )
 
 

@@ -1,6 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
+from django.utils.translation import gettext as _
 from .models import ClassSlot
 
 
@@ -15,6 +16,8 @@ def class_toggle(request, pk):
     slot = get_object_or_404(ClassSlot, pk=pk)
     slot.is_active = not slot.is_active
     slot.save()
-    status = "activated" if slot.is_active else "deactivated"
-    messages.success(request, f"Class slot {slot} {status}.")
+    if slot.is_active:
+        messages.success(request, _("Class slot %s activated.") % slot)
+    else:
+        messages.success(request, _("Class slot %s deactivated.") % slot)
     return redirect("classes:class-schedule")

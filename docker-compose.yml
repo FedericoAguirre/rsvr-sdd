@@ -1,6 +1,6 @@
 services:
   db:
-    image: postgres:16
+    image: postgres:16.14-alpine3.23
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-rsvr}
       POSTGRES_USER: ${POSTGRES_USER:-rsvr}

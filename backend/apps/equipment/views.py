@@ -1,6 +1,7 @@
 from django.contrib.auth.decorators import login_required, permission_required
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
+from django.utils.translation import gettext as _
 from .models import Equipment
 from .forms import EquipmentForm
 
@@ -23,11 +24,11 @@ def equipment_create(request):
         form = EquipmentForm(request.POST)
         if form.is_valid():
             form.save()
-            messages.success(request, "Equipment added.")
+            messages.success(request, _("Equipment added."))
             return redirect("equipment:equipment-list")
     else:
         form = EquipmentForm()
-    return render(request, "equipment/equipment_form.html", {"form": form, "title": "Add Equipment"})
+    return render(request, "equipment/equipment_form.html", {"form": form, "title": _("Add Equipment")})
 
 
 @login_required
@@ -37,8 +38,8 @@ def equipment_edit(request, pk):
         form = EquipmentForm(request.POST, instance=equipment)
         if form.is_valid():
             form.save()
-            messages.success(request, "Equipment updated.")
+            messages.success(request, _("Equipment updated."))
             return redirect("equipment:equipment-list")
     else:
         form = EquipmentForm(instance=equipment)
-    return render(request, "equipment/equipment_form.html", {"form": form, "title": "Edit Equipment"})
+    return render(request, "equipment/equipment_form.html", {"form": form, "title": _("Edit Equipment")})

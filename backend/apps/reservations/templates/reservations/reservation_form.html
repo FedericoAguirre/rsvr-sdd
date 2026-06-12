@@ -1,7 +1,8 @@
 {% extends "base.html" %}
-{% block title %}New Reservation{% endblock %}
+{% load i18n %}
+{% block title %}{% translate "New Reservation" %}{% endblock %}
 {% block content %}
-<h2 class="mb-4">New Reservation</h2>
+<h2 class="mb-4">{% translate "New Reservation" %}</h2>
 <form method="post" class="row g-3">
     {% csrf_token %}
     {% for field in form %}
@@ -12,8 +13,8 @@
     </div>
     {% endfor %}
     <div class="col-12">
-        <button type="submit" class="btn btn-primary">Create Reservation</button>
-        <a href="{% url 'reservations:reservation-list' %}" class="btn btn-secondary">Cancel</a>
+        <button type="submit" class="btn btn-primary">{% translate "Create Reservation" %}</button>
+        <a href="{% url 'reservations:reservation-list' %}" class="btn btn-secondary">{% translate "Cancel" %}</a>
     </div>
 </form>
 {% endblock %}
