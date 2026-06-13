@@ -1,0 +1,65 @@
+{% load i18n client_extras %}{% get_current_language as LANG %}
+
+<div id="search-results" aria-live="polite" aria-atomic="true">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <h5 class="mb-0">{{ client_count }} {% translate "Clients" %}</h5>
+        {% if q %}
+        <span class="text-muted">{% blocktranslate %}Filtered by "{{ q }}"{% endblocktranslate %}</span>
+        {% endif %}
+    </div>
+
+    {% if not_found %}
+    <div class="alert alert-warning" role="alert">{% translate "Client NOT FOUND" %}</div>
+    {% endif %}
+
+    {% if page_obj.object_list %}
+    <table class="table table-striped">
+        <thead><tr>
+            <th>{% translate "Name" %}</th>
+            <th>{% translate "Email" %}</th>
+            <th>{% translate "Mobile" %}</th>
+            <th>{% translate "Active" %}</th>
+            <th>{% translate "Created" %}</th>
+            <th></th>
+        </tr></thead>
+        <tbody>
+        {% for c in page_obj.object_list %}
+        <tr>
+            <td>{{ c.first_name|highlight:q }} {{ c.last_name|highlight:q }}</td>
+            <td>{{ c.email|default:"—" }}</td>
+            <td>{{ c.mobile|default:"—" }}</td>
+            <td>{{ c.is_active|yesno:_("Yes,No") }}</td>
+            <td>{{ c.created_at|date:"SHORT_DATE_FORMAT" }}</td>
+            <td>
+                <a href="{% url 'admin:clients_client_change' c.pk %}" class="btn btn-sm btn-outline-secondary">{% translate "Edit" %}</a>
+                <a href="{% url 'clients:client-detail' c.pk %}" class="btn btn-sm btn-outline-primary">{% translate "View" %}</a>
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    {% if page_obj.paginator.num_pages > 1 %}
+    <nav aria-label="{% translate 'Client list pagination' %}">
+        <ul class="pagination">
+            {% if page_obj.has_previous %}
+            <li class="page-item"><a class="page-link" href="?page=1{% if q %}&q={{ q }}{% endif %}" hx-get="?page=1{% if q %}&q={{ q }}{% endif %}" hx-target="#search-results">&laquo; {% translate "First" %}</a></li>
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if q %}&q={{ q }}{% endif %}" hx-get="?page={{ page_obj.previous_page_number }}{% if q %}&q={{ q }}{% endif %}" hx-target="#search-results">{% translate "Previous" %}</a></li>
+            {% endif %}
+            {% for num in page_obj.paginator.page_range %}
+            <li class="page-item{% if num == page_obj.number %} active{% endif %}">
+                <a class="page-link" href="?page={{ num }}{% if q %}&q={{ q }}{% endif %}" hx-get="?page={{ num }}{% if q %}&q={{ q }}{% endif %}" hx-target="#search-results">{{ num }}</a>
+            </li>
+            {% endfor %}
+            {% if page_obj.has_next %}
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}{% if q %}&q={{ q }}{% endif %}" hx-get="?page={{ page_obj.next_page_number }}{% if q %}&q={{ q }}{% endif %}" hx-target="#search-results">{% translate "Next" %}</a></li>
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if q %}&q={{ q }}{% endif %}" hx-get="?page={{ page_obj.paginator.num_pages }}{% if q %}&q={{ q }}{% endif %}" hx-target="#search-results">{% translate "Last" %} &raquo;</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+    {% else %}
+    <p class="text-muted">{% translate "Start typing to search clients..." %}</p>
+    {% endif %}
+</div>
+</parameter>
