@@ -3,6 +3,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.core.paginator import Paginator
 from django.utils.translation import gettext as _
+import django.db.models as models
 from .models import Client
 from .forms import ClientSearchForm, ClientForm
 
@@ -13,27 +14,29 @@ def client_search(request):
     q = ""
     if form.is_valid():
         q = form.cleaned_data.get("q", "")
+    filters = models.Q(email__icontains=q) | models.Q(mobile__icontains=q)
+    if q and len(q) >= 3:
+        filters |= models.Q(first_name__icontains=q) | models.Q(last_name__icontains=q)
     if q:
-        clients = Client.objects.filter(
-            models.Q(email__icontains=q) | models.Q(mobile__icontains=q)
-        ).order_by("last_name", "first_name")
+        clients = Client.objects.filter(filters).order_by("last_name", "first_name")
     else:
         clients = Client.objects.all().order_by("last_name", "first_name")
     paginator = Paginator(clients, 10)
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
     client_count = Client.objects.count()
-    return render(
-        request,
-        "clients/search.html",
-        {
-            "form": form,
-            "page_obj": page_obj,
-            "results": page_obj.object_list,
-            "q": q,
-            "client_count": client_count,
-        },
-    )
+    not_found = bool(q) and not page_obj.object_list
+    context = {
+        "form": form,
+        "page_obj": page_obj,
+        "results": page_obj.object_list,
+        "q": q,
+        "client_count": client_count,
+        "not_found": not_found,
+    }
+    if request.headers.get("HX-Request"):
+        return render(request, "clients/_search_results.html", context)
+    return render(request, "clients/search.html", context)
 
 
 @login_required
@@ -54,6 +57,3 @@ def client_create(request):
     else:
         form = ClientForm()
     return render(request, "clients/client_form.html", {"form": form})
-
-
-import django.db.models as models
