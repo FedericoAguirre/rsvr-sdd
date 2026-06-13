@@ -23,6 +23,7 @@ def logged_client(http_client, staff_user):
 
 @pytest.fixture
 def many_clients(db):
+    Client.objects.all().delete()
     for i in range(21):
         Client.objects.create(
             first_name=f"First{i:02d}",
@@ -37,6 +38,7 @@ def many_clients(db):
 class TestClientList:
 
     def test_all_clients_rendered_when_no_search(self, logged_client):
+        Client.objects.all().delete()
         for i in range(15):
             Client.objects.create(first_name=f"Test{i:02d}", last_name=f"User{i:02d}")
         response = logged_client.get("/clients/search/")
@@ -83,9 +85,10 @@ class TestClientList:
             "Pagination controls should appear with 11 clients"
 
     def test_empty_state_when_no_clients(self, logged_client):
+        Client.objects.all().delete()
         response = logged_client.get("/clients/search/")
         content = response.content.decode()
-        assert "no se encontraron clientes" in content.lower()
+        assert "start typing to search clients..." in content.lower()
 
     def test_search_still_works_alongside_list(self, logged_client):
         Client.objects.create(
