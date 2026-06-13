@@ -49,6 +49,8 @@ messages MUST be actionable (state what went wrong AND how to fix it).
 CLI output MUST support both human-readable and JSON formats. Every
 feature MUST include user-facing documentation updated in the same PR.
 
+All text labels MUST be translated into Spanish using i18n package.
+
 ### IV. Performance Requirements
 
 Every feature MUST define measurable performance criteria before
@@ -74,6 +76,13 @@ Each user story MUST be independently testable and deliverable as an MVP
 increment. Code quality, UX, and performance checks MUST pass before
 merge.
 
+Before creating a PR, an AI session markdown file must be saved in the ai/sessions folder.
+The session must be compressed before saving.
+The name of the session file must be compound of the LLM model, feature, and timestamp.
+
+If the feature was defined from a ai/features/todos file, move that file into the ai/features/done folder.
+Adding the next requests, to the LLM Agent that were not included in the first file version.
+
 ## Governance
 
 This constitution supersedes all other practices and is the single source
@@ -90,4 +99,4 @@ only clarified. All project artifacts follow MAJOR.MINOR.PATCH semantic
 versioning. Breaking changes MUST increment MAJOR; new backward-
 compatible functionality increments MINOR; bug fixes increment PATCH.
 
-**Version**: 2.0.0 | **Ratified**: 2026-06-07 | **Last Amended**: 2026-06-07
+**Version**: 2.0.1 | **Ratified**: 2026-06-07 | **Last Amended**: 2026-06-12
