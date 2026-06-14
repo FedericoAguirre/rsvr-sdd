@@ -24,8 +24,8 @@ description: "Task list for creating reservations list per class slot"
 
 **Purpose**: Project initialization and review existing codebase
 
-- [ ] T001 Create feature branch `008-reservation-lists` from main
-- [ ] T002 [P] Review existing Reservation model, views, and URL patterns in `backend/apps/reservations/`
+- [X] T001 Create feature branch `008-reservation-lists` from main
+- [X] T002 [P] Review existing Reservation model, views, and URL patterns in `backend/apps/reservations/`
 
 ---
 
@@ -35,9 +35,9 @@ description: "Task list for creating reservations list per class slot"
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T003 Install WeasyPrint system dependencies (`libpango-1.0-0`, `libcairo2`, `libgdk-pixbuf2.0-0`) in Dockerfile at `backend/Dockerfile`
-- [ ] T004 Add `weasyprint` to project dependencies in `backend/pyproject.toml`
-- [ ] T005 [P] Review existing test patterns in `backend/tests/test_client_list.py` for conventions (fixtures, auth, assertions)
+- [X] T003 Install WeasyPrint system dependencies (`libpango-1.0-0`, `libcairo2`, `libgdk-pixbuf2.0-0`) in Dockerfile at `backend/Dockerfile`
+- [X] T004 Add `weasyprint` to project dependencies in `backend/pyproject.toml`
+- [X] T005 [P] Review existing test patterns in `backend/tests/test_client_list.py` for conventions (fixtures, auth, assertions)
 
 **Checkpoint**: Foundation ready — user story implementation can now begin
 
@@ -51,18 +51,18 @@ description: "Task list for creating reservations list per class slot"
 
 ### Tests for User Story 1 (TDD — write first, ensure they FAIL) ⚠️
 
-- [ ] T006 [P] [US1] Write test for list page rendering with header (date + class slot name) in `backend/tests/test_reservations_list.py`
-- [ ] T007 [P] [US1] Write test for equipment-client table ordered alphabetically by equipment name in `backend/tests/test_reservations_list.py`
-- [ ] T008 [P] [US1] Write test for empty state (no reservations — header shown, empty table) in `backend/tests/test_reservations_list.py`
-- [ ] T009 [P] [US1] Write test for unauthenticated user being redirected to login in `backend/tests/test_reservations_list.py`
+- [X] T006 [P] [US1] Write test for list page rendering with header (date + class slot name) in `backend/tests/test_reservations_list.py`
+- [X] T007 [P] [US1] Write test for equipment-client table ordered alphabetically by equipment name in `backend/tests/test_reservations_list.py`
+- [X] T008 [P] [US1] Write test for empty state (no reservations — header shown, empty table) in `backend/tests/test_reservations_list.py`
+- [X] T009 [P] [US1] Write test for unauthenticated user being redirected to login in `backend/tests/test_reservations_list.py`
 
 ### Implementation for User Story 1
 
-- [ ] T010 [US1] Create `reservation_list_by_slot` view in `backend/apps/reservations/views.py` that filters by class_slot and date, orders by equipment__name, and passes query results to template
-- [ ] T011 [US1] Add URL pattern for the list view at `reservations/list/` in `backend/apps/reservations/urls.py`
-- [ ] T012 [P] [US1] Create `reservation_list.html` template in `backend/apps/reservations/templates/reservations/` with header (date + class slot name), ordered equipment-client table, and export button for PDF
-- [ ] T013 [US1] Add i18n labels (`gettext_lazy`) for all UI text in the new template and view
-- [ ] T014 [US1] Verify tests pass: run `pytest tests/test_reservations_list.py -v`
+- [X] T010 [US1] Create `reservation_list_by_slot` view in `backend/apps/reservations/views.py` that filters by class_slot and date, orders by equipment__name, and passes query results to template
+- [X] T011 [US1] Add URL pattern for the list view at `reservations/list/` in `backend/apps/reservations/urls.py`
+- [X] T012 [P] [US1] Create `reservation_list_by_slot.html` template in `backend/apps/reservations/templates/reservations/` with header (date + class slot name), ordered equipment-client table
+- [X] T013 [US1] Add i18n labels (`gettext_lazy`) for all UI text in the new template and view
+- [X] T014 [US1] Verify tests pass: run `pytest tests/test_reservations_list.py -v`
 
 **Checkpoint**: At this point, User Story 1 should be fully functional — the reservations list page works for any class slot and date combination
 
@@ -76,18 +76,18 @@ description: "Task list for creating reservations list per class slot"
 
 ### Tests for User Story 2 (TDD — write first, ensure they FAIL) ⚠️
 
-- [ ] T015 [P] [US2] Write test for PDF download returns correct content type (`application/pdf`) in `backend/tests/test_reservations_list.py`
-- [ ] T016 [P] [US2] Write test for PDF with empty reservations list (header present, empty table) in `backend/tests/test_reservations_list.py`
-- [ ] T017 [P] [US2] Write test for PDF export button visible on list page in `backend/tests/test_reservations_list.py`
+- [X] T015 [P] [US2] Write test for PDF download returns correct content type (`application/pdf`) in `backend/tests/test_reservations_list.py`
+- [X] T016 [P] [US2] Write test for PDF with empty reservations list (header present, empty table) in `backend/tests/test_reservations_list.py`
+- [X] T017 [P] [US2] Write test for PDF export button visible on list page in `backend/tests/test_reservations_list.py`
 
 ### Implementation for User Story 2
 
-- [ ] T018 [US2] Create `reservation_list_pdf` view in `backend/apps/reservations/views.py` that generates PDF via WeasyPrint from the filtered reservation data
-- [ ] T019 [US2] Add URL pattern for PDF export at `reservations/list/pdf/` in `backend/apps/reservations/urls.py`
-- [ ] T020 [P] [US2] Create `reservation_list_pdf.html` template in `backend/apps/reservations/templates/reservations/` styled for print/PDF output with header and equipment-client table
-- [ ] T021 [US2] Add error handling — if PDF generation fails, show user-friendly error message with retry button (reuse existing message framework)
-- [ ] T022 [US2] Add i18n labels (`gettext_lazy`) for all text in the PDF template
-- [ ] T023 [US2] Verify tests pass: run `pytest tests/test_reservations_list.py -v`
+- [X] T018 [US2] Create `reservation_list_pdf` view in `backend/apps/reservations/views.py` that generates PDF via WeasyPrint from the filtered reservation data
+- [X] T019 [US2] Add URL pattern for PDF export at `reservations/list/pdf/` in `backend/apps/reservations/urls.py`
+- [X] T020 [P] [US2] Create `reservation_list_pdf.html` template in `backend/apps/reservations/templates/reservations/` styled for print/PDF output with header and equipment-client table
+- [X] T021 [US2] Add error handling — if PDF generation fails, show user-friendly error message with retry button (reuse existing message framework)
+- [X] T022 [US2] Add i18n labels (`gettext_lazy`) for all text in the PDF template
+- [X] T023 [US2] Verify tests pass: run `pytest tests/test_reservations_list.py -v`
 
 **Checkpoint**: Both user stories complete — reservations list viewable on screen and exportable as PDF
 
@@ -97,11 +97,11 @@ description: "Task list for creating reservations list per class slot"
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T024 [P] Update Dockerfile in `backend/Dockerfile` with WeasyPrint system dependencies (libpango, libcairo, libgdk-pixbuf)
-- [ ] T025 [P] Update `.env.example` if any new environment variables were added
-- [ ] T026 [P] Run full test suite: `pytest tests/ -v` — confirm all tests pass
-- [ ] T027 [P] Move `ai/features/todos/01_create_reservations_list_per_class.md` to `ai/features/done/`
-- [ ] T028 Run quickstart.md verification steps to confirm feature works end-to-end
+- [X] T024 [P] Update Dockerfile in `backend/Dockerfile` with WeasyPrint system dependencies (libpango, libcairo, libgdk-pixbuf)
+- [X] T025 [P] Update `.env.example` if any new environment variables were added
+- [X] T026 [P] Run full test suite: `pytest tests/ -v` — confirm all tests pass
+- [X] T027 [P] Move `ai/features/todos/01_create_reservations_list_per_class.md` to `ai/features/done/`
+- [X] T028 Run quickstart.md verification steps to confirm feature works end-to-end
 
 ---
 

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+{% load i18n %}
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>{% translate "Reservations by Class" %}</title>
+    <style>
+        body { font-family: sans-serif; font-size: 12pt; margin: 2cm; }
+        h2 { text-align: center; margin-bottom: 1em; }
+        .header { margin-bottom: 1em; text-align: center; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #333; padding: 6px; text-align: left; }
+        th { background-color: #eee; }
+    </style>
+</head>
+<body>
+    <h2>{% translate "Reservations by Class" %}</h2>
+    <div class="header">
+        <strong>{% translate "Date" %}:</strong> {{ date_str }} &mdash;
+        <strong>{% translate "Class" %}:</strong> {{ class_slot }}
+    </div>
+    {% if reservations %}
+    <table>
+        <thead>
+            <tr>
+                <th>{% translate "Equipment" %}</th>
+                <th>{% translate "Client" %}</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for r in reservations %}
+            <tr>
+                <td>{{ r.equipment.name }}</td>
+                <td>{{ r.client }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>{% translate "No reservations found for this class and date." %}</p>
+    {% endif %}
+</body>
+</html>
