@@ -6,7 +6,7 @@
 
 **Status**: Draft
 
-**Input**: User description: "create the spec from @ai/features/todos/01_create_reservations_list_per_class.md"
+**Input**: User description: "create the spec from @ai/features/todos/01_create_reservations_list_per_class.md" and "Add the next spec @ai/features/todos/01a_Modify_reservations.md into the current feature"
 
 ## Clarifications
 
@@ -17,6 +17,7 @@
 - Q: Which user roles can access the reservations list? → A: Both Operators and Administrators can view and export the reservations list.
 - Q: What happens if PDF export or data loading fails? → A: Show a user-friendly error message with a retry button.
 - Q: What language/locale should the list header and UI use? → A: Use the system's configured language; display header labels and data as stored in the system.
+- Q: (spec amendment) Modify main Reservations page with class slot filter and per-slot table → A: Integrated as User Story 3 (P2)
 
 ## User Scenarios & Testing
 
@@ -50,6 +51,23 @@ An Operator or Administrator downloads the equipment reservations list for a giv
 1. **Given** the Operator is viewing a reservations list, **When** they click the export button, **Then** a PDF file is downloaded containing the same header and table data as the on-screen list
 2. **Given** the Operator views an empty reservations list, **When** they export to PDF, **Then** the PDF is still generated with the header and an empty table
 
+### User Story 3 - Modify main Reservations page with class slot filter (Priority: P2)
+
+The main Reservations page (`/reservations/`) is updated to include a class slot filter alongside the existing date filter, and the table displays the reservation-list-by-slot data showing equipment names with their assigned clients. The "New Reservation" button is preserved.
+
+**Why this priority**: Improves the existing workflow by integrating the per-slot list into the main page, but the separate `/reservations/list/` page already provides the functionality.
+
+**Independent Test**: Navigate to `/reservations/` as an Operator — the page shows a class slot filter, date filter, "New Reservation" button, and a table of equipment-client pairs filtered by the selected class slot and date.
+
+**Acceptance Scenarios**:
+
+1. **Given** the Operator is on the main Reservations page, **When** they select a Class slot and date and apply the filter, **Then** the table displays equipment names and their corresponding client names ordered by equipment name
+2. **Given** the Operator is on the main Reservations page, **When** no class slot or date filter is selected, **Then** the table shows all reservations (existing behavior)
+3. **Given** the Operator is on the main Reservations page, **When** they view the page, **Then** the "New Reservation" button is visible and functional
+4. **Given** the Operator is on the main Reservations page with a class slot filter active, **When** there are no reservations for the selected slot and date, **Then** the table is empty with an appropriate message
+
+---
+
 ### Edge Cases
 
 - What happens when a Class slot has no equipment reservations for the selected date? An empty list/table is shown with the header intact.
@@ -57,6 +75,8 @@ An Operator or Administrator downloads the equipment reservations list for a giv
 - What happens if the Operator selects a future date with no reservations yet? The list shows an empty table — the Operator can still view and export it.
 - What happens if the selected Class slot does not exist (e.g., was deleted)? The system should show an appropriate message rather than an empty or broken list.
 - What happens if PDF export fails (e.g., network error, server timeout)? A user-friendly error message is displayed with a retry button.
+- What happens when the main reservations page loads without any filters selected? All reservations are shown (existing behavior preserved).
+- What happens if the class slot filter is changed while a date filter is already set? The table updates to show reservations matching both filters simultaneously.
 
 ## Requirements
 
@@ -69,6 +89,9 @@ An Operator or Administrator downloads the equipment reservations list for a giv
 - **FR-005**: The system MUST allow the Operator to export the displayed reservations list as a PDF document
 - **FR-006**: The exported PDF MUST contain the same date, class slot name, and equipment-client table as the on-screen view
 - **FR-007**: The system MUST handle the case where no reservations exist for the selected combination by showing an empty table (with header still present)
+- **FR-008**: The main Reservations page MUST include a class slot filter (dropdown) in addition to the existing date filter
+- **FR-009**: When a class slot is selected as filter, the reservations table MUST display equipment names with client names ordered by equipment name (as in the per-slot list view)
+- **FR-010**: The "New Reservation" button MUST remain visible and functional on the modified Reservations page
 
 ### Key Entities
 
@@ -86,6 +109,8 @@ An Operator or Administrator downloads the equipment reservations list for a giv
 - **SC-003**: The PDF export completes within 5 seconds and downloads a correctly formatted document
 - **SC-004**: Equipment names are consistently displayed in alphabetical order across all views and exports
 - **SC-005**: An Operator can successfully view reservations lists for any combination of past, present, or future dates and class slots
+- **SC-006**: An Operator can apply a class slot filter on the main Reservations page in 1 click from the page load
+- **SC-007**: The main Reservations page preserves all existing functionality (date filter, New Reservation button, all-reservations table when unfiltered)
 
 ## Assumptions
 

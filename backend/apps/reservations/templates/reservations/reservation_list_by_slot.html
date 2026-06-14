@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% translate "Reservations by Class" %}{% endblock %}
+{% block content %}
+<h2 class="mb-4">{% translate "Reservations by Class" %}</h2>
+
+{% if class_slot %}
+<div class="mb-3">
+    <strong>{% translate "Date" %}:</strong> {{ date_display }} &mdash;
+    <strong>{% translate "Class" %}:</strong> {{ class_slot }}
+</div>
+{% endif %}
+
+{% if reservations %}
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>{% translate "Equipment" %}</th>
+            <th>{% translate "Client" %}</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for r in reservations %}
+        <tr>
+            <td>{{ r.equipment.name }}</td>
+            <td>{{ r.client }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p class="text-muted">{% translate "No reservations found for this class and date." %}</p>
+{% endif %}
+
+<div class="mt-3">
+    <a href="{% url 'reservations:reservation-list' %}" class="btn btn-secondary">{% translate "Back" %}</a>
+    {% if class_slot %}
+    <a href="{% url 'reservations:reservation-list-pdf' %}?class_slot={{ class_slot.pk }}&date={{ date_str }}" class="btn btn-primary">{% translate "Export PDF" %}</a>
+    {% endif %}
+</div>
+{% endblock %}
