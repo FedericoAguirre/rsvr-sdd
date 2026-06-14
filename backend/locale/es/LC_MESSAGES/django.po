@@ -153,6 +153,9 @@ msgstr "Elíptica"
 msgid "Rowing Machine"
 msgstr "Máquina de remo"
 
+msgid "Climber"
+msgstr "Escaladora"
+
 msgid "Other"
 msgstr "Otro"
 

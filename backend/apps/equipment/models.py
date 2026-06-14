@@ -4,6 +4,7 @@ from django.utils.translation import gettext_lazy as _
 
 class Equipment(models.Model):
     EQUIPMENT_TYPES = [
+        ("climber", _("Climber")),
         ("treadmill", _("Treadmill")),
         ("bike", _("Stationary Bike")),
         ("elliptical", _("Elliptical")),
