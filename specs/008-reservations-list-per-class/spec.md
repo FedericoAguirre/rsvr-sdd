@@ -8,11 +8,21 @@
 
 **Input**: User description: "create the spec from @ai/features/todos/01_create_reservations_list_per_class.md"
 
+## Clarifications
+
+### Session 2026-06-14
+
+- Q: Can one client reserve multiple equipment items and can multiple clients reserve the same equipment? → A: One Client can reserve only one piece of Equipment per class slot, and each Equipment can be reserved by only one Client per slot (1:1 mapping per slot).
+- Q: Should cancelled or expired reservations appear in the list? → A: Show only active/confirmed reservations; exclude cancelled/expired.
+- Q: Which user roles can access the reservations list? → A: Both Operators and Administrators can view and export the reservations list.
+- Q: What happens if PDF export or data loading fails? → A: Show a user-friendly error message with a retry button.
+- Q: What language/locale should the list header and UI use? → A: Use the system's configured language; display header labels and data as stored in the system.
+
 ## User Scenarios & Testing
 
 ### User Story 1 - View reservations list for a class slot and date (Priority: P1)
 
-An Operator selects a Class slot and a date, and the system displays a list of all equipment reservations for that class slot on that date. The list includes the date and class slot name in the header, and shows a table of equipment names with the clients that reserved them, ordered by equipment name.
+An Operator or Administrator selects a Class slot and a date, and the system displays a list of all equipment reservations for that class slot on that date. The list includes the date and class slot name in the header, and shows a table of equipment names with the clients that reserved them, ordered by equipment name.
 
 **Why this priority**: Core functionality — without being able to view the list, the feature has no value.
 
@@ -29,7 +39,7 @@ An Operator selects a Class slot and a date, and the system displays a list of a
 
 ### User Story 2 - Export reservations list to PDF (Priority: P2)
 
-An Operator downloads the equipment reservations list for a given class slot and date as a PDF document for offline use, sharing, or record-keeping.
+An Operator or Administrator downloads the equipment reservations list for a given class slot and date as a PDF document for offline use, sharing, or record-keeping.
 
 **Why this priority**: The PDF export adds practical utility but the feature is still valuable without it — the Operator can view the list on screen.
 
@@ -43,15 +53,16 @@ An Operator downloads the equipment reservations list for a given class slot and
 ### Edge Cases
 
 - What happens when a Class slot has no equipment reservations for the selected date? An empty list/table is shown with the header intact.
-- What happens when multiple clients have reserved the same equipment? Each reservation appears as a separate row or the client names are listed together for that equipment.
+- What happens when multiple clients have reserved the same equipment? This does not occur — each piece of Equipment can be reserved by at most one Client per class slot.
 - What happens if the Operator selects a future date with no reservations yet? The list shows an empty table — the Operator can still view and export it.
 - What happens if the selected Class slot does not exist (e.g., was deleted)? The system should show an appropriate message rather than an empty or broken list.
+- What happens if PDF export fails (e.g., network error, server timeout)? A user-friendly error message is displayed with a retry button.
 
 ## Requirements
 
 ### Functional Requirements
 
-- **FR-001**: The system MUST allow an Operator to select a Class slot from the available slots
+- **FR-001**: The system MUST allow an Operator or Administrator to select a Class slot from the available slots
 - **FR-002**: The system MUST allow an Operator to select or enter a date
 - **FR-003**: The system MUST display a reservations list that includes the selected date and class slot name in the header
 - **FR-004**: The system MUST display a table of equipment names with their corresponding client names, ordered alphabetically by equipment name
@@ -64,7 +75,7 @@ An Operator downloads the equipment reservations list for a given class slot and
 - **Class Slot**: Represents a scheduled class time slot (e.g., "Morning Yoga", "Evening Climbing"). Identified by name and scheduled time.
 - **Equipment**: A piece of gym equipment that can be reserved by clients. Key attributes: name, type, status.
 - **Client**: A gym member or user who can reserve equipment. Key attributes: name, membership details.
-- **Reservation**: The association between a Client, a piece of Equipment, and a Class Slot for a specific date.
+- **Reservation**: The association between a Client, a piece of Equipment, and a Class Slot for a specific date. A Client may reserve at most one piece of Equipment per Class Slot per date, and each piece of Equipment may be reserved by at most one Client per Class Slot per date (1:1 mapping per slot). Each reservation has a status (active/confirmed or cancelled/expired). The reservations list shows only active/confirmed reservations.
 
 ## Success Criteria
 
@@ -84,3 +95,4 @@ An Operator downloads the equipment reservations list for a given class slot and
 - PDF generation uses a standard browser-based or server-side approach (e.g., print-to-PDF or PDF library)
 - The existing class slot selection and date picker UI patterns are reused for this feature
 - Alphabetical ordering follows standard lexicographic order by equipment name
+- The list UI uses the system's configured language/locale for all header labels and messages
