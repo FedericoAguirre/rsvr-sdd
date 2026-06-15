@@ -60,12 +60,12 @@ class TestClientSearchByName:
         response = logged_client.get("/clients/search/?q=MAR")
         content = response.content.decode()
         assert "<mark>Mar</mark>" in content
-        assert "NOT FOUND" not in content
+        assert "NO ENCONTRADO" not in content
 
     def test_min_3_chars_does_not_trigger_name_search(self, logged_client, sample_clients):
         response = logged_client.get("/clients/search/?q=zz")
         content = response.content.decode()
-        assert "NOT FOUND" in content
+        assert "NO ENCONTRADO" in content
 
     def test_search_across_both_name_fields(self, logged_client, sample_clients):
         response = logged_client.get("/clients/search/?q=Mar")
@@ -98,15 +98,15 @@ class TestClientSearchNotFound:
     def test_not_found_message_appears_when_no_match(self, logged_client, sample_clients):
         response = logged_client.get("/clients/search/?q=Zzzz")
         content = response.content.decode()
-        assert "NOT FOUND" in content
+        assert "NO ENCONTRADO" in content
 
     def test_not_found_disappears_when_search_modified(self, logged_client, sample_clients):
         response = logged_client.get("/clients/search/?q=Zzzz")
         content = response.content.decode()
-        assert "NOT FOUND" in content
+        assert "NO ENCONTRADO" in content
         response = logged_client.get("/clients/search/?q=Joh")
         content = response.content.decode()
-        assert "NOT FOUND" not in content
+        assert "NO ENCONTRADO" not in content
 
 
 @pytest.mark.django_db

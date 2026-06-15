@@ -101,7 +101,7 @@ msgid "Class"
 msgstr "Clase"
 
 msgid "Equipment"
-msgstr "Equipos"
+msgstr "Equipo"
 
 msgid "No reservations yet."
 msgstr "Sin reservas aún."
@@ -140,6 +140,35 @@ msgstr "No se encontraron clientes."
 #, python-format
 msgid "Client %s created."
 msgstr "Cliente %s creado."
+
+#: apps/clients/templates/clients/search.html:17
+msgid "Searching..."
+msgstr "Búsqueda..."
+
+#: apps/clients/forms.py:11
+msgid "Search clients..."
+msgstr "Buscar clientes..."
+
+#: apps/clients/templates/clients/_search_results.html:7
+#, python-format
+msgid "Filtered by \"%(q)s\""
+msgstr "Filtrado por \"%(q)s\""
+
+#: apps/clients/templates/clients/_search_results.html:12
+msgid "Client NOT FOUND"
+msgstr "Cliente NO ENCONTRADO"
+
+#: apps/clients/templates/clients/_search_results.html:62
+msgid "Start typing to search clients..."
+msgstr "Empiece a escribir para buscar clientes..."
+
+#: apps/clients/templates/clients/_search_results.html:55
+msgid "Next"
+msgstr "Siguiente"
+
+#: apps/clients/templates/clients/_search_results.html:56
+msgid "Last"
+msgstr "Último"
 
 msgid "Treadmill"
 msgstr "Cinta de correr"

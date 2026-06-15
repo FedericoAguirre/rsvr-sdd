@@ -88,7 +88,7 @@ class TestClientList:
         Client.objects.all().delete()
         response = logged_client.get("/clients/search/")
         content = response.content.decode()
-        assert "start typing to search clients..." in content.lower()
+        assert "empiece a escribir para buscar clientes..." in content.lower()
 
     def test_search_still_works_alongside_list(self, logged_client):
         Client.objects.create(
