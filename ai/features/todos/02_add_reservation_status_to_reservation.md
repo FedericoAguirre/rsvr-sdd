@@ -1,4 +1,4 @@
-# Add assistance flag to a reservation
+# Add reservation status to a reservation
 
 ## Description
 
