@@ -298,3 +298,9 @@ msgstr "Apellido"
 
 msgid "Created at"
 msgstr "Creado en"
+
+msgid "Reservations by Class"
+msgstr "Reservaciones por Clase"
+
+msgid "Export PDF"
+msgstr "Exportar PDF"
