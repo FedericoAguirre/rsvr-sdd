@@ -1,5 +1,5 @@
 <!-- SPECKIT START -->
 For additional context about technologies to be used, project structure,
 shell commands, and other important information, read the current plan at
-`specs/008-reservations-list-per-class/plan.md`
+`specs/009-remove-email-from-list/plan.md`
 <!-- SPECKIT END -->
