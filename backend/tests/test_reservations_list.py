@@ -63,6 +63,63 @@ def reservations_for_slot(db, class_slot, equipment_list, client_list, staff_use
         )
 
 
+@pytest.fixture
+def client_list_with_email(db):
+    return [
+        Client.objects.create(first_name="Alice", last_name="A", email="alice@test.com"),
+        Client.objects.create(first_name="Bob", last_name="B", email="bob@test.com"),
+        Client.objects.create(first_name="Charlie", last_name="C"),
+        Client.objects.create(first_name="Diana", last_name="D", mobile="555-0100"),
+    ]
+
+
+@pytest.fixture
+def reservations_with_email(db, class_slot, equipment_list, client_list_with_email, staff_user):
+    date = "2026-06-15"
+    for i, (equip, client) in enumerate(zip(equipment_list, client_list_with_email)):
+        Reservation.objects.create(
+            client=client,
+            equipment=equip,
+            class_slot=class_slot,
+            date=date,
+            created_by=staff_user,
+        )
+
+
+@pytest.mark.django_db
+class TestClientColumnNoEmail:
+
+    def test_full_list_has_no_email(self, logged_client, reservations_with_email):
+        response = logged_client.get("/reservations/list/")
+        content = response.content.decode()
+        assert "alice@test.com" not in content
+        assert "bob@test.com" not in content
+
+    def test_by_slot_has_no_email(self, logged_client, class_slot, reservations_with_email):
+        response = logged_client.get(
+            f"/reservations/list/?class_slot={class_slot.pk}&date=2026-06-15"
+        )
+        content = response.content.decode()
+        assert "alice@test.com" not in content
+        assert "bob@test.com" not in content
+
+    def test_pdf_has_no_email(self, logged_client, class_slot, reservations_with_email):
+        response = logged_client.get(
+            f"/reservations/list/pdf/?class_slot={class_slot.pk}&date=2026-06-15"
+        )
+        assert b"alice@test.com" not in response.content
+        assert b"bob@test.com" not in response.content
+
+    def test_no_fallback_text(self, logged_client, class_slot, reservations_with_email):
+        response = logged_client.get(
+            f"/reservations/list/?class_slot={class_slot.pk}&date=2026-06-15"
+        )
+        content = response.content.decode()
+        assert "(no contact)" not in content
+        assert "alice@test.com" not in content
+        assert "555-0100" not in content
+
+
 @pytest.mark.django_db
 class TestReservationsList:
 

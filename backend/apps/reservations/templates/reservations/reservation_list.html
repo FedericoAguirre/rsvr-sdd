@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load i18n %}
+{% load reservation_extras %}
 {% block title %}{% translate "Reservations" %}{% endblock %}
 {% block content %}
 <h2 class="mb-4">{% translate "Reservations" %}</h2>
@@ -43,7 +44,7 @@
       {% for r in reservations %}
           <tr>
               <td>{{ r.equipment.name }}</td>
-              <td>{{ r.client }}</td>
+              <td>{{ r.client|full_name }}</td>
           </tr>
       {% endfor %}
       </tbody>
@@ -55,7 +56,7 @@
       {% for r in reservations %}
       <tr>
           <td>{{ r.date }}</td>
-          <td>{{ r.client }}</td>
+          <td>{{ r.client|full_name }}</td>
           <td>{{ r.class_slot }}</td>
           <td>{{ r.equipment }}</td>
           <td><a href="{% url 'reservations:reservation-detail' r.pk %}" class="btn btn-sm btn-outline-primary">{% translate "View" %}</a></td>
