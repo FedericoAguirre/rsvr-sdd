@@ -32,3 +32,4 @@
 ## Notes
 
 - All items pass validation.
+- Spec amended 2026-06-14: Added User Story 3 (modify main Reservations page) + FR-008–FR-010 + SC-006–SC-007 from `01a_Modify_reservations.md`.

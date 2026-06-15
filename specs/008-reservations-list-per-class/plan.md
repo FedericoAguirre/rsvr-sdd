@@ -6,7 +6,7 @@
 
 ## Summary
 
-Add a reservations list page for Operators and Administrators to view equipment-to-client assignments for a given class slot and date, with PDF export. The list shows active reservations in a table ordered by equipment name.
+Add a reservations list page for Operators and Administrators to view equipment-to-client assignments for a given class slot and date, with PDF export. The list shows active reservations in a table ordered by equipment name. Additionally, the main Reservations page (`/reservations/`) is updated with a class slot filter and displays the per-slot equipment-client table when both class slot and date are selected.
 
 ## Technical Context
 
@@ -69,7 +69,8 @@ backend/
 │       ├── urls.py       # + new URL patterns
 │       └── templates/
 │           └── reservations/
-│               ├── reservation_list.html      # New: list page
+│               ├── reservation_list.html      # Modified: class slot filter + per-slot table
+│               ├── reservation_list_by_slot.html  # New: per-slot list page
 │               └── reservation_list_pdf.html  # New: PDF template
 ├── templates/
 │   └── base.html         # Shared Bootstrap 5 layout
