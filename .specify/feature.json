@@ -1,1 +1,3 @@
-{"feature_directory": "specs/009-remove-email-from-list"}
+{
+  "feature_directory": "specs/010-pdf-export-filename"
+}
