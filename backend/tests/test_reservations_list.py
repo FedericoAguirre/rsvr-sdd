@@ -126,3 +126,45 @@ class TestReservationsListPDF:
         )
         content = response.content.decode()
         assert "/reservations/list/pdf/" in content
+
+
+@pytest.mark.django_db
+class TestMainPageWithSlotFilter:
+
+    def test_class_slot_and_date_filter_shows_equipment_client_pairs(
+        self, logged_client, class_slot, reservations_for_slot
+    ):
+        response = logged_client.get(
+            f"/reservations/?class_slot={class_slot.pk}&date=2026-06-15"
+        )
+        content = response.content.decode()
+        assert "Treadmill" in content
+        assert "Alice" in content
+        assert str(class_slot) in content
+        assert "2026-06-15" in content
+
+    def test_new_reservation_button_visible_with_filter(
+        self, logged_client, class_slot, reservations_for_slot
+    ):
+        response = logged_client.get(
+            f"/reservations/?class_slot={class_slot.pk}&date=2026-06-15"
+        )
+        content = response.content.decode()
+        assert "/reservations/create/" in content
+
+    def test_main_page_shows_class_slot_dropdown(
+        self, logged_client, class_slot
+    ):
+        response = logged_client.get("/reservations/")
+        content = response.content.decode()
+        assert "class_slot" in content
+        assert str(class_slot) in content
+
+    def test_main_page_empty_state_when_no_reservations(
+        self, logged_client, class_slot
+    ):
+        response = logged_client.get(
+            f"/reservations/?class_slot={class_slot.pk}&date=2026-06-15"
+        )
+        content = response.content.decode()
+        assert "No se encontraron reservaciones" in content

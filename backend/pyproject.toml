@@ -25,3 +25,9 @@ quote-style = "double"
 [tool.pytest.ini_options]
 pythonpath = ["backend"]
 DJANGO_SETTINGS_MODULE = "config.settings"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.0",
+    "pytest-django>=4.12.0",
+]

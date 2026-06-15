@@ -16,7 +16,7 @@
 <body>
     <h2>{% translate "Reservations by Class" %}</h2>
     <div class="header">
-        <strong>{% translate "Date" %}:</strong> {{ date_str }} &mdash;
+        <strong>{% translate "Date" %}:</strong> {{ date_display }} &mdash;
         <strong>{% translate "Class" %}:</strong> {{ class_slot }}
     </div>
     {% if reservations %}
