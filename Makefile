@@ -4,7 +4,7 @@ MAKEFLAGS += --no-builtin-rules
 
 DOCKER_COMPOSE := docker-compose
 DOCKER := docker
-WEB_CONTAINER := rsvr-sdd_web_1
+WEB_CONTAINER := rsvr-sdd-web-1
 
 .PHONY: help
 help:
