@@ -56,7 +56,14 @@ def reservation_list_pdf(request):
         })
         pdf = HTML(string=html_string).write_pdf()
         response = HttpResponse(pdf, content_type="application/pdf")
-        response["Content-Disposition"] = f'attachment; filename="reservations-{date_str}.pdf"'
+        safe_name = (
+            str(class_slot).replace(" ", "_").translate(
+                str.maketrans("", "", "/" + chr(0) + '<>:"|?*')
+            ) if class_slot else "unknown"
+        )
+        date_compact = date_str.replace("-", "") if date_str else "no_date"
+        filename = f"reservations_{safe_name}_{date_compact}.pdf"
+        response["Content-Disposition"] = f'attachment; filename="{filename}"'
         return response
     except Exception as exc:
         logger.exception("PDF generation failed: %s", exc)

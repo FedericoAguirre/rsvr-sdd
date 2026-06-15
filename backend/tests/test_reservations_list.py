@@ -109,6 +109,10 @@ class TestClientColumnNoEmail:
         )
         assert b"alice@test.com" not in response.content
         assert b"bob@test.com" not in response.content
+        expected = TestReservationsListPDF._expected_filename(
+            TestReservationsListPDF, class_slot, "2026-06-15"
+        )
+        assert response["Content-Disposition"] == f'attachment; filename="{expected}"'
 
     def test_no_fallback_text(self, logged_client, class_slot, reservations_with_email):
         response = logged_client.get(
@@ -163,12 +167,21 @@ class TestReservationsList:
 @pytest.mark.django_db
 class TestReservationsListPDF:
 
+    def _expected_filename(self, class_slot, date_str):
+        safe = str(class_slot).replace(" ", "_").translate(
+            str.maketrans("", "", "/" + chr(0) + '<>:"|?*')
+        )
+        date_compact = date_str.replace("-", "")
+        return f"reservations_{safe}_{date_compact}.pdf"
+
     def test_pdf_download_content_type(self, logged_client, class_slot, reservations_for_slot):
         response = logged_client.get(
             f"/reservations/list/pdf/?class_slot={class_slot.pk}&date=2026-06-15"
         )
         assert response.status_code == 200
         assert response["Content-Type"] == "application/pdf"
+        expected = self._expected_filename(class_slot, "2026-06-15")
+        assert response["Content-Disposition"] == f'attachment; filename="{expected}"'
 
     def test_pdf_empty_list(self, logged_client, class_slot):
         response = logged_client.get(
@@ -176,6 +189,23 @@ class TestReservationsListPDF:
         )
         assert response.status_code == 200
         assert response["Content-Type"] == "application/pdf"
+        expected = self._expected_filename(class_slot, "2026-06-15")
+        assert response["Content-Disposition"] == f'attachment; filename="{expected}"'
+
+    def test_filename_with_missing_date_uses_no_date_fallback(self, logged_client, class_slot):
+        response = logged_client.get(
+            f"/reservations/list/pdf/?class_slot={class_slot.pk}&date="
+        )
+        assert response.status_code == 200
+        assert "no_date" in response["Content-Disposition"]
+
+    def test_pdf_filename_with_missing_class_slot_fallback(self, logged_client):
+        response = logged_client.get(
+            "/reservations/list/pdf/?date=2026-06-15"
+        )
+        assert response.status_code == 200
+        safe = "unknown"
+        assert safe in response["Content-Disposition"]
 
     def test_export_button_visible_on_list_page(self, logged_client, class_slot, reservations_for_slot):
         response = logged_client.get(
