@@ -333,3 +333,19 @@ msgstr "Reservaciones por Clase"
 
 msgid "Export PDF"
 msgstr "Exportar PDF"
+
+#: apps/clients/templates/clients/_search_results.html:22
+msgid "Created"
+msgstr "Creado"
+
+#: apps/clients/templates/clients/_search_results.html:31
+msgid "Yes,No"
+msgstr "Sí,No"
+
+#: apps/clients/templates/clients/_search_results.html:46
+msgid "First"
+msgstr "Primero"
+
+#: apps/clients/templates/clients/_search_results.html:47
+msgid "Previous"
+msgstr "Anterior"
