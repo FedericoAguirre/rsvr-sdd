@@ -1,10 +1,16 @@
-# Add assitance flag to a reservation
+# Add assistance flag to a reservation
 
-As an Administrator and Operator, I want to mark a reservation as "redeemed"
+## Description
+
+As an Administrator and Operator, I want to mark a **reservation** as "used"
 when a client has assisted to the class slot.
 
-The reservation initial status, can be "reserved", then when the client assited
-to the class slot, his reservation can be marked as "redeemed". If the client
-didn't assist, then the reservation can be marked as "passed".
+1. The **reservation status**, can start as "reserved".
+2. When the client assisted to the class slot, his reservation can be marked as "used".
+3. If the client didn't assist, then the reservation can be marked as "unused".
 
-IMPORTANT: Remenber to translate this into Spanish, for the Operator's usage.
+**IMPORTANT**:
+
+- Translate this into Spanish, for the Operator's usage
+- Review the reservations use cases: list, export to pdf, filter, etc.
+- Update the use cases tests for reservations and update them accordingly, pay attention to list reservation and export to pdf.
