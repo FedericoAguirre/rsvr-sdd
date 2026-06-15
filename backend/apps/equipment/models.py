@@ -25,6 +25,7 @@ class Equipment(models.Model):
 
     class Meta:
         ordering = ["name"]
+        verbose_name = _("Equipment")
         verbose_name_plural = _("equipment")
 
     def __str__(self):

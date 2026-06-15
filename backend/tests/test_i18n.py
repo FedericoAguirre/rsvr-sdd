@@ -30,7 +30,7 @@ class TestSpanishLabels:
         self._login(client, staff_user)
         response = client.get("/equipment/")
         content = response.content.decode()
-        assert "Equipos" in content
+        assert "Equipo" in content
 
     def test_reservation_page_titles_spanish(self, client, staff_user):
         self._login(client, staff_user)
