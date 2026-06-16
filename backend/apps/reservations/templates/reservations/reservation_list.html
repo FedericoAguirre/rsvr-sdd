@@ -16,6 +16,12 @@
                 {% endfor %}
             </select>
             <input type="date" name="date" class="form-control me-2" value="{% if request.GET.date %}{{ request.GET.date }}{% else %}{{ today|date:'Y-m-d' }}{% endif %}">
+            <select name="status" class="form-select me-2">
+                <option value="">{% translate "All statuses" %}</option>
+                <option value="reserved" {% if status_filter == "reserved" %}selected{% endif %}>{% translate "Reserved" %}</option>
+                <option value="used" {% if status_filter == "used" %}selected{% endif %}>{% translate "Used" %}</option>
+                <option value="unused" {% if status_filter == "unused" %}selected{% endif %}>{% translate "Unused" %}</option>
+            </select>
             <button type="submit" class="btn btn-outline-secondary">{% translate "Filter" %}</button>
         </form>
     </div>
@@ -38,6 +44,7 @@
           <tr>
               <th>{% translate "Equipment" %}</th>
               <th>{% translate "Client" %}</th>
+              <th>{% translate "Status" %}</th>
           </tr>
       </thead>
       <tbody>
@@ -45,13 +52,14 @@
           <tr>
               <td>{{ r.equipment.name }}</td>
               <td>{{ r.client|full_name }}</td>
+              <td>{{ r.get_status_display }}</td>
           </tr>
       {% endfor %}
       </tbody>
   </table>
   {% else %}
   <table class="table table-striped">
-      <thead><tr><th>{% translate "Date" %}</th><th>{% translate "Client" %}</th><th>{% translate "Class" %}</th><th>{% translate "Equipment" %}</th><th></th></tr></thead>
+      <thead><tr><th>{% translate "Date" %}</th><th>{% translate "Client" %}</th><th>{% translate "Class" %}</th><th>{% translate "Equipment" %}</th><th>{% translate "Status" %}</th><th></th></tr></thead>
       <tbody>
       {% for r in reservations %}
       <tr>
@@ -59,6 +67,7 @@
           <td>{{ r.client|full_name }}</td>
           <td>{{ r.class_slot }}</td>
           <td>{{ r.equipment }}</td>
+          <td>{{ r.get_status_display }}</td>
           <td><a href="{% url 'reservations:reservation-detail' r.pk %}" class="btn btn-sm btn-outline-primary">{% translate "View" %}</a></td>
       </tr>
       {% endfor %}

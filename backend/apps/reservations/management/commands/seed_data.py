@@ -1,9 +1,11 @@
+from datetime import time
+
 from django.core.management.base import BaseCommand
 from django.utils.translation import gettext as _
+
 from apps.classes.models import ClassSlot
-from apps.equipment.models import Equipment
 from apps.clients.models import Client
-from datetime import time
+from apps.equipment.models import Equipment
 
 
 class Command(BaseCommand):

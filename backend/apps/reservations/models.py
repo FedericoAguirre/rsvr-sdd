@@ -4,6 +4,18 @@ from django.utils.translation import gettext_lazy as _
 
 
 class Reservation(models.Model):
+    STATUS_CHOICES = [
+        ("reserved", _("Reserved")),
+        ("used", _("Used")),
+        ("unused", _("Unused")),
+    ]
+
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default="reserved",
+        verbose_name=_("Status"),
+    )
     client = models.ForeignKey(
         "clients.Client", on_delete=models.CASCADE, related_name="reservations",
         verbose_name=_("Client"),

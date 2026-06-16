@@ -14,3 +14,7 @@ when a client has assisted to the class slot.
 - Translate this into Spanish, for the Operator's usage
 - Review the reservations use cases: list, export to pdf, filter, etc.
 - Update the use cases tests for reservations and update them accordingly, pay attention to list reservation and export to pdf.
+
+## Added During Implementation
+
+- **Quick status management**: Add inline row actions in reservation list views for 1-click status changes, bulk operations (checkbox selection + "Mark selected as Used/Unused"), and colored status badges for at-a-glance identification. Use HTMX for instant row updates without page reloads.

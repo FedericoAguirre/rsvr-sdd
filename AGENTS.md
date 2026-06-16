@@ -1,5 +1,5 @@
 <!-- SPECKIT START -->
 For additional context about technologies to be used, project structure,
 shell commands, and other important information, read the current plan at
-`specs/012-translate-remaining-tags/plan.md`
+`specs/013-reservation-status/plan.md`
 <!-- SPECKIT END -->

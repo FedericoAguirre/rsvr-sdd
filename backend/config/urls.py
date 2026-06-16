@@ -1,6 +1,6 @@
 from django.contrib import admin
-from django.urls import path, include
 from django.shortcuts import redirect
+from django.urls import include, path
 
 
 def home_redirect(request):

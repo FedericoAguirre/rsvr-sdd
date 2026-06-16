@@ -1,11 +1,13 @@
 import datetime
 
 import pytest
-from django.test import Client as HttpClient
 from django.contrib.auth.models import User
+from django.template.loader import render_to_string
+from django.test import Client as HttpClient
+
+from apps.classes.models import ClassSlot
 from apps.clients.models import Client
 from apps.equipment.models import Equipment
-from apps.classes.models import ClassSlot
 from apps.reservations.models import Reservation
 
 
@@ -255,3 +257,108 @@ class TestMainPageWithSlotFilter:
         )
         content = response.content.decode()
         assert "No se encontraron reservaciones" in content
+
+
+@pytest.mark.django_db
+class TestReservationStatusChange:
+
+    def test_change_status_to_used(self, logged_client, reservations_for_slot):
+        reservation = Reservation.objects.first()
+        response = logged_client.post(
+            f"/reservations/{reservation.pk}/status/", {"status": "used"}
+        )
+        assert response.status_code == 302
+        reservation.refresh_from_db()
+        assert reservation.status == "used"
+
+    def test_change_status_to_unused(self, logged_client, reservations_for_slot):
+        reservation = Reservation.objects.first()
+        response = logged_client.post(
+            f"/reservations/{reservation.pk}/status/", {"status": "unused"}
+        )
+        assert response.status_code == 302
+        reservation.refresh_from_db()
+        assert reservation.status == "unused"
+
+    def test_change_status_back_to_reserved(self, logged_client, reservations_for_slot):
+        reservation = Reservation.objects.first()
+        reservation.status = "used"
+        reservation.save()
+        response = logged_client.post(
+            f"/reservations/{reservation.pk}/status/", {"status": "reserved"}
+        )
+        assert response.status_code == 302
+        reservation.refresh_from_db()
+        assert reservation.status == "reserved"
+
+    def test_re_set_same_status(self, logged_client, reservations_for_slot):
+        reservation = Reservation.objects.first()
+        reservation.status = "used"
+        reservation.save()
+        response = logged_client.post(
+            f"/reservations/{reservation.pk}/status/", {"status": "used"}
+        )
+        assert response.status_code == 302
+        reservation.refresh_from_db()
+        assert reservation.status == "used"
+
+    def test_invalid_status_value(self, logged_client, reservations_for_slot):
+        reservation = Reservation.objects.first()
+        response = logged_client.post(
+            f"/reservations/{reservation.pk}/status/", {"status": "invalid"}
+        )
+        assert response.status_code == 302
+        reservation.refresh_from_db()
+        assert reservation.status == "reserved"
+
+    def test_unauthenticated_user_redirected(self, http_client, reservations_for_slot):
+        reservation = Reservation.objects.first()
+        response = http_client.post(
+            f"/reservations/{reservation.pk}/status/", {"status": "used"}
+        )
+        assert response.status_code == 302
+        assert "/accounts/login/" in response.url
+
+
+@pytest.mark.django_db
+class TestReservationStatusInList:
+
+    def test_status_column_in_list_view(self, logged_client, class_slot, reservations_for_slot):
+        reservation = Reservation.objects.first()
+        reservation.status = "used"
+        reservation.save()
+        response = logged_client.get(
+            f"/reservations/list/?class_slot={class_slot.pk}&date=2026-06-15"
+        )
+        content = response.content.decode()
+        assert "Usado" in content
+
+
+@pytest.mark.django_db
+class TestReservationStatusFilter:
+
+    def test_filter_by_status_shows_only_matching(self, logged_client, class_slot, reservations_for_slot):
+        reservation = Reservation.objects.first()
+        reservation.status = "used"
+        reservation.save()
+        response = logged_client.get(
+            f"/reservations/?class_slot={class_slot.pk}&date=2026-06-15&status=used"
+        )
+        content = response.content.decode()
+        assert "Usado" in content
+
+
+@pytest.mark.django_db
+class TestReservationStatusInPDF:
+
+    def test_status_in_pdf_export(self, logged_client, class_slot, reservations_for_slot):
+        reservation = Reservation.objects.first()
+        reservation.status = "used"
+        reservation.save()
+        html_string = render_to_string("reservations/reservation_list_pdf.html", {
+            "reservations": Reservation.objects.filter(class_slot=class_slot, date="2026-06-15"),
+            "class_slot": class_slot,
+            "date_str": "2026-06-15",
+            "date_display": "2026/06/15",
+        })
+        assert "Usado" in html_string

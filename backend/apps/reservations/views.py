@@ -1,15 +1,17 @@
 import logging
 
-from django.contrib.auth.decorators import login_required, permission_required
-from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
+from django.shortcuts import get_object_or_404, redirect, render
 from django.template.loader import render_to_string
 from django.utils import timezone
 from django.utils.translation import gettext as _
+
 from apps.classes.models import ClassSlot
-from .models import Reservation
+
 from .forms import ReservationForm
+from .models import Reservation
 
 logger = logging.getLogger(__name__)
 
@@ -30,13 +32,17 @@ def _get_slot_reservations(class_slot_pk, date_str):
 def reservation_list_by_slot(request):
     class_slot_pk = request.GET.get("class_slot")
     date_str = request.GET.get("date", "")
+    status_filter = request.GET.get("status", "")
     reservations, class_slot = _get_slot_reservations(class_slot_pk, date_str)
+    if status_filter:
+        reservations = reservations.filter(status=status_filter)
     date_display = date_str.replace("-", "/") if date_str else ""
     return render(request, "reservations/reservation_list_by_slot.html", {
         "reservations": reservations,
         "class_slot": class_slot,
         "date_str": date_str,
         "date_display": date_display,
+        "status_filter": status_filter,
     })
 
 
@@ -75,6 +81,7 @@ def reservation_list_pdf(request):
 def reservation_list(request):
     date_str = request.GET.get("date", "")
     class_slot_pk = request.GET.get("class_slot", "")
+    status_filter = request.GET.get("status", "")
     if class_slot_pk and date_str:
         reservations, class_slot = _get_slot_reservations(class_slot_pk, date_str)
     else:
@@ -82,6 +89,8 @@ def reservation_list(request):
         if date_str:
             reservations = reservations.filter(date=date_str)
         class_slot = None
+    if status_filter:
+        reservations = reservations.filter(status=status_filter)
     class_slots = ClassSlot.objects.all()
     today = timezone.localdate()
     date_display = date_str.replace("-", "/") if date_str else ""
@@ -92,6 +101,7 @@ def reservation_list(request):
         "class_slot": class_slot,
         "date_str": date_str,
         "date_display": date_display,
+        "status_filter": status_filter,
     })
 
 
@@ -102,6 +112,20 @@ def reservation_detail(request, pk):
         pk=pk,
     )
     return render(request, "reservations/reservation_detail.html", {"reservation": reservation})
+
+
+@login_required
+def reservation_change_status(request, pk):
+    reservation = get_object_or_404(Reservation, pk=pk)
+    new_status = request.POST.get("status")
+    valid_statuses = dict(Reservation.STATUS_CHOICES)
+    if new_status in valid_statuses:
+        reservation.status = new_status
+        reservation.save()
+        messages.success(request, _("Reservation status updated."))
+    else:
+        messages.error(request, _("Invalid status."))
+    return redirect("reservations:reservation-detail", pk=reservation.pk)
 
 
 @login_required

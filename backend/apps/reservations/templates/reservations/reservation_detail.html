@@ -16,6 +16,25 @@
     <dd class="col-sm-10">{{ reservation.created_by|default:"—" }}</dd>
     <dt class="col-sm-2">{% translate "Notes" %}</dt>
     <dd class="col-sm-10">{{ reservation.notes|default:"—" }}</dd>
+    <dt class="col-sm-2">{% translate "Status" %}</dt>
+    <dd class="col-sm-10">{{ reservation.get_status_display }}</dd>
 </dl>
+<div class="mb-3">
+    <form method="post" action="{% url 'reservations:reservation-change-status' reservation.pk %}" style="display: inline;">
+        {% csrf_token %}
+        <input type="hidden" name="status" value="used">
+        <button type="submit" class="btn btn-success">{% translate "Mark as Used" %}</button>
+    </form>
+    <form method="post" action="{% url 'reservations:reservation-change-status' reservation.pk %}" style="display: inline;">
+        {% csrf_token %}
+        <input type="hidden" name="status" value="unused">
+        <button type="submit" class="btn btn-warning">{% translate "Mark as Unused" %}</button>
+    </form>
+    <form method="post" action="{% url 'reservations:reservation-change-status' reservation.pk %}" style="display: inline;">
+        {% csrf_token %}
+        <input type="hidden" name="status" value="reserved">
+        <button type="submit" class="btn btn-secondary">{% translate "Mark as Reserved" %}</button>
+    </form>
+</div>
 <a href="{% url 'reservations:reservation-list' %}" class="btn btn-secondary">{% translate "Back" %}</a>
 {% endblock %}

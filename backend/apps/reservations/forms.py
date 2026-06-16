@@ -1,9 +1,10 @@
 from django import forms
 from django.utils.translation import gettext_lazy as _
-from .models import Reservation
-from apps.equipment.models import Equipment
+
 from apps.classes.models import ClassSlot
-from apps.clients.models import Client
+from apps.equipment.models import Equipment
+
+from .models import Reservation
 
 
 class ReservationForm(forms.ModelForm):

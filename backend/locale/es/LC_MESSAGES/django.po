@@ -349,3 +349,30 @@ msgstr "Primero"
 #: apps/clients/templates/clients/_search_results.html:47
 msgid "Previous"
 msgstr "Anterior"
+
+msgid "Reserved"
+msgstr "Reservado"
+
+msgid "Used"
+msgstr "Usado"
+
+msgid "Unused"
+msgstr "No usado"
+
+msgid "Mark as Used"
+msgstr "Marcar como Usado"
+
+msgid "Mark as Unused"
+msgstr "Marcar como No usado"
+
+msgid "Mark as Reserved"
+msgstr "Marcar como Reservado"
+
+msgid "Reservation status updated."
+msgstr "Estado de la reserva actualizado."
+
+msgid "Invalid status."
+msgstr "Estado inválido."
+
+msgid "All statuses"
+msgstr "Todos los estados"
