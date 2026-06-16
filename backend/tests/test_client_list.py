@@ -1,7 +1,8 @@
 import pytest
-from django.test import Client as HttpClient
 from django.contrib.auth.models import User
+from django.test import Client as HttpClient
 from django.urls import reverse
+
 from apps.clients.models import Client
 
 

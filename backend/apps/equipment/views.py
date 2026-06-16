@@ -1,9 +1,10 @@
-from django.contrib.auth.decorators import login_required, permission_required
-from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.translation import gettext as _
-from .models import Equipment
+
 from .forms import EquipmentForm
+from .models import Equipment
 
 
 @login_required

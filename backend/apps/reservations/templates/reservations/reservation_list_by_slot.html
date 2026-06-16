@@ -10,6 +10,17 @@
     <strong>{% translate "Date" %}:</strong> {{ date_display }} &mdash;
     <strong>{% translate "Class" %}:</strong> {{ class_slot }}
 </div>
+<form method="get" class="d-flex mb-3">
+    <input type="hidden" name="class_slot" value="{{ class_slot.pk }}">
+    <input type="hidden" name="date" value="{{ date_str }}">
+    <select name="status" class="form-select me-2" style="max-width: 200px;">
+        <option value="">{% translate "All statuses" %}</option>
+        <option value="reserved" {% if status_filter == "reserved" %}selected{% endif %}>{% translate "Reserved" %}</option>
+        <option value="used" {% if status_filter == "used" %}selected{% endif %}>{% translate "Used" %}</option>
+        <option value="unused" {% if status_filter == "unused" %}selected{% endif %}>{% translate "Unused" %}</option>
+    </select>
+    <button type="submit" class="btn btn-outline-secondary">{% translate "Filter" %}</button>
+</form>
 {% endif %}
 
 {% if reservations %}
@@ -18,6 +29,7 @@
         <tr>
             <th>{% translate "Equipment" %}</th>
             <th>{% translate "Client" %}</th>
+            <th>{% translate "Status" %}</th>
         </tr>
     </thead>
     <tbody>
@@ -25,6 +37,7 @@
         <tr>
             <td>{{ r.equipment.name }}</td>
             <td>{{ r.client|full_name }}</td>
+            <td>{{ r.get_status_display }}</td>
         </tr>
     {% endfor %}
     </tbody>

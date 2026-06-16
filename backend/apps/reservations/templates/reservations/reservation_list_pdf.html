@@ -26,6 +26,7 @@
             <tr>
                 <th>{% translate "Equipment" %}</th>
                 <th>{% translate "Client" %}</th>
+                <th>{% translate "Status" %}</th>
             </tr>
         </thead>
         <tbody>
@@ -33,6 +34,7 @@
             <tr>
                 <td>{{ r.equipment.name }}</td>
                 <td>{{ r.client|full_name }}</td>
+                <td>{{ r.get_status_display }}</td>
             </tr>
         {% endfor %}
         </tbody>
