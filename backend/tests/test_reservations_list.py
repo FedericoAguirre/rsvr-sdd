@@ -362,3 +362,57 @@ class TestReservationStatusInPDF:
             "date_display": "2026/06/15",
         })
         assert "Usado" in html_string
+
+
+@pytest.mark.django_db
+class TestFilterStatePreservation:
+
+    def test_class_slot_has_selected_attribute_after_filter(
+        self, logged_client, class_slot, reservations_for_slot
+    ):
+        response = logged_client.get(
+            f"/reservations/?class_slot={class_slot.pk}&date=2026-06-15&status=used"
+        )
+        content = response.content.decode()
+        assert f'value="{class_slot.pk}" selected' in content
+
+    def test_date_input_preserves_value_after_filter(
+        self, logged_client, class_slot, reservations_for_slot
+    ):
+        response = logged_client.get(
+            f"/reservations/?class_slot={class_slot.pk}&date=2026-06-15"
+        )
+        content = response.content.decode()
+        assert 'value="2026-06-15"' in content
+
+    def test_status_dropdown_has_selected_attribute_after_filter(
+        self, logged_client, class_slot, reservations_for_slot
+    ):
+        response = logged_client.get(
+            f"/reservations/?class_slot={class_slot.pk}&date=2026-06-15&status=used"
+        )
+        content = response.content.decode()
+        assert 'value="used" selected' in content
+
+    def test_clear_filters_removes_class_slot_selected(
+        self, logged_client, class_slot, reservations_for_slot
+    ):
+        response = logged_client.get("/reservations/")
+        content = response.content.decode()
+        assert 'selected' not in content.split('<select name="class_slot"')[1].split('</select>')[0]
+
+    def test_clear_filters_resets_status_to_all(
+        self, logged_client, class_slot, reservations_for_slot
+    ):
+        response = logged_client.get("/reservations/")
+        content = response.content.decode()
+        status_section = content.split('<select name="status"')[1].split('</select>')[0]
+        assert 'selected' not in status_section
+
+    def test_clear_filters_button_exists(
+        self, logged_client, class_slot
+    ):
+        response = logged_client.get("/reservations/")
+        content = response.content.decode()
+        assert "Clear Filters" in content
+        assert "/reservations/" in content

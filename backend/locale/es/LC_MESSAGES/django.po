@@ -274,6 +274,9 @@ msgstr "Reservaciones"
 msgid "Filter"
 msgstr "Filtrar"
 
+msgid "Clear Filters"
+msgstr "Limpiar Filtros"
+
 msgid "No reservations found."
 msgstr "No se encontraron reservaciones."
 
