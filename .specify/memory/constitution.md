@@ -1,16 +1,10 @@
 <!--
   Sync Impact Report
-  Version change: 1.0.0 → 2.0.0
+  Version change: 2.0.1 → 2.0.2
   Modified principles:
-    - I. Library-First → I. Code Quality
-    - II. CLI Interface → II. Testing Standards
-    - III. Test-First (NON-NEGOTIABLE) → (removed — folded into II)
-    - IV. Integration Testing → (removed — folded into II)
-    - V. Observability / VI. Versioning / VII. Simplicity → (split: Observability → IV, Versioning → Governance, Simplicity → I)
-    - (new) III. User Experience Consistency
-    - (new) IV. Performance Requirements
+    - III. User Experience Consistency — expanded i18n rule with explicit element types
   Added sections: None
-  Removed sections: None (principles restructured)
+  Removed sections: None
   Templates requiring updates:
     - .specify/templates/plan-template.md ✅ (no change needed — generic)
     - .specify/templates/spec-template.md ✅ (no change needed — generic)
@@ -49,7 +43,8 @@ messages MUST be actionable (state what went wrong AND how to fix it).
 CLI output MUST support both human-readable and JSON formats. Every
 feature MUST include user-facing documentation updated in the same PR.
 
-All text labels MUST be translated into Spanish using i18n package.
+Whenever a header, tag, text, button, or link is added to the project,
+it MUST be translated into Spanish using i18n.
 
 ### IV. Performance Requirements
 
@@ -99,4 +94,4 @@ only clarified. All project artifacts follow MAJOR.MINOR.PATCH semantic
 versioning. Breaking changes MUST increment MAJOR; new backward-
 compatible functionality increments MINOR; bug fixes increment PATCH.
 
-**Version**: 2.0.1 | **Ratified**: 2026-06-07 | **Last Amended**: 2026-06-12
+**Version**: 2.0.2 | **Ratified**: 2026-06-07 | **Last Amended**: 2026-06-17
