@@ -12,7 +12,7 @@
         <form method="get" class="d-flex">
             <select name="class_slot" class="form-select me-2">
                 {% for slot in class_slots %}
-                <option value="{{ slot.pk }}">{{ slot }}</option>
+                <option value="{{ slot.pk }}"{% if class_slot and class_slot.pk == slot.pk %} selected{% endif %}>{{ slot }}</option>
                 {% endfor %}
             </select>
             <input type="date" name="date" class="form-control me-2" value="{% if request.GET.date %}{{ request.GET.date }}{% else %}{{ today|date:'Y-m-d' }}{% endif %}">
@@ -23,6 +23,7 @@
                 <option value="unused" {% if status_filter == "unused" %}selected{% endif %}>{% translate "Unused" %}</option>
             </select>
             <button type="submit" class="btn btn-outline-secondary">{% translate "Filter" %}</button>
+            <a href="{% url 'reservations:reservation-list' %}" class="btn btn-outline-danger ms-2">{% translate "Clear Filters" %}</a>
         </form>
     </div>
 </div>
