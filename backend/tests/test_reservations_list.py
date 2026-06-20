@@ -216,6 +216,22 @@ class TestReservationsListPDF:
         content = response.content.decode()
         assert "/reservations/list/pdf/" in content
 
+    def test_pdf_regression_content_type_and_filename(self, logged_client, class_slot, reservations_for_slot):
+        response = logged_client.get(
+            f"/reservations/list/pdf/?class_slot={class_slot.pk}&date=2026-06-15"
+        )
+        assert response.status_code == 200
+        assert response["Content-Type"] == "application/pdf"
+        expected = self._expected_filename(class_slot, "2026-06-15")
+        assert response["Content-Disposition"] == f'attachment; filename="{expected}"'
+
+    def test_pdf_regression_with_status_filter(self, logged_client, class_slot, reservations_for_slot):
+        response = logged_client.get(
+            f"/reservations/list/pdf/?class_slot={class_slot.pk}&date=2026-06-15&status=used"
+        )
+        assert response.status_code == 200
+        assert response["Content-Type"] == "application/pdf"
+
 
 @pytest.mark.django_db
 class TestMainPageWithSlotFilter:
@@ -362,6 +378,41 @@ class TestReservationStatusInPDF:
             "date_display": "2026/06/15",
         })
         assert "Usado" in html_string
+
+
+@pytest.mark.django_db
+class TestConsistentColumnDisplay:
+    """All six column headers must appear consistently regardless of filter state."""
+
+    COLUMNS = ["Fecha", "Cliente", "Clase", "Equipo", "Estado", "Ver"]
+
+    def test_all_columns_on_initial_page_load(self, logged_client, class_slot, reservations_for_slot):
+        response = logged_client.get("/reservations/")
+        content = response.content.decode()
+        for col in self.COLUMNS:
+            assert col in content, f"Column '{col}' missing on initial page load"
+
+    def test_all_columns_after_applying_filter(self, logged_client, class_slot, reservations_for_slot):
+        response = logged_client.get(
+            f"/reservations/?class_slot={class_slot.pk}&date=2026-06-15"
+        )
+        content = response.content.decode()
+        for col in self.COLUMNS:
+            assert col in content, f"Column '{col}' missing after applying filter"
+
+    def test_all_columns_after_clearing_filter(self, logged_client, class_slot, reservations_for_slot):
+        response = logged_client.get("/reservations/")
+        content = response.content.decode()
+        for col in self.COLUMNS:
+            assert col in content, f"Column '{col}' missing after clearing filter"
+
+    def test_all_columns_in_by_slot_view(self, logged_client, class_slot, reservations_for_slot):
+        response = logged_client.get(
+            f"/reservations/list/?class_slot={class_slot.pk}&date=2026-06-15"
+        )
+        content = response.content.decode()
+        for col in self.COLUMNS:
+            assert col in content, f"Column '{col}' missing in by-slot view"
 
 
 @pytest.mark.django_db
