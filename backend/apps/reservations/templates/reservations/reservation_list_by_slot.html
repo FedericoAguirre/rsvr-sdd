@@ -27,17 +27,23 @@
 <table class="table table-striped">
     <thead>
         <tr>
-            <th>{% translate "Equipment" %}</th>
+            <th>{% translate "Date" %}</th>
             <th>{% translate "Client" %}</th>
+            <th>{% translate "Class" %}</th>
+            <th>{% translate "Equipment" %}</th>
             <th>{% translate "Status" %}</th>
+            <th></th>
         </tr>
     </thead>
     <tbody>
     {% for r in reservations %}
         <tr>
-            <td>{{ r.equipment.name }}</td>
+            <td>{{ r.date }}</td>
             <td>{{ r.client|full_name }}</td>
+            <td>{{ r.class_slot }}</td>
+            <td>{{ r.equipment }}</td>
             <td>{{ r.get_status_display }}</td>
+            <td><a href="{% url 'reservations:reservation-detail' r.pk %}" class="btn btn-sm btn-outline-primary">{% translate "View" %}</a></td>
         </tr>
     {% endfor %}
     </tbody>
