@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% translate "Upload Clients CSV" %}{% endblock %}
+{% block content %}
+<h2>{% translate "Upload Clients CSV" %}</h2>
+<form method="post" enctype="multipart/form-data" class="row g-3">
+    {% csrf_token %}
+    <div class="col-md-6">
+        <label class="form-label">{{ form.csv_file.label }}</label>
+        {{ form.csv_file }}
+        {% if form.csv_file.errors %}<div class="text-danger">{{ form.csv_file.errors }}</div>{% endif %}
+        <div class="form-text">{{ form.csv_file.help_text }}</div>
+    </div>
+    <div class="col-12">
+        <button type="submit" class="btn btn-primary">{% translate "Upload" %}</button>
+        <a href="{% url 'clients:client-csv-template' %}" class="btn btn-outline-secondary">{% translate "Download Template" %}</a>
+        <a href="{% url 'clients:client-search' %}" class="btn btn-secondary">{% translate "Cancel" %}</a>
+    </div>
+</form>
+{% if result %}
+    {% include "clients/_client_csv_results.html" %}
+{% endif %}
+{% endblock %}

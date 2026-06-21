@@ -1,11 +1,16 @@
+import csv
+import io
+
 import django.db.models as models
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.translation import gettext as _
 
-from .forms import ClientForm, ClientSearchForm
+from . import csv_import
+from .forms import ClientCsvUploadForm, ClientForm, ClientSearchForm
 from .models import Client
 
 
@@ -58,3 +63,44 @@ def client_create(request):
     else:
         form = ClientForm()
     return render(request, "clients/client_form.html", {"form": form})
+
+
+@login_required
+def client_csv_upload(request):
+    result = None
+    if request.method == "POST":
+        form = ClientCsvUploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            csv_file = request.FILES["csv_file"]
+            if csv_file.size == 0:
+                form.add_error("csv_file", _("The file is empty."))
+            else:
+                try:
+                    decoded = csv_file.read().decode("utf-8")
+                    rows = csv_import.parse_csv_file(io.StringIO(decoded))
+                    if not rows:
+                        form.add_error("csv_file", _("The CSV file contains no data rows."))
+                    else:
+                        result = csv_import.process_csv_rows(rows)
+                        messages.success(
+                            request,
+                            _("Processed %(total)s rows: %(created)s created, %(updated)s updated, %(errors)s errors.")
+                            % {"total": result.total_rows, "created": result.created, "updated": result.updated, "errors": result.errors},
+                        )
+                except UnicodeDecodeError:
+                    form.add_error("csv_file", _("Could not decode the file. Please use UTF-8 encoding."))
+                except ValueError as e:
+                    form.add_error("csv_file", str(e))
+    else:
+        form = ClientCsvUploadForm()
+    return render(request, "clients/client_csv_upload.html", {"form": form, "result": result})
+
+
+@login_required
+def client_csv_template(request):
+    response = HttpResponse(content_type="text/csv")
+    response["Content-Disposition"] = 'attachment; filename="client_template.csv"'
+    writer = csv.writer(response)
+    writer.writerow(["first_name", "last_name", "email", "mobile"])
+    writer.writerow(["Nombre", "Apellido", "ejemplo@correo.com", "+5491123456789"])
+    return response
