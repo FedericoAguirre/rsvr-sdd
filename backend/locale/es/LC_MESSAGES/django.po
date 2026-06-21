@@ -366,6 +366,10 @@ msgstr "Buscar"
 msgid "Searching..."
 msgstr "Búsqueda..."
 
+#: apps/clients/templates/clients/search.html:18
+msgid "Upload Clients"
+msgstr "Subir Clientes"
+
 #: apps/clients/views.py:61
 #, python-format
 msgid "Client %s created."

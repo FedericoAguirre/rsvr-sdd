@@ -1,5 +1,5 @@
 <!-- SPECKIT START -->
 For additional context about technologies to be used, project structure,
 shell commands, and other important information, read the current plan at
-`specs/017-remove-reservations-dead-code/plan.md`
+`specs/018-add-clients-import-button/plan.md`
 <!-- SPECKIT END -->
