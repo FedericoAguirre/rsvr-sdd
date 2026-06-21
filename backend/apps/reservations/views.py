@@ -29,24 +29,6 @@ def _get_slot_reservations(class_slot_pk, date_str):
 
 
 @login_required
-def reservation_list_by_slot(request):
-    class_slot_pk = request.GET.get("class_slot")
-    date_str = request.GET.get("date", "")
-    status_filter = request.GET.get("status", "")
-    reservations, class_slot = _get_slot_reservations(class_slot_pk, date_str)
-    if status_filter:
-        reservations = reservations.filter(status=status_filter)
-    date_display = date_str.replace("-", "/") if date_str else ""
-    return render(request, "reservations/reservation_list_by_slot.html", {
-        "reservations": reservations,
-        "class_slot": class_slot,
-        "date_str": date_str,
-        "date_display": date_display,
-        "status_filter": status_filter,
-    })
-
-
-@login_required
 def reservation_list_pdf(request):
     class_slot_pk = request.GET.get("class_slot")
     date_str = request.GET.get("date", "")
