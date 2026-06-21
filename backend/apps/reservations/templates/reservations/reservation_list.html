@@ -39,26 +39,6 @@
 {% endif %}
 
 {% if reservations %}
-  {% if class_slot %}
-  <table class="table table-striped">
-      <thead>
-          <tr>
-              <th>{% translate "Equipment" %}</th>
-              <th>{% translate "Client" %}</th>
-              <th>{% translate "Status" %}</th>
-          </tr>
-      </thead>
-      <tbody>
-      {% for r in reservations %}
-          <tr>
-              <td>{{ r.equipment.name }}</td>
-              <td>{{ r.client|full_name }}</td>
-              <td>{{ r.get_status_display }}</td>
-          </tr>
-      {% endfor %}
-      </tbody>
-  </table>
-  {% else %}
   <table class="table table-striped">
       <thead><tr><th>{% translate "Date" %}</th><th>{% translate "Client" %}</th><th>{% translate "Class" %}</th><th>{% translate "Equipment" %}</th><th>{% translate "Status" %}</th><th></th></tr></thead>
       <tbody>
@@ -74,7 +54,6 @@
       {% endfor %}
       </tbody>
   </table>
-  {% endif %}
 {% else %}
 <p class="text-muted">{% translate "No reservations found." %}</p>
 {% endif %}
