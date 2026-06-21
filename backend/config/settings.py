@@ -100,4 +100,7 @@ LOGIN_URL = "/accounts/login/"
 LOGIN_REDIRECT_URL = "/reservations/"
 LOGOUT_REDIRECT_URL = "/accounts/login/"
 
+FILE_UPLOAD_MAX_MEMORY_SIZE = 5 * 1024 * 1024  # 5 MB
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 10_000
+
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"

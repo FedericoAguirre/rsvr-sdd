@@ -1,0 +1,47 @@
+{% load i18n %}
+<hr>
+<h3 class="mt-4">{% translate "Results" %}</h3>
+<div class="row mt-3">
+    <div class="col-md-3">
+        <div class="card text-bg-primary mb-3">
+            <div class="card-body text-center">
+                <h5 class="card-title">{% translate "Total" %}</h5>
+                <p class="card-text display-6">{{ result.total_rows }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-bg-success mb-3">
+            <div class="card-body text-center">
+                <h5 class="card-title">{% translate "Created" %}</h5>
+                <p class="card-text display-6">{{ result.created }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-bg-warning mb-3">
+            <div class="card-body text-center">
+                <h5 class="card-title">{% translate "Updated" %}</h5>
+                <p class="card-text display-6">{{ result.updated }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-bg-danger mb-3">
+            <div class="card-body text-center">
+                <h5 class="card-title">{% translate "Errors" %}</h5>
+                <p class="card-text display-6">{{ result.errors }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% if result.error_details %}
+<h4>{% translate "Error Details" %}</h4>
+<ul class="list-group mb-3">
+    {% for err in result.error_details %}
+    <li class="list-group-item list-group-item-danger">
+        {% translate "Row" %} {{ err.row }}: {{ err.message }}
+    </li>
+    {% endfor %}
+</ul>
+{% endif %}
