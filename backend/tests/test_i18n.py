@@ -49,3 +49,10 @@ class TestSpanishLabels:
         response = client.get("/classes/")
         content = response.content.decode()
         assert "Horario de Clases" in content
+
+    def test_client_search_upload_link_spanish(self, client, staff_user):
+        self._login(client, staff_user)
+        response = client.get("/clients/search/")
+        content = response.content.decode()
+        assert "Subir Clientes" in content
+        assert "/clients/upload/" in content

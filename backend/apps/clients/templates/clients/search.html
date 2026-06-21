@@ -12,6 +12,7 @@
       hx-indicator="#search-indicator">
     <div class="col-md-4">{{ form.q }}</div>
     <div class="col-md-2"><button type="submit" class="btn btn-primary">{% translate "Search" %}</button></div>
+    <div class="col-md-2"><a href="{% url 'clients:client-csv-upload' %}" class="btn btn-info">{% translate "Upload Clients" %}</a></div>
     <div class="col-md-2"><a href="{% url 'clients:client-create' %}" class="btn btn-success">{% translate "New Client" %}</a></div>
     <div class="col-md-2">
         <span id="search-indicator" class="htmx-indicator text-muted">{% translate "Searching..." %}</span>
