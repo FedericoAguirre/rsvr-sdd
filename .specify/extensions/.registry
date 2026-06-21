@@ -18,6 +18,34 @@
       },
       "registered_skills": [],
       "installed_at": "2026-06-08T04:32:39.165417+00:00"
+    },
+    "data-model-diagram": {
+      "version": "0.2.2",
+      "source": "local",
+      "manifest_hash": "sha256:6a58f22cc2e035136fb3cf6a993739fab941ad446250810f9ec8763c72e42c4e",
+      "enabled": true,
+      "priority": 10,
+      "registered_commands": {
+        "opencode": [
+          "speckit.data-model-diagram.generate"
+        ]
+      },
+      "registered_skills": [],
+      "installed_at": "2026-06-21T00:46:16.274932+00:00"
+    },
+    "improve": {
+      "version": "1.0.1",
+      "source": "local",
+      "manifest_hash": "sha256:150cb460e207830460483d065ac2a6017bdeeb1d95775c85cdce54cb00caeaef",
+      "enabled": true,
+      "priority": 10,
+      "registered_commands": {
+        "opencode": [
+          "speckit.improve.improve"
+        ]
+      },
+      "registered_skills": [],
+      "installed_at": "2026-06-21T01:15:36.767021+00:00"
     }
   }
 }
