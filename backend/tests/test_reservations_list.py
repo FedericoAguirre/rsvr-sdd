@@ -65,107 +65,6 @@ def reservations_for_slot(db, class_slot, equipment_list, client_list, staff_use
         )
 
 
-@pytest.fixture
-def client_list_with_email(db):
-    return [
-        Client.objects.create(first_name="Alice", last_name="A", email="alice@test.com"),
-        Client.objects.create(first_name="Bob", last_name="B", email="bob@test.com"),
-        Client.objects.create(first_name="Charlie", last_name="C"),
-        Client.objects.create(first_name="Diana", last_name="D", mobile="555-0100"),
-    ]
-
-
-@pytest.fixture
-def reservations_with_email(db, class_slot, equipment_list, client_list_with_email, staff_user):
-    date = "2026-06-15"
-    for i, (equip, client) in enumerate(zip(equipment_list, client_list_with_email)):
-        Reservation.objects.create(
-            client=client,
-            equipment=equip,
-            class_slot=class_slot,
-            date=date,
-            created_by=staff_user,
-        )
-
-
-@pytest.mark.django_db
-class TestClientColumnNoEmail:
-
-    def test_full_list_has_no_email(self, logged_client, reservations_with_email):
-        response = logged_client.get("/reservations/list/")
-        content = response.content.decode()
-        assert "alice@test.com" not in content
-        assert "bob@test.com" not in content
-
-    def test_by_slot_has_no_email(self, logged_client, class_slot, reservations_with_email):
-        response = logged_client.get(
-            f"/reservations/list/?class_slot={class_slot.pk}&date=2026-06-15"
-        )
-        content = response.content.decode()
-        assert "alice@test.com" not in content
-        assert "bob@test.com" not in content
-
-    def test_pdf_has_no_email(self, logged_client, class_slot, reservations_with_email):
-        response = logged_client.get(
-            f"/reservations/list/pdf/?class_slot={class_slot.pk}&date=2026-06-15"
-        )
-        assert b"alice@test.com" not in response.content
-        assert b"bob@test.com" not in response.content
-        expected = TestReservationsListPDF._expected_filename(
-            TestReservationsListPDF, class_slot, "2026-06-15"
-        )
-        assert response["Content-Disposition"] == f'attachment; filename="{expected}"'
-
-    def test_no_fallback_text(self, logged_client, class_slot, reservations_with_email):
-        response = logged_client.get(
-            f"/reservations/list/?class_slot={class_slot.pk}&date=2026-06-15"
-        )
-        content = response.content.decode()
-        assert "(no contact)" not in content
-        assert "alice@test.com" not in content
-        assert "555-0100" not in content
-
-
-@pytest.mark.django_db
-class TestReservationsList:
-
-    def test_list_page_renders_header(self, logged_client, class_slot, reservations_for_slot):
-        response = logged_client.get(
-            f"/reservations/list/?class_slot={class_slot.pk}&date=2026-06-15"
-        )
-        content = response.content.decode()
-        assert str(class_slot) in content
-        assert "2026-06-15" in content
-
-    def test_equipment_ordered_alphabetically(self, logged_client, class_slot, reservations_for_slot):
-        response = logged_client.get(
-            f"/reservations/list/?class_slot={class_slot.pk}&date=2026-06-15"
-        )
-        content = response.content.decode()
-        bike_pos = content.index("Bike")
-        elliptical_pos = content.index("Elliptical")
-        rower_pos = content.index("Rower")
-        treadmill_pos = content.index("Treadmill")
-        assert bike_pos < elliptical_pos, "Bike should come before Elliptical"
-        assert elliptical_pos < rower_pos, "Elliptical should come before Rower"
-        assert rower_pos < treadmill_pos, "Rower should come before Treadmill"
-
-    def test_empty_state_shows_header_and_empty_table(self, logged_client, class_slot):
-        response = logged_client.get(
-            f"/reservations/list/?class_slot={class_slot.pk}&date=2026-06-15"
-        )
-        content = response.content.decode()
-        assert str(class_slot) in content
-        assert "2026-06-15" in content
-
-    def test_unauthenticated_user_redirected(self, http_client, class_slot):
-        response = http_client.get(
-            f"/reservations/list/?class_slot={class_slot.pk}&date=2026-06-15"
-        )
-        assert response.status_code == 302
-        assert "/accounts/login/" in response.url
-
-
 @pytest.mark.django_db
 class TestReservationsListPDF:
 
@@ -178,7 +77,7 @@ class TestReservationsListPDF:
 
     def test_pdf_download_content_type(self, logged_client, class_slot, reservations_for_slot):
         response = logged_client.get(
-            f"/reservations/list/pdf/?class_slot={class_slot.pk}&date=2026-06-15"
+            f"/reservations/pdf/?class_slot={class_slot.pk}&date=2026-06-15"
         )
         assert response.status_code == 200
         assert response["Content-Type"] == "application/pdf"
@@ -187,7 +86,7 @@ class TestReservationsListPDF:
 
     def test_pdf_empty_list(self, logged_client, class_slot):
         response = logged_client.get(
-            f"/reservations/list/pdf/?class_slot={class_slot.pk}&date=2026-06-15"
+            f"/reservations/pdf/?class_slot={class_slot.pk}&date=2026-06-15"
         )
         assert response.status_code == 200
         assert response["Content-Type"] == "application/pdf"
@@ -196,25 +95,25 @@ class TestReservationsListPDF:
 
     def test_filename_with_missing_date_uses_no_date_fallback(self, logged_client, class_slot):
         response = logged_client.get(
-            f"/reservations/list/pdf/?class_slot={class_slot.pk}&date="
+            f"/reservations/pdf/?class_slot={class_slot.pk}&date="
         )
         assert response.status_code == 200
         assert "no_date" in response["Content-Disposition"]
 
     def test_pdf_filename_with_missing_class_slot_fallback(self, logged_client):
         response = logged_client.get(
-            "/reservations/list/pdf/?date=2026-06-15"
+            "/reservations/pdf/?date=2026-06-15"
         )
         assert response.status_code == 200
         safe = "unknown"
         assert safe in response["Content-Disposition"]
 
-    def test_export_button_visible_on_list_page(self, logged_client, class_slot, reservations_for_slot):
+    def test_export_button_visible_on_main_page(self, logged_client, class_slot, reservations_for_slot):
         response = logged_client.get(
-            f"/reservations/list/?class_slot={class_slot.pk}&date=2026-06-15"
+            f"/reservations/?class_slot={class_slot.pk}&date=2026-06-15"
         )
         content = response.content.decode()
-        assert "/reservations/list/pdf/" in content
+        assert "/reservations/pdf/" in content
 
 
 @pytest.mark.django_db
@@ -318,20 +217,6 @@ class TestReservationStatusChange:
         )
         assert response.status_code == 302
         assert "/accounts/login/" in response.url
-
-
-@pytest.mark.django_db
-class TestReservationStatusInList:
-
-    def test_status_column_in_list_view(self, logged_client, class_slot, reservations_for_slot):
-        reservation = Reservation.objects.first()
-        reservation.status = "used"
-        reservation.save()
-        response = logged_client.get(
-            f"/reservations/list/?class_slot={class_slot.pk}&date=2026-06-15"
-        )
-        content = response.content.decode()
-        assert "Usado" in content
 
 
 @pytest.mark.django_db
