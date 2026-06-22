@@ -93,6 +93,28 @@ docker-compose exec web python -m pytest
 docker-compose exec web ruff check .
 ```
 
+## AI Agent Skills
+
+[autoskills.sh](https://www.autoskills.sh/) automatically detects your tech stack and installs curated AI agent skills for your project.
+
+```bash
+npx autoskills
+```
+
+This project uses Django, so running the above command will detect it and offer to install relevant Django skills:
+
+| Skill | Description |
+|-------|-------------|
+| [django-expert](https://skills.sh/vintasoftware/django-ai-plugins/django-expert) | Expert-level Django development patterns |
+| [django-patterns](https://skills.sh/affaan-m/everything-claude-code/django-patterns) | Common Django patterns and best practices |
+| [django-security](https://skills.sh/affaan-m/everything-claude-code/django-security) | Django security best practices |
+
+Additional skills for other technologies in the stack (Bootstrap, PostgreSQL, Docker) will also be offered. Use `--dry-run` to preview before installing:
+
+```bash
+npx autoskills --dry-run
+```
+
 ## Project Structure
 
 ```text
