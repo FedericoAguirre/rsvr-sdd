@@ -21,3 +21,5 @@ cal_<client_name>_<start_date>_<end_date>.ics
 Where:
 client_name is the snake_case version of Client's name
 start_date and end_date are formatted as YYYYMMDD
+
+Add this functionality in the clients/{client_id}/ webpage.
