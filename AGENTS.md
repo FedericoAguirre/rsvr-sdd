@@ -1,12 +1,12 @@
 <!-- SPECKIT START -->
 For additional context about technologies to be used, project structure,
 shell commands, and other important information, read the current plan at
-`specs/020-remove-status-buttons/plan.md`
+`specs/021-send-class-calendar/plan.md`
 <!-- SPECKIT END -->
 
 ## Session Summary (2026-06-22)
 
-This session is on branch **020-remove-status-buttons** — see `specs/020-remove-status-buttons/plan.md`.
+This session is on branch **021-send-class-calendar** — see `specs/021-send-class-calendar/plan.md`.
 
 ## Session Summary (2026-06-22)
 
