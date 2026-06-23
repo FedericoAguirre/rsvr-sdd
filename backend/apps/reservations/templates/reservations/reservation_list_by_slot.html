@@ -12,27 +12,7 @@
         <td>{{ r.equipment }}</td>
         <td><span class="{{ r.status|status_badge_class }}">{{ r.status|status_label }}</span></td>
         <td>
-                <div class="d-flex gap-1">
-                    {% if r.status != "used" %}
-                    <button class="btn btn-sm btn-success"
-                            hx-post="{% url 'reservations:reservation-change-status' r.pk %}"
-                            hx-vals='{"status": "used"}'
-                            hx-target="#row-{{ r.pk }}"
-                            hx-swap="outerHTML">
-                        {% translate "Used" %}
-                    </button>
-                    {% endif %}
-                    {% if r.status != "unused" %}
-                    <button class="btn btn-sm btn-warning"
-                            hx-post="{% url 'reservations:reservation-change-status' r.pk %}"
-                            hx-vals='{"status": "unused"}'
-                            hx-target="#row-{{ r.pk }}"
-                            hx-swap="outerHTML">
-                        {% translate "Unused" %}
-                    </button>
-                    {% endif %}
-                    <a href="{% url 'reservations:reservation-detail' r.pk %}" class="btn btn-sm btn-outline-primary">{% translate "View" %}</a>
-                </div>
+                <a href="{% url 'reservations:reservation-detail' r.pk %}" class="btn btn-sm btn-outline-primary">{% translate "View" %}</a>
             </td>
     </tr>
     {% endfor %}
