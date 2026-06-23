@@ -1,0 +1,32 @@
+{% load i18n %}
+{% load reservation_extras %}
+<tr id="row-{{ reservation.pk }}">
+    <td>{{ reservation.date }}</td>
+    <td>{{ reservation.client|full_name }}</td>
+    <td>{{ reservation.class_slot }}</td>
+    <td>{{ reservation.equipment }}</td>
+    <td><span class="{{ reservation.status|status_badge_class }}">{{ reservation.status|status_label }}</span></td>
+    <td>
+        <div class="d-flex gap-1">
+            {% if reservation.status != "used" %}
+            <button class="btn btn-sm btn-success"
+                    hx-post="{% url 'reservations:reservation-change-status' reservation.pk %}"
+                    hx-vals='{"status": "used"}'
+                    hx-target="#row-{{ reservation.pk }}"
+                    hx-swap="outerHTML">
+                {% translate "Used" %}
+            </button>
+            {% endif %}
+            {% if reservation.status != "unused" %}
+            <button class="btn btn-sm btn-warning"
+                    hx-post="{% url 'reservations:reservation-change-status' reservation.pk %}"
+                    hx-vals='{"status": "unused"}'
+                    hx-target="#row-{{ reservation.pk }}"
+                    hx-swap="outerHTML">
+                {% translate "Unused" %}
+            </button>
+            {% endif %}
+            <a href="{% url 'reservations:reservation-detail' reservation.pk %}" class="btn btn-sm btn-outline-primary">{% translate "View" %}</a>
+        </div>
+    </td>
+</tr>
