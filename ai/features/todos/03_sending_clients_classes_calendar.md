@@ -15,8 +15,7 @@ The reservations in the calendar must include:
 - The class slot date
 - The reserved equipment
 
-The calendar is send via email. If email is not available, the calendar can be
-downloaded as an ics file, with the file name:
+The calendar can be downloaded as an ics file, with the file name:
 cal_<client_name>_<start_date>_<end_date>.ics
 
 Where:
