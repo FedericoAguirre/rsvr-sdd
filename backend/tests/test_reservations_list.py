@@ -1,4 +1,5 @@
 import datetime
+import json
 
 import pytest
 from django.contrib.auth.models import User
@@ -220,6 +221,115 @@ class TestReservationStatusChange:
 
 
 @pytest.mark.django_db
+class TestHTMXStatusChange:
+
+    def test_htmx_request_returns_row_partial(self, logged_client, reservations_for_slot):
+        reservation = Reservation.objects.first()
+        response = logged_client.post(
+            f"/reservations/{reservation.pk}/status/",
+            {"status": "used"},
+            HTTP_HX_REQUEST="true",
+        )
+        assert response.status_code == 200
+        content = response.content.decode()
+        assert f'id="row-{reservation.pk}"' in content
+        assert "bg-primary" in content
+
+    def test_non_htmx_request_still_redirects(self, logged_client, reservations_for_slot):
+        reservation = Reservation.objects.first()
+        response = logged_client.post(
+            f"/reservations/{reservation.pk}/status/", {"status": "used"}
+        )
+        assert response.status_code == 302
+        assert f"/reservations/{reservation.pk}/" in response.url
+
+    def test_htmx_invalid_status_returns_400(self, logged_client, reservations_for_slot):
+        reservation = Reservation.objects.first()
+        response = logged_client.post(
+            f"/reservations/{reservation.pk}/status/",
+            {"status": "invalid"},
+            HTTP_HX_REQUEST="true",
+        )
+        assert response.status_code == 400
+
+    def test_htmx_unauthenticated_redirects(self, http_client, reservations_for_slot):
+        reservation = Reservation.objects.first()
+        response = http_client.post(
+            f"/reservations/{reservation.pk}/status/",
+            {"status": "used"},
+            HTTP_HX_REQUEST="true",
+        )
+        assert response.status_code == 302
+        assert "/accounts/login/" in response.url
+
+    def test_htmx_reserved_to_used_updates_badge(self, logged_client, reservations_for_slot):
+        reservation = Reservation.objects.first()
+        assert reservation.status == "reserved"
+        response = logged_client.post(
+            f"/reservations/{reservation.pk}/status/",
+            {"status": "used"},
+            HTTP_HX_REQUEST="true",
+        )
+        assert response.status_code == 200
+        content = response.content.decode()
+        assert "bg-primary" in content
+        reservation.refresh_from_db()
+        assert reservation.status == "used"
+
+    def test_htmx_used_to_unused_updates_badge(self, logged_client, reservations_for_slot):
+        reservation = Reservation.objects.first()
+        reservation.status = "used"
+        reservation.save()
+        response = logged_client.post(
+            f"/reservations/{reservation.pk}/status/",
+            {"status": "unused"},
+            HTTP_HX_REQUEST="true",
+        )
+        assert response.status_code == 200
+        content = response.content.decode()
+        assert "bg-secondary" in content
+        reservation.refresh_from_db()
+        assert reservation.status == "unused"
+
+    def test_htmx_response_has_status_changed_trigger(self, logged_client, reservations_for_slot):
+        reservation = Reservation.objects.first()
+        response = logged_client.post(
+            f"/reservations/{reservation.pk}/status/",
+            {"status": "used"},
+            HTTP_HX_REQUEST="true",
+        )
+        assert response.headers.get("HX-Trigger") == "statusChanged"
+
+    def test_htmx_same_status_noop(self, logged_client, reservations_for_slot):
+        reservation = Reservation.objects.first()
+        reservation.status = "used"
+        reservation.save()
+        response = logged_client.post(
+            f"/reservations/{reservation.pk}/status/",
+            {"status": "used"},
+            HTTP_HX_REQUEST="true",
+        )
+        assert response.status_code == 200
+        reservation.refresh_from_db()
+        assert reservation.status == "used"
+
+    def test_htmx_json_body_updates_status(self, logged_client, reservations_for_slot):
+        reservation = Reservation.objects.first()
+        assert reservation.status == "reserved"
+        response = logged_client.post(
+            f"/reservations/{reservation.pk}/status/",
+            json.dumps({"status": "used"}),
+            content_type="application/json",
+            HTTP_HX_REQUEST="true",
+        )
+        assert response.status_code == 200
+        content = response.content.decode()
+        assert "bg-primary" in content
+        reservation.refresh_from_db()
+        assert reservation.status == "used"
+
+
+@pytest.mark.django_db
 class TestReservationStatusFilter:
 
     def test_filter_by_status_shows_only_matching(self, logged_client, class_slot, reservations_for_slot):
@@ -247,6 +357,36 @@ class TestReservationStatusInPDF:
             "date_display": "2026/06/15",
         })
         assert "Usado" in html_string
+
+
+@pytest.mark.django_db
+class TestStatusBadgeRendering:
+
+    def test_status_badge_class_filter(self, db):
+        from apps.reservations.templatetags.reservation_extras import status_badge_class
+        assert "bg-success" in status_badge_class("reserved")
+        assert "bg-primary" in status_badge_class("used")
+        assert "bg-secondary" in status_badge_class("unused")
+
+    def test_badge_appears_in_list_view_per_status(self, logged_client, class_slot, equipment_list, client_list, staff_user):
+        date = "2026-06-15"
+        statuses = ["reserved", "used", "unused"]
+        for i, status in enumerate(statuses):
+            Reservation.objects.create(
+                client=client_list[i],
+                equipment=equipment_list[i],
+                class_slot=class_slot,
+                date=date,
+                status=status,
+                created_by=staff_user,
+            )
+        response = logged_client.get(
+            f"/reservations/?class_slot={class_slot.pk}&date=2026-06-15"
+        )
+        content = response.content.decode()
+        assert 'bg-success' in content
+        assert 'bg-primary' in content
+        assert 'bg-secondary' in content
 
 
 @pytest.mark.django_db

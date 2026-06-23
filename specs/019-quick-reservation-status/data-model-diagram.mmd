@@ -1,0 +1,46 @@
+erDiagram
+    Reservation {
+        enum-reserved-used-unused status
+        date date
+        Client client
+        Equipment equipment
+        ClassSlot class_slot
+        User_nullable created_by
+        User_nullable updated_by
+    }
+
+    Client {
+        string first_name
+        string last_name
+        string_nullable email
+        string_nullable mobile
+        boolean is_active
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    Equipment {
+        string name
+        enum-climber-treadmill-bike-elliptical-rower-other equipment_type
+        enum-in-service-out-of-service status
+        text_nullable notes
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    ClassSlot {
+        integer day_of_week
+        time time
+        boolean is_active
+    }
+
+    User {
+        string username
+        string email
+    }
+
+    Reservation ||--o{ Client : "belongs to"
+    Reservation ||--o{ Equipment : "reserves"
+    Reservation ||--o{ ClassSlot : "scheduled in"
+    Reservation ||--o{ User : "created by"
+    Reservation ||--o{ User : "updated by"

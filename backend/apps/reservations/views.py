@@ -1,3 +1,4 @@
+import json
 import logging
 
 from django.contrib import messages
@@ -100,13 +101,26 @@ def reservation_detail(request, pk):
 def reservation_change_status(request, pk):
     reservation = get_object_or_404(Reservation, pk=pk)
     new_status = request.POST.get("status")
+    if new_status is None and request.headers.get("Content-Type") == "application/json":
+        try:
+            new_status = json.loads(request.body).get("status")
+        except (json.JSONDecodeError, AttributeError):
+            new_status = None
     valid_statuses = dict(Reservation.STATUS_CHOICES)
-    if new_status in valid_statuses:
-        reservation.status = new_status
-        reservation.save()
-        messages.success(request, _("Reservation status updated."))
-    else:
+    if new_status not in valid_statuses:
+        if request.headers.get("HX-Request"):
+            return HttpResponse(_("Invalid status."), status=400)
         messages.error(request, _("Invalid status."))
+        return redirect("reservations:reservation-detail", pk=reservation.pk)
+    reservation.status = new_status
+    reservation.save()
+    if request.headers.get("HX-Request"):
+        response = render(request, "reservations/partials/reservation_row.html", {
+            "reservation": reservation,
+        })
+        response["HX-Trigger"] = "statusChanged"
+        return response
+    messages.success(request, _("Reservation status updated."))
     return redirect("reservations:reservation-detail", pk=reservation.pk)
 
 
