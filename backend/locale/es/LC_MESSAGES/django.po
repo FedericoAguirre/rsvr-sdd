@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: rsvr-sdd\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-21 11:33-0600\n"
+"POT-Creation-Date: 2026-06-24 12:56-0600\n"
 "PO-Revision-Date: 2026-06-11 10:30-0600\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -93,9 +93,8 @@ msgstr "Día"
 #: apps/equipment/templates/equipment/equipment_list.html:8
 #: apps/reservations/models.py:17
 #: apps/reservations/templates/reservations/reservation_detail.html:19
-#: apps/reservations/templates/reservations/reservation_list.html:48
-#: apps/reservations/templates/reservations/reservation_list.html:63
-#: apps/reservations/templates/reservations/reservation_list_by_slot.html:32
+#: apps/reservations/templates/reservations/reservation_list.html:43
+#: apps/reservations/templates/reservations/reservation_list_by_slot.html:5
 #: apps/reservations/templates/reservations/reservation_list_pdf.html:29
 msgid "Status"
 msgstr "Estado"
@@ -146,7 +145,8 @@ msgstr "Archivo CSV"
 
 #: apps/clients/forms.py:31
 msgid "Upload a CSV file with columns: first_name, last_name, email, mobile."
-msgstr "Subir un archivo CSV con las columnas: first_name, last_name, email, mobile."
+msgstr ""
+"Subir un archivo CSV con las columnas: first_name, last_name, email, mobile."
 
 #: apps/clients/forms.py:39
 msgid "Only .csv files are allowed."
@@ -179,9 +179,8 @@ msgstr "Móvil"
 #: apps/clients/models.py:16 apps/reservations/forms.py:15
 #: apps/reservations/models.py:21
 #: apps/reservations/templates/reservations/reservation_detail.html:7
-#: apps/reservations/templates/reservations/reservation_list.html:47
-#: apps/reservations/templates/reservations/reservation_list.html:63
-#: apps/reservations/templates/reservations/reservation_list_by_slot.html:31
+#: apps/reservations/templates/reservations/reservation_list.html:43
+#: apps/reservations/templates/reservations/reservation_list_by_slot.html:5
 #: apps/reservations/templates/reservations/reservation_list_pdf.html:28
 msgid "Client"
 msgstr "Cliente"
@@ -242,7 +241,9 @@ msgstr "Editar"
 
 #: apps/clients/templates/clients/_search_results.html:35
 #: apps/equipment/templates/equipment/equipment_list.html:16
-#: apps/reservations/templates/reservations/reservation_list.html:72
+#: apps/reservations/templates/reservations/partials/reservation_row.html:10
+#: apps/reservations/templates/reservations/reservation_list.html:53
+#: apps/reservations/templates/reservations/reservation_list_by_slot.html:15
 msgid "View"
 msgstr "Ver"
 
@@ -297,54 +298,65 @@ msgstr "Cancelar"
 msgid "New Reservation"
 msgstr "Nueva Reserva"
 
-#: apps/clients/templates/clients/client_detail.html:13
+#: apps/clients/templates/clients/client_detail.html:16
+msgid "Start date"
+msgstr "Fecha de inicio"
+
+#: apps/clients/templates/clients/client_detail.html:22
+msgid "End date"
+msgstr "Fecha de fin"
+
+#: apps/clients/templates/clients/client_detail.html:28
+msgid "Download Calendar"
+msgstr "Descargar Calendario"
+
+#: apps/clients/templates/clients/client_detail.html:32
 msgid "Reservation History"
 msgstr "Historial de Reservas"
 
-#: apps/clients/templates/clients/client_detail.html:16
+#: apps/clients/templates/clients/client_detail.html:35
 #: apps/reservations/forms.py:18 apps/reservations/models.py:31
 #: apps/reservations/templates/reservations/reservation_detail.html:13
 #: apps/reservations/templates/reservations/reservation_list.html:33
-#: apps/reservations/templates/reservations/reservation_list.html:63
-#: apps/reservations/templates/reservations/reservation_list_by_slot.html:10
+#: apps/reservations/templates/reservations/reservation_list.html:43
+#: apps/reservations/templates/reservations/reservation_list_by_slot.html:5
 #: apps/reservations/templates/reservations/reservation_list_pdf.html:20
 msgid "Date"
 msgstr "Fecha"
 
-#: apps/clients/templates/clients/client_detail.html:16
+#: apps/clients/templates/clients/client_detail.html:35
 #: apps/reservations/templates/reservations/reservation_detail.html:11
 #: apps/reservations/templates/reservations/reservation_list.html:34
-#: apps/reservations/templates/reservations/reservation_list.html:63
-#: apps/reservations/templates/reservations/reservation_list_by_slot.html:11
+#: apps/reservations/templates/reservations/reservation_list.html:43
+#: apps/reservations/templates/reservations/reservation_list_by_slot.html:5
 #: apps/reservations/templates/reservations/reservation_list_pdf.html:21
 msgid "Class"
 msgstr "Clase"
 
-#: apps/clients/templates/clients/client_detail.html:16
+#: apps/clients/templates/clients/client_detail.html:35
 #: apps/equipment/apps.py:8 apps/equipment/models.py:28
 #: apps/equipment/templates/equipment/equipment_list.html:3
 #: apps/equipment/templates/equipment/equipment_list.html:5
 #: apps/reservations/forms.py:16 apps/reservations/models.py:25
 #: apps/reservations/templates/reservations/reservation_detail.html:9
-#: apps/reservations/templates/reservations/reservation_list.html:46
-#: apps/reservations/templates/reservations/reservation_list.html:63
-#: apps/reservations/templates/reservations/reservation_list_by_slot.html:30
+#: apps/reservations/templates/reservations/reservation_list.html:43
+#: apps/reservations/templates/reservations/reservation_list_by_slot.html:5
 #: apps/reservations/templates/reservations/reservation_list_pdf.html:27
 #: templates/base.html:20
 msgid "Equipment"
 msgstr "Equipo"
 
-#: apps/clients/templates/clients/client_detail.html:28
+#: apps/clients/templates/clients/client_detail.html:47
 msgid "No reservations yet."
 msgstr "Sin reservas aún."
 
-#: apps/clients/templates/clients/client_detail.html:30
+#: apps/clients/templates/clients/client_detail.html:49
 msgid "Back to Search"
 msgstr "Volver a Búsqueda"
 
 #: apps/clients/templates/clients/client_form.html:3
 #: apps/clients/templates/clients/client_form.html:5
-#: apps/clients/templates/clients/search.html:15
+#: apps/clients/templates/clients/search.html:16
 msgid "New Client"
 msgstr "Nuevo Cliente"
 
@@ -362,28 +374,59 @@ msgstr "Buscar Clientes"
 msgid "Search"
 msgstr "Buscar"
 
-#: apps/clients/templates/clients/search.html:17
-msgid "Searching..."
-msgstr "Búsqueda..."
-
-#: apps/clients/templates/clients/search.html:18
+#: apps/clients/templates/clients/search.html:15
 msgid "Upload Clients"
 msgstr "Subir Clientes"
 
-#: apps/clients/views.py:61
+#: apps/clients/templates/clients/search.html:18
+msgid "Searching..."
+msgstr "Búsqueda..."
+
+#: apps/clients/views.py:101
+#, python-format
+msgid ""
+"Client: %(name)s\n"
+"Class: %(slot)s\n"
+"Date: %(date)s\n"
+"Equipment: %(equipment)s"
+msgstr ""
+"Cliente: %(name)s\n"
+"Clase: %(slot)s\n"
+"Fecha: %(date)s\n"
+"Equipo: %(equipment)s"
+
+#: apps/clients/views.py:119
+msgid "Please provide both a start date and an end date."
+msgstr "Proporcione una fecha de inicio y una fecha de fin."
+
+#: apps/clients/views.py:126
+msgid "Invalid date format. Use YYYY-MM-DD."
+msgstr "Formato de fecha inválido. Use YYYY-MM-DD."
+
+#: apps/clients/views.py:130
+msgid "The start date must be before the end date."
+msgstr "La fecha de inicio debe ser anterior a la fecha de fin."
+
+#: apps/clients/views.py:138
+#, fuzzy
+#| msgid "No reservations found."
+msgid "No reservations found for the selected date range."
+msgstr "No se encontraron reservaciones."
+
+#: apps/clients/views.py:156
 #, python-format
 msgid "Client %s created."
 msgstr "Cliente %s creado."
 
-#: apps/clients/views.py:76
+#: apps/clients/views.py:171
 msgid "The file is empty."
 msgstr "El archivo está vacío."
 
-#: apps/clients/views.py:82
+#: apps/clients/views.py:177
 msgid "The CSV file contains no data rows."
 msgstr "El archivo CSV no contiene filas de datos."
 
-#: apps/clients/views.py:87
+#: apps/clients/views.py:182
 #, python-format
 msgid ""
 "Processed %(total)s rows: %(created)s created, %(updated)s updated, "
@@ -392,7 +435,7 @@ msgstr ""
 "Procesadas %(total)s filas: %(created)s creadas, %(updated)s actualizadas, "
 "%(errors)s errores."
 
-#: apps/clients/views.py:91
+#: apps/clients/views.py:186
 msgid "Could not decode the file. Please use UTF-8 encoding."
 msgstr "No se pudo decodificar el archivo. Use codificación UTF-8."
 
@@ -402,7 +445,7 @@ msgstr "Tipo de equipo"
 
 #: apps/equipment/forms.py:15 apps/equipment/models.py:22
 #: apps/equipment/templates/equipment/equipment_detail.html:11
-#: apps/reservations/forms.py:19 apps/reservations/models.py:40
+#: apps/reservations/forms.py:19 apps/reservations/models.py:48
 #: apps/reservations/templates/reservations/reservation_detail.html:17
 msgid "Notes"
 msgstr "Notas"
@@ -454,7 +497,6 @@ msgstr "Tipo"
 
 #: apps/equipment/templates/equipment/equipment_detail.html:15
 #: apps/reservations/templates/reservations/reservation_detail.html:39
-#: apps/reservations/templates/reservations/reservation_list_by_slot.html:50
 msgid "Back"
 msgstr "Volver"
 
@@ -475,7 +517,7 @@ msgstr "Equipo actualizado."
 msgid "Edit Equipment"
 msgstr "Editar Equipo"
 
-#: apps/reservations/apps.py:8 apps/reservations/models.py:48
+#: apps/reservations/apps.py:8 apps/reservations/models.py:56
 #: apps/reservations/templates/reservations/reservation_list.html:4
 #: apps/reservations/templates/reservations/reservation_list.html:6
 #: templates/base.html:17
@@ -519,19 +561,19 @@ msgstr "  Creados %(count)s clientes."
 
 #: apps/reservations/models.py:8
 #: apps/reservations/templates/reservations/reservation_list.html:21
-#: apps/reservations/templates/reservations/reservation_list_by_slot.html:18
+#: apps/reservations/templatetags/reservation_extras.py:26
 msgid "Reserved"
 msgstr "Reservado"
 
 #: apps/reservations/models.py:9
 #: apps/reservations/templates/reservations/reservation_list.html:22
-#: apps/reservations/templates/reservations/reservation_list_by_slot.html:19
+#: apps/reservations/templatetags/reservation_extras.py:27
 msgid "Used"
 msgstr "Usado"
 
 #: apps/reservations/models.py:10
 #: apps/reservations/templates/reservations/reservation_list.html:23
-#: apps/reservations/templates/reservations/reservation_list_by_slot.html:20
+#: apps/reservations/templatetags/reservation_extras.py:28
 msgid "Unused"
 msgstr "No usado"
 
@@ -540,11 +582,17 @@ msgstr "No usado"
 msgid "Created by"
 msgstr "Creado por"
 
-#: apps/reservations/models.py:47
+#: apps/reservations/models.py:46
+#, fuzzy
+#| msgid "Updated"
+msgid "Updated by"
+msgstr "Actualizados"
+
+#: apps/reservations/models.py:55
 msgid "Reservation"
 msgstr "Reserva"
 
-#: apps/reservations/models.py:51
+#: apps/reservations/models.py:59
 #, python-format
 msgid "%(client)s – %(equipment)s – %(date)s"
 msgstr "%(client)s – %(equipment)s – %(date)s"
@@ -571,12 +619,10 @@ msgid "Create Reservation"
 msgstr "Crear Reserva"
 
 #: apps/reservations/templates/reservations/reservation_list.html:20
-#: apps/reservations/templates/reservations/reservation_list_by_slot.html:17
 msgid "All statuses"
 msgstr "Todos los estados"
 
 #: apps/reservations/templates/reservations/reservation_list.html:25
-#: apps/reservations/templates/reservations/reservation_list_by_slot.html:22
 msgid "Filter"
 msgstr "Filtrar"
 
@@ -585,41 +631,38 @@ msgid "Clear Filters"
 msgstr "Limpiar Filtros"
 
 #: apps/reservations/templates/reservations/reservation_list.html:37
-#: apps/reservations/templates/reservations/reservation_list_by_slot.html:52
 msgid "Export PDF"
 msgstr "Exportar PDF"
 
-#: apps/reservations/templates/reservations/reservation_list.html:79
+#: apps/reservations/templates/reservations/reservation_list.html:60
+#: apps/reservations/templates/reservations/reservation_list_by_slot.html:22
 msgid "No reservations found."
 msgstr "No se encontraron reservaciones."
 
-#: apps/reservations/templates/reservations/reservation_list_by_slot.html:4
-#: apps/reservations/templates/reservations/reservation_list_by_slot.html:6
 #: apps/reservations/templates/reservations/reservation_list_pdf.html:7
 #: apps/reservations/templates/reservations/reservation_list_pdf.html:18
 msgid "Reservations by Class"
 msgstr "Reservaciones por Clase"
 
-#: apps/reservations/templates/reservations/reservation_list_by_slot.html:46
 #: apps/reservations/templates/reservations/reservation_list_pdf.html:43
 #, fuzzy
 #| msgid "No reservations found."
 msgid "No reservations found for this class and date."
 msgstr "No se encontraron reservaciones."
 
-#: apps/reservations/views.py:76
+#: apps/reservations/views.py:59
 msgid "Could not generate the PDF. Please try again."
 msgstr ""
 
-#: apps/reservations/views.py:125
-msgid "Reservation status updated."
-msgstr "Estado de la reserva actualizado."
-
-#: apps/reservations/views.py:127
+#: apps/reservations/views.py:112 apps/reservations/views.py:113
 msgid "Invalid status."
 msgstr "Estado inválido."
 
-#: apps/reservations/views.py:143
+#: apps/reservations/views.py:123
+msgid "Reservation status updated."
+msgstr "Estado de la reserva actualizado."
+
+#: apps/reservations/views.py:139
 msgid "Reservation created."
 msgstr "Reserva creada."
 
