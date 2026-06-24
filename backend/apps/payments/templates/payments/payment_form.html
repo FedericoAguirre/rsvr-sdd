@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% if mode == "edit" %}{% translate "Edit Payment" %}{% else %}{% translate "New Payment" %}{% endif %} | {{ block.super }}{% endblock %}
+{% block content %}
+<h2 class="mb-4">{% if mode == "edit" %}{% translate "Edit Payment" %}{% else %}{% translate "New Payment" %}{% endif %}</h2>
+<form method="post" enctype="multipart/form-data" class="row g-3">
+    {% csrf_token %}
+    {% for field in form %}
+    <div class="col-12">
+        <label class="form-label">{{ field.label }}</label>
+        {{ field }}
+        {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
+        {% if field.errors %}<div class="text-danger">{{ field.errors }}</div>{% endif %}
+    </div>
+    {% endfor %}
+    <div class="col-12">
+        <button type="submit" class="btn btn-primary">
+            {% if mode == "edit" %}{% translate "Save Changes" %}{% else %}{% translate "Create Payment" %}{% endif %}
+        </button>
+        <a href="{% url 'payments:list' %}" class="btn btn-secondary">{% translate "Cancel" %}</a>
+    </div>
+</form>
+{% endblock %}

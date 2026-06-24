@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load payment_extras %}
+{% load humanize %}
+
+{% block title %}{{ payment.payment_identifier }} | {% translate "Payments" %} | {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'payments:list' %}">{% translate "Payments" %}</a></li>
+                <li class="breadcrumb-item active">{{ payment.payment_identifier }}</li>
+            </ol>
+        </nav>
+
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h3 class="mb-0">{{ payment.payment_identifier }}</h3>
+                <div>
+                    <a href="{% url 'payments:edit' payment.pk %}" class="btn btn-sm btn-outline-primary">{% translate "Edit" %}</a>
+                    <form method="post" action="{% url 'payments:delete' payment.pk %}" class="d-inline" onsubmit="return confirm('{% translate "Are you sure?" %}')">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-outline-danger">{% translate "Delete" %}</button>
+                    </form>
+                </div>
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-4">{% translate "Client" %}</dt>
+                    <dd class="col-sm-8">{{ payment.client }}</dd>
+
+                    <dt class="col-sm-4">{% translate "Amount" %}</dt>
+                    <dd class="col-sm-8">{{ payment.amount|currency }}</dd>
+
+                    <dt class="col-sm-4">{% translate "Payment Type" %}</dt>
+                    <dd class="col-sm-8">{{ payment.get_payment_type_display }}</dd>
+
+                    <dt class="col-sm-4">{% translate "Date" %}</dt>
+                    <dd class="col-sm-8">{{ payment.date|date:"SHORT_DATE_FORMAT" }}</dd>
+
+                    <dt class="col-sm-4">{% translate "Class Slot Count" %}</dt>
+                    <dd class="col-sm-8">{{ payment.class_slot_count }}</dd>
+
+                    {% if payment.reference %}
+                    <dt class="col-sm-4">{% translate "Reference" %}</dt>
+                    <dd class="col-sm-8">{{ payment.reference }}</dd>
+                    {% endif %}
+
+                    {% if payment.notes %}
+                    <dt class="col-sm-4">{% translate "Notes" %}</dt>
+                    <dd class="col-sm-8">{{ payment.notes }}</dd>
+                    {% endif %}
+
+                    {% if payment.evidence %}
+                    <dt class="col-sm-4">{% translate "Evidence" %}</dt>
+                    <dd class="col-sm-8"><a href="{{ payment.evidence.url }}" target="_blank">{% translate "View" %}</a></dd>
+                    {% endif %}
+                </dl>
+            </div>
+        </div>
+
+        {% if reservations %}
+        <div class="card mt-3">
+            <div class="card-header">
+                <h4>{% translate "Associated Reservations" %}</h4>
+            </div>
+            <div class="card-body">
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>{% translate "Date" %}</th>
+                            <th>{% translate "Equipment" %}</th>
+                            <th>{% translate "Class Slot" %}</th>
+                            <th>{% translate "Status" %}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for pr in reservations %}
+                        <tr>
+                            <td>{{ pr.reservation.date|date:"SHORT_DATE_FORMAT" }}</td>
+                            <td>{{ pr.reservation.equipment }}</td>
+                            <td>{{ pr.reservation.class_slot }}</td>
+                            <td>{{ pr.reservation.get_status_display }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

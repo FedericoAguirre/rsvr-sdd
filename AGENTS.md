@@ -1,14 +1,12 @@
 <!-- SPECKIT START -->
 For additional context about technologies to be used, project structure,
 shell commands, and other important information, read the current plan at
-`specs/021-send-class-calendar/plan.md`
+`specs/022-payments-module/plan.md`
 <!-- SPECKIT END -->
 
-## Session Summary (2026-06-22)
+## Session Summary (2026-06-24)
 
-This session is on branch **021-send-class-calendar** — see `specs/021-send-class-calendar/plan.md`.
-
-## Session Summary (2026-06-22)
+This session is on branch **022-payments-module** — see `specs/022-payments-module/plan.md`.
 
 ### Completed
 - Added `status_badge_class` and `status_label` template filters in `reservation_extras.py`

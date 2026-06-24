@@ -1,0 +1,13 @@
+{% load payment_extras %}
+<tr>
+    <td><a href="{% url 'payments:detail' payment.pk %}">{{ payment.payment_identifier }}</a></td>
+    <td>{{ payment.client }}</td>
+    <td>{{ payment.amount|currency }}</td>
+    <td>{{ payment.get_payment_type_display }}</td>
+    <td>{{ payment.date|date:"SHORT_DATE_FORMAT" }}</td>
+    <td>{{ payment.class_slot_count }}</td>
+    <td>
+        <a href="{% url 'payments:detail' payment.pk %}" class="btn btn-sm btn-outline-info">{% translate "View" %}</a>
+        <a href="{% url 'payments:edit' payment.pk %}" class="btn btn-sm btn-outline-primary">{% translate "Edit" %}</a>
+    </td>
+</tr>
