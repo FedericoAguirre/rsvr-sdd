@@ -43,7 +43,7 @@ A Client's payment can be associated with the clients reservations by the number
 
 The payments module must be accessible from the Main menu like other modules.
 
-A new payment can be created from the New Reservations webpage.
+A new payment can be created from the New Reservations webpage. The payment must exist before it can be associated to the Reservations.
 
 An operator can see the payment history per client in a paginated way, each page is made up of 5 payments. The payments must be ordered by descending date.
 

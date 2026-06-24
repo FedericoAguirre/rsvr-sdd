@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block title %}{% translate "Payment Reports" %} | {{ block.super }}{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">{% translate "Payment Reports" %}</h1>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3 align-items-end">
+            <div class="col-auto">
+                <label for="grouping" class="form-label">{% translate "Group by" %}</label>
+                <select name="grouping" id="grouping" class="form-select">
+                    <option value="day" {% if grouping == "day" %}selected{% endif %}>{% translate "Day" %}</option>
+                    <option value="week" {% if grouping == "week" %}selected{% endif %}>{% translate "Week" %}</option>
+                    <option value="month" {% if grouping == "month" %}selected{% endif %}>{% translate "Month" %}</option>
+                    <option value="range" {% if grouping == "range" %}selected{% endif %}>{% translate "Custom Range" %}</option>
+                </select>
+            </div>
+            <div class="col-auto">
+                <label for="start" class="form-label">{% translate "Start Date" %}</label>
+                <input type="date" name="start" id="start" class="form-control" value="{{ start_date }}">
+            </div>
+            <div class="col-auto">
+                <label for="end" class="form-label">{% translate "End Date" %}</label>
+                <input type="date" name="end" id="end" class="form-control" value="{{ end_date }}">
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-primary">{% translate "Generate Report" %}</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>{% translate "Totals by Payment Type" %}</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="totalsChart" width="400" height="300"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>{% translate "Distribution" %}</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="distributionChart" width="400" height="300"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{ report_data|json_script:"report-data" }}
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var raw = document.getElementById('report-data');
+    if (!raw) return;
+    var data = JSON.parse(raw.textContent);
+
+    var paymentTypes = {};
+    data.forEach(function(row) {
+        var pt = row.payment_type || 'Unknown';
+        if (!paymentTypes[pt]) paymentTypes[pt] = 0;
+        paymentTypes[pt] += parseFloat(row.total) || 0;
+    });
+
+    var labels = Object.keys(paymentTypes);
+    var values = Object.values(paymentTypes);
+
+    if (labels.length === 0) return;
+
+    var colors = [
+        'rgba(54, 162, 235, 0.7)', 'rgba(255, 99, 132, 0.7)',
+        'rgba(255, 206, 86, 0.7)', 'rgba(75, 192, 192, 0.7)',
+        'rgba(153, 102, 255, 0.7)',
+    ];
+
+    var totalsCtx = document.getElementById('totalsChart');
+    if (totalsCtx) {
+        new Chart(totalsCtx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: '{% translate "Total Amount" %}',
+                    data: values,
+                    backgroundColor: colors.slice(0, labels.length),
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false },
+                }
+            }
+        });
+    }
+
+    var distCtx = document.getElementById('distributionChart');
+    if (distCtx) {
+        new Chart(distCtx, {
+            type: 'pie',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: values,
+                    backgroundColor: colors.slice(0, labels.length),
+                }]
+            },
+            options: {
+                responsive: true,
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

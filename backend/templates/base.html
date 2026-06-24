@@ -22,6 +22,7 @@
                 {% if perms.classes.view_classslot %}
                 <li class="nav-item"><a class="nav-link" href="{% url 'classes:class-schedule' %}">{% translate "Schedule" %}</a></li>
                 {% endif %}
+                <li class="nav-item"><a class="nav-link" href="{% url 'payments:list' %}">{% translate "Payments" %}</a></li>
                 <li class="nav-item"><a class="nav-link" href="{% url 'admin:index' %}">{% translate "Admin" %}</a></li>
                 <li class="nav-item">
                     <form method="post" action="{% url 'logout' %}" class="d-inline">
@@ -41,6 +42,7 @@
         {% endif %}
         {% block content %}{% endblock %}
     </main>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.body.addEventListener('htmx:configRequest', function(evt) {
