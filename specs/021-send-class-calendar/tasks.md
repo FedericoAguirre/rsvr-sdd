@@ -30,8 +30,8 @@ description: "Task list for implementing client class calendar ICS download"
 
 **Purpose**: Project initialization and dependency setup
 
-- [ ] T001 Add `icalendar>=5.0` dependency in `backend/pyproject.toml`
-- [ ] T002 Install new dependency with `uv sync` in `backend/`
+- [X] T001 Add `icalendar>=5.0` dependency in `backend/pyproject.toml`
+- [X] T002 Install new dependency with `uv sync` in `backend/`
 
 ---
 
@@ -39,8 +39,8 @@ description: "Task list for implementing client class calendar ICS download"
 
 **Purpose**: Core infrastructure that MUST be complete before ANY user story can be implemented
 
-- [ ] T003 Read existing `client_detail` view patterns in `backend/apps/clients/views.py` and `client_csv_template` HttpResponse pattern
-- [ ] T004 Read existing `client_detail.html` template structure in `backend/apps/clients/templates/clients/client_detail.html`
+- [X] T003 Read existing `client_detail` view patterns in `backend/apps/clients/views.py` and `client_csv_template` HttpResponse pattern
+- [X] T004 Read existing `client_detail.html` template structure in `backend/apps/clients/templates/clients/client_detail.html`
 
 **Checkpoint**: Foundation ready — user story implementation can now begin in parallel
 
@@ -56,17 +56,17 @@ description: "Task list for implementing client class calendar ICS download"
 
 > **NOTE**: Write these tests FIRST, ensure they FAIL before implementation
 
-- [ ] T005 [P] [US1] Integration test for ICS download in `backend/tests/test_client_calendar.py` — authenticated user requests `clients/{pk}/calendar/?start_date=...&end_date=...` and receives 200 with `text/calendar` content type
-- [ ] T006 [P] [US1] Integration test verifying ICS content includes VEVENT with correct SUMMARY and DESCRIPTION fields in `backend/tests/test_client_calendar.py`
-- [ ] T007 [US1] Integration test verifying filename format `cal_*.ics` in `backend/tests/test_client_calendar.py`
+- [X] T005 [P] [US1] Integration test for ICS download in `backend/tests/test_client_calendar.py` — authenticated user requests `clients/{pk}/calendar/?start_date=...&end_date=...` and receives 200 with `text/calendar` content type
+- [X] T006 [P] [US1] Integration test verifying ICS content includes VEVENT with correct SUMMARY and DESCRIPTION fields in `backend/tests/test_client_calendar.py`
+- [X] T007 [US1] Integration test verifying filename format `cal_*.ics` in `backend/tests/test_client_calendar.py`
 
 ### Implementation for User Story 1
 
-- [ ] T008 [US1] Add `calendar/` URL route in `backend/apps/clients/urls.py` — map `<int:pk>/calendar/` to `client_calendar` view with name `client-calendar`
-- [ ] T009 [US1] Implement `client_calendar` view in `backend/apps/clients/views.py` — parse `start_date`/`end_date` GET params, query reservations for client with `select_related("equipment", "class_slot")`, generate ICS response using `icalendar`, return as file download
-- [ ] T010 [US1] Implement snake_case filename generation: lowercase client full name, replace spaces with underscores, remove non-alphanumeric chars (except underscores), format as `cal_<name>_<start_YYYYMMDD>_<end_YYYYMMDD>.ics`
-- [ ] T011 [US1] Add date range form (start date + end date inputs) and "Download Calendar" button to `backend/apps/clients/templates/clients/client_detail.html` above the reservation history table
-- [ ] T012 [US1] Extract Spanish strings and run `makemessages` + `compilemessages` in `backend/` for all new UI text
+- [X] T008 [US1] Add `calendar/` URL route in `backend/apps/clients/urls.py` — map `<int:pk>/calendar/` to `client_calendar` view with name `client-calendar`
+- [X] T009 [US1] Implement `client_calendar` view in `backend/apps/clients/views.py` — parse `start_date`/`end_date` GET params, query reservations for client with `select_related("equipment", "class_slot")`, generate ICS response using `icalendar`, return as file download
+- [X] T010 [US1] Implement snake_case filename generation: lowercase client full name, replace spaces with underscores, remove non-alphanumeric chars (except underscores), format as `cal_<name>_<start_YYYYMMDD>_<end_YYYYMMDD>.ics`
+- [X] T011 [US1] Add date range form (start date + end date inputs) and "Download Calendar" button to `backend/apps/clients/templates/clients/client_detail.html` above the reservation history table
+- [X] T012 [US1] Extract Spanish strings and run `makemessages` + `compilemessages` in `backend/` for all new UI text
 
 **Checkpoint**: At this point, User Story 1 should be fully functional and testable independently
 
@@ -82,12 +82,12 @@ description: "Task list for implementing client class calendar ICS download"
 
 > **NOTE**: Write these tests FIRST, ensure they FAIL before implementation
 
-- [ ] T013 [US2] Integration test for empty range in `backend/tests/test_client_calendar.py` — request with date range having no reservations, verify no file download, verify HTML response contains empty-range message
+- [X] T013 [US2] Integration test for empty range in `backend/tests/test_client_calendar.py` — request with date range having no reservations, verify no file download, verify HTML response contains empty-range message
 
 ### Implementation for User Story 2
 
-- [ ] T014 [US2] Add empty result check in `client_calendar` view in `backend/apps/clients/views.py` — if reservation count is zero after filter, render detail page with an info message instead of returning file
-- [ ] T015 [US2] Add empty-range message display area in `backend/apps/clients/templates/clients/client_detail.html` — Django messages pattern or inline conditional
+- [X] T014 [US2] Add empty result check in `client_calendar` view in `backend/apps/clients/views.py` — if reservation count is zero after filter, render detail page with an info message instead of returning file
+- [X] T015 [US2] Add empty-range message display area in `backend/apps/clients/templates/clients/client_detail.html` — Django messages pattern or inline conditional
 
 **Checkpoint**: At this point, User Story 2 should work independently
 
@@ -103,11 +103,11 @@ description: "Task list for implementing client class calendar ICS download"
 
 > **NOTE**: Write these tests FIRST, ensure they FAIL before implementation
 
-- [ ] T016 [US3] Integration test for date validation in `backend/tests/test_client_calendar.py` — request with `start_date` after `end_date`, verify error response and no file download
+- [X] T016 [US3] Integration test for date validation in `backend/tests/test_client_calendar.py` — request with `start_date` after `end_date`, verify error response and no file download
 
 ### Implementation for User Story 3
 
-- [ ] T017 [US3] Add date validation in `client_calendar` view in `backend/apps/clients/views.py` — if `start_date > end_date`, return error message without querying
+- [X] T017 [US3] Add date validation in `client_calendar` view in `backend/apps/clients/views.py` — if `start_date > end_date`, return error message without querying
 
 **Checkpoint**: At this point, all user stories should be independently functional
 
@@ -117,11 +117,11 @@ description: "Task list for implementing client class calendar ICS download"
 
 **Purpose**: Final verification and quality assurance
 
-- [ ] T018 [P] Add tests for special characters in client name (accents, apostrophes) in filename generation in `backend/tests/test_client_calendar.py`
-- [ ] T019 [P] Add test for unauthenticated access redirects to login in `backend/tests/test_client_calendar.py`
-- [ ] T020 [P] Add test for 404 when client PK doesn't exist in `backend/tests/test_client_calendar.py`
-- [ ] T021 Run full test suite with `uv run pytest` from `backend/` and verify all tests pass
-- [ ] T022 Run linting with `ruff check` from `backend/` and fix any issues
+- [X] T018 [P] Add tests for special characters in client name (accents, apostrophes) in filename generation in `backend/tests/test_client_calendar.py`
+- [X] T019 [P] Add test for unauthenticated access redirects to login in `backend/tests/test_client_calendar.py`
+- [X] T020 [P] Add test for 404 when client PK doesn't exist in `backend/tests/test_client_calendar.py`
+- [X] T021 Run full test suite with `uv run pytest` from `backend/` and verify all tests pass
+- [X] T022 Run linting with `ruff check` from `backend/` and fix any issues
 
 ---
 

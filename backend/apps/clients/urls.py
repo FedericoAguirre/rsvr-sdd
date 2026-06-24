@@ -8,5 +8,6 @@ urlpatterns = [
     path("create/", views.client_create, name="client-create"),
     path("upload/", views.client_csv_upload, name="client-csv-upload"),
     path("template/", views.client_csv_template, name="client-csv-template"),
+    path("<int:pk>/calendar/", views.client_calendar, name="client-calendar"),
     path("<int:pk>/", views.client_detail, name="client-detail"),
 ]
