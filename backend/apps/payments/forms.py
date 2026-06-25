@@ -15,10 +15,17 @@ class PaymentForm(forms.ModelForm):
             "date", "class_slot_count", "reference", "evidence", "notes",
         ]
         widgets = {
+            "client": forms.Select(attrs={"class": "form-control"}),
+            "amount": forms.NumberInput(attrs={"class": "form-control"}),
+            "payment_type": forms.Select(attrs={"class": "form-control"}),
+            "payment_identifier": forms.TextInput(attrs={"class": "form-control"}),
             "date": forms.DateInput(
-                attrs={"type": "date"}, format="%Y-%m-%d",
+                attrs={"class": "form-control", "type": "date"}, format="%Y-%m-%d",
             ),
-            "notes": forms.Textarea(attrs={"rows": 3}),
+            "class_slot_count": forms.NumberInput(attrs={"class": "form-control"}),
+            "reference": forms.TextInput(attrs={"class": "form-control"}),
+            "evidence": forms.FileInput(attrs={"class": "form-control"}),
+            "notes": forms.Textarea(attrs={"class": "form-control", "rows": 3}),
         }
 
     def __init__(self, *args, **kwargs):
