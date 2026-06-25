@@ -23,6 +23,14 @@
                 <li class="nav-item"><a class="nav-link" href="{% url 'classes:class-schedule' %}">{% translate "Schedule" %}</a></li>
                 {% endif %}
                 <li class="nav-item"><a class="nav-link" href="{% url 'payments:list' %}">{% translate "Payments" %}</a></li>
+                {% if user.is_superuser %}
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">{% translate "Reports" %}</a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="{% url 'payments:reports' %}">{% translate "Payments" %}</a></li>
+                    </ul>
+                </li>
+                {% endif %}
                 <li class="nav-item"><a class="nav-link" href="{% url 'admin:index' %}">{% translate "Admin" %}</a></li>
                 <li class="nav-item">
                     <form method="post" action="{% url 'logout' %}" class="d-inline">
