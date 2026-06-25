@@ -1,8 +1,9 @@
 <!--
   Sync Impact Report
-  Version change: 2.0.1 → 2.0.2
+  Version change: 2.0.2 → 2.1.0
   Modified principles:
-    - III. User Experience Consistency — expanded i18n rule with explicit element types
+    - III. User Experience Consistency — expanded i18n rule with explicit
+      element types, 3-step implementation contract, and AI agent directive
   Added sections: None
   Removed sections: None
   Templates requiring updates:
@@ -43,8 +44,35 @@ messages MUST be actionable (state what went wrong AND how to fix it).
 CLI output MUST support both human-readable and JSON formats. Every
 feature MUST include user-facing documentation updated in the same PR.
 
-Whenever a header, tag, text, button, or link is added to the project,
-it MUST be translated into Spanish using i18n.
+**i18n — NON-NEGOTIABLE (Zero Exceptions)**
+
+Every string visible to the user MUST be internationalized via i18n
+before the task is considered complete. This rule applies without
+exception to ALL of the following element types:
+
+- Headers (&lt;h1&gt;–&lt;h6&gt;, section titles, panel titles)
+- Labels (form labels, field names, tooltip text)
+- Body text and paragraphs
+- Buttons and CTAs
+- Links and anchor text
+- Tags, badges, and status chips
+- Error messages, warnings, and success notifications
+- Placeholder text and helper text
+- Empty states and fallback messages
+
+**Implementation contract — ALL three steps are REQUIRED:**
+
+1. **Never hardcode strings.** No user-visible text may appear as a
+   raw string literal in JSX, templates, or component logic.
+2. **Register the key.** Every new string MUST have an entry in the
+   i18n translation file before the component is written.
+3. **Verify Spanish output.** The rendered UI MUST display the Spanish
+   translation. Untranslated strings block merge.
+
+**AI agent (opencode) directive:** Before marking any task done,
+scan every component touched in this session for raw user-visible
+strings. If any are found, translating them is part of the current
+task — not a follow-up.
 
 ### IV. Performance Requirements
 
@@ -94,4 +122,4 @@ only clarified. All project artifacts follow MAJOR.MINOR.PATCH semantic
 versioning. Breaking changes MUST increment MAJOR; new backward-
 compatible functionality increments MINOR; bug fixes increment PATCH.
 
-**Version**: 2.0.2 | **Ratified**: 2026-06-07 | **Last Amended**: 2026-06-17
+**Version**: 2.1.0 | **Ratified**: 2026-06-07 | **Last Amended**: 2026-06-24
