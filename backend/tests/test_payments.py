@@ -377,3 +377,34 @@ class TestPaymentReports:
         Payment.objects.create(**{**payment_data, "created_by": admin})
         response = http_client.get("/payments/reports/?grouping=range&start=2026-01-01&end=2026-12-31")
         assert response.status_code == 200
+
+    def test_reports_day_grouping_with_date_range(self, http_client, client, staff_user):
+        admin = User.objects.create_superuser(username="admin3", password="pass")
+        http_client.force_login(admin)
+        Payment.objects.create(
+            client=client, amount=150.00, payment_type="CASH",
+            date=datetime.date(2026, 6, 24), class_slot_count=2,
+            reference="REF-DAY", created_by=staff_user,
+        )
+        response = http_client.get(
+            "/payments/reports/?grouping=day&start=2026-06-20&end=2026-06-30",
+        )
+        assert response.status_code == 200
+        html = response.content.decode()
+        assert "report-data" in html
+        import re
+        match = re.search(
+            r'<script id="report-data"[^>]*>(.*?)</script>', html, re.DOTALL,
+        )
+        assert match is not None, "report-data script tag not found"
+        report_data = json.loads(match.group(1))
+        assert isinstance(report_data, list), (
+            f"Expected report_data to be a list, got {type(report_data)}: {report_data!r}"
+        )
+        assert len(report_data) > 0, (
+            "Expected report_data to contain payment data, got empty list"
+        )
+        assert any(
+            row["payment_type"] == "CASH" and float(row["total"]) == 150.0
+            for row in report_data
+        ), f"No CASH payment with total 150.0 found in {report_data}"

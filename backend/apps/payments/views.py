@@ -1,5 +1,3 @@
-import json
-
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db import transaction
 from django.db.models import Count, Sum
@@ -178,5 +176,5 @@ class PaymentReportView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
                 total=Sum("amount"), count=Count("id"),
             ).order_by("date__year", "date__month", "payment_type")
 
-        context["report_data"] = json.dumps(list(rows), default=str)
+        context["report_data"] = list(rows)
         return context
