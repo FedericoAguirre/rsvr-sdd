@@ -962,6 +962,10 @@ msgstr "Reserva de Cardio"
 msgid "Schedule"
 msgstr "Horario"
 
+#: templates/base.html:27
+msgid "Reports"
+msgstr "Reportes"
+
 #: templates/base.html:26
 msgid "Admin"
 msgstr "Admin"

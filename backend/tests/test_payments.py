@@ -298,6 +298,62 @@ class TestPaymentFormStyling:
         )
 
 
+# ── T004-T006: US1 — Reports Menu (superuser visibility) ────────────────────
+
+
+@pytest.mark.django_db
+class TestReportsMenuSuperuser:
+    """TDD tests — must fail before Reports dropdown is implemented."""
+
+    def test_superuser_sees_reports_link(self, http_client):
+        admin = User.objects.create_superuser(username="admin", password="pass")
+        http_client.force_login(admin)
+        response = http_client.get("/reservations/")
+        assert response.status_code == 200
+        assert "Reportes" in response.content.decode()
+
+    def test_superuser_sees_reports_payments_dropdown(self, http_client):
+        admin = User.objects.create_superuser(username="admin2", password="pass")
+        http_client.force_login(admin)
+        response = http_client.get("/reservations/")
+        assert response.status_code == 200
+        html = response.content.decode()
+        assert "Reportes" in html
+        assert "dropdown-item" in html
+        assert "/payments/reports/" in html
+
+    def test_reports_payments_link_navigates_correctly(self, http_client):
+        admin = User.objects.create_superuser(username="admin3", password="pass")
+        http_client.force_login(admin)
+        response = http_client.get("/payments/reports/")
+        assert response.status_code == 200
+
+
+# ── T010-T012: US2 — Reports Menu (non-superuser hidden) ────────────────────
+
+
+@pytest.mark.django_db
+class TestReportsMenuNonSuperuser:
+    """TDD tests — must fail once US1 passes, guard still needed."""
+
+    def test_non_superuser_does_not_see_reports(self, http_client, staff_user):
+        http_client.force_login(staff_user)
+        response = http_client.get("/reservations/")
+        assert response.status_code == 200
+        assert "Reportes" not in response.content.decode()
+
+    def test_non_superuser_does_not_see_payments_dropdown(self, http_client, staff_user):
+        http_client.force_login(staff_user)
+        response = http_client.get("/reservations/")
+        assert response.status_code == 200
+        assert "dropdown-toggle" not in response.content.decode()
+
+    def test_non_superuser_blocked_from_reports_page(self, http_client, staff_user):
+        http_client.force_login(staff_user)
+        response = http_client.get("/payments/reports/")
+        assert response.status_code == 403
+
+
 # ── T050-T052: US4 — Payment Reports ─────────────────────────────────────────
 
 

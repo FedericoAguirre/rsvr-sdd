@@ -1,7 +1,7 @@
 <!-- SPECKIT START -->
 For additional context about technologies to be used, project structure,
 shell commands, and other important information, read the current plan at
-`specs/023-redesign-payment-form/plan.md`
+`specs/024-reports-menu/plan.md`
 <!-- SPECKIT END -->
 
 ## Session Summary (2026-06-24)
