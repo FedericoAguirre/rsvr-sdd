@@ -1,26 +1,27 @@
 <!-- SPECKIT START -->
 For additional context about technologies to be used, project structure,
 shell commands, and other important information, read the current plan at
-`specs/022-payments-module/plan.md`
+`specs/023-redesign-payment-form/plan.md`
 <!-- SPECKIT END -->
 
 ## Session Summary (2026-06-24)
 
-This session is on branch **022-payments-module** — see `specs/022-payments-module/plan.md`.
+This session is on branch **023-redesign-payment-form** — see `specs/023-redesign-payment-form/plan.md`.
 
 ### Completed
-- Added `status_badge_class` and `status_label` template filters in `reservation_extras.py`
-- Created `reservation_row.html` partial for HTMX row swap
-- Added status badge rendering + inline action buttons ("Used"/"Unused") to reservation list templates
-- Modified `reservation_change_status` view to return HTMX partial response with `HX-Trigger`
-- Added JSON body fallback for `hx-vals` sent as `application/json`
-- 11 tests written, all 102 passing
-
-### CSRF Fix (the bug)
-Root cause: `django.template.context_processors.csrf` was **missing** from `TEMPLATES.OPTIONS.context_processors` in settings.py, so `{{ csrf_token }}` rendered as empty. Additionally, HTMX 2.x's `hx-include` scopes CSS selectors to the button's **descendants only** — the CSRF `<input>` was never found.
-
-**Fix**: Added a `<script>` in `base.html` that reads the `csrftoken` cookie and sets `X-CSRFToken` header on all HTMX requests via `htmx:configRequest` event — the standard recommended pattern for HTMX + Django.
+- Redesigned payment form to match project Django form standards
+- Added `"class": "form-control"` to all widget attrs in `PaymentForm.Meta.widgets` (`forms.py`) — 9 widgets now match ClientForm/EquipmentForm pattern
+- Changed field wrapper from `col-12` to `col-md-6` in `payment_form.html` — two-column grid matching all other forms
+- Wrote 2 TDD tests (`TestPaymentFormStyling`) — widget attrs and rendered HTML assertions
+- All 27 payment tests passing (25 existing + 2 new)
+- Phase 1-5 artifacts generated: spec, plan, research, data-model, quickstart, tasks
 
 ### Key Decisions
-- All HTMX CSRF handling is now in one place (JS in `base.html`) — no `hx-headers`/`hx-include` on individual buttons
-- The view's JSON body fallback was kept as defensive measure for edge cases
+- Template field wrapper changed to `col-md-6` (Bootstrap responsive grid)
+- Evidence file input uses `FileInput(attrs={"class": "form-control"})` matching CSV upload pattern
+- Button row remains `col-12` (full-width), consistent with other forms
+
+### Session 2 (2026-06-24)
+- Ran post-implementation auto-commit hook
+- Squashed 4 branch commits into a single clean PR commit
+- Prepared PR against `main`

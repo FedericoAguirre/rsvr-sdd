@@ -267,6 +267,37 @@ class TestPaymentReservation:
         assert response.status_code == 200
 
 
+# ── T080-T081: US1 — Form widget styling and layout ────────────────────────────
+
+
+@pytest.mark.django_db
+class TestPaymentFormStyling:
+    """TDD tests for FR-001 and FR-003 — written before implementation."""
+
+    def test_all_widgets_have_form_control(self):
+        """FR-003: Every widget in Meta.widgets must have form-control class."""
+        for field_name, widget in PaymentForm.Meta.widgets.items():
+            assert "class" in widget.attrs, (
+                f"{field_name} widget missing 'class' attr"
+            )
+            assert "form-control" in widget.attrs["class"], (
+                f"{field_name} widget missing 'form-control'"
+            )
+
+    def test_create_page_renders_col_md_6(self, logged_client):
+        """FR-001: Payment create page renders fields with col-md-6."""
+        response = logged_client.get("/payments/create/")
+        assert response.status_code == 200
+        html = response.content.decode()
+        assert "col-md-6" in html, "Expected col-md-6 in rendered form fields"
+        # The button row still uses col-12, but field wrappers should not
+        field_wrappers = [line for line in html.split("\n") if 'class="col-12"' in line]
+        # Only the button row (1 instance) should remain
+        assert len(field_wrappers) == 1, (
+            f"Expected exactly 1 col-12 (button row), found {len(field_wrappers)}"
+        )
+
+
 # ── T050-T052: US4 — Payment Reports ─────────────────────────────────────────
 
 

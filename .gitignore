@@ -13,3 +13,4 @@ backend/staticfiles/
 *.log
 .vscode/
 .idea/
+backend/payments/evidence/*
