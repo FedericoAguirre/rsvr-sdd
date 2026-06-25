@@ -35,23 +35,13 @@
 </div>
 
 <div class="row">
-    <div class="col-md-6">
+    <div class="col-12">
         <div class="card">
             <div class="card-header">
                 <h5>{% translate "Totals by Payment Type" %}</h5>
             </div>
             <div class="card-body">
                 <canvas id="totalsChart" width="400" height="300"></canvas>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">
-                <h5>{% translate "Distribution" %}</h5>
-            </div>
-            <div class="card-body">
-                <canvas id="distributionChart" width="400" height="300"></canvas>
             </div>
         </div>
     </div>
@@ -104,22 +94,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    var distCtx = document.getElementById('distributionChart');
-    if (distCtx) {
-        new Chart(distCtx, {
-            type: 'pie',
-            data: {
-                labels: labels,
-                datasets: [{
-                    data: values,
-                    backgroundColor: colors.slice(0, labels.length),
-                }]
-            },
-            options: {
-                responsive: true,
-            }
-        });
-    }
 });
 </script>
 {% endblock %}
