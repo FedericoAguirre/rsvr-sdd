@@ -15,4 +15,3 @@ webpage.
 
 I can access the payments/reports/ webpage by clicking Reports -> Payments in
 the main bar.
-
