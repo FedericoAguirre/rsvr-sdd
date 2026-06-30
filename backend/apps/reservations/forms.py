@@ -1,4 +1,5 @@
 from django import forms
+from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
 from apps.classes.models import ClassSlot
@@ -30,3 +31,24 @@ class ReservationForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields["equipment"].queryset = Equipment.objects.filter(status="in-service")
         self.fields["class_slot"].queryset = ClassSlot.objects.filter(is_active=True)
+
+    def clean(self):
+        cleaned_data = super().clean()
+        equipment = cleaned_data.get("equipment")
+        class_slot = cleaned_data.get("class_slot")
+        date = cleaned_data.get("date")
+
+        if equipment and class_slot and date:
+            exists = Reservation.objects.filter(
+                equipment=equipment,
+                class_slot=class_slot,
+                date=date,
+                status="reserved",
+            ).exclude(pk=self.instance.pk if self.instance else None).exists()
+
+            if exists:
+                raise ValidationError(
+                    _("%(equipment)s is UNAVAILABLE for %(date)s — %(class_slot)s (already reserved).")
+                    % {"equipment": equipment, "date": date, "class_slot": class_slot}
+                )
+        return cleaned_data
