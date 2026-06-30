@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: rsvr-sdd\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-24 15:12-0600\n"
+"POT-Creation-Date: 2026-06-29 23:44-0600\n"
 "PO-Revision-Date: 2026-06-11 10:30-0600\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -60,7 +60,7 @@ msgstr "Hora"
 msgid "Is active"
 msgstr "Activo"
 
-#: apps/classes/models.py:25 apps/reservations/forms.py:17
+#: apps/classes/models.py:25 apps/reservations/forms.py:18
 #: apps/reservations/models.py:29
 msgid "Class slot"
 msgstr "Bloque de clase"
@@ -92,7 +92,7 @@ msgstr "Día"
 #: apps/equipment/models.py:21
 #: apps/equipment/templates/equipment/equipment_detail.html:9
 #: apps/equipment/templates/equipment/equipment_list.html:8
-#: apps/payments/templates/payments/payment_detail.html:74
+#: apps/payments/templates/payments/payment_detail.html:76
 #: apps/reservations/models.py:17
 #: apps/reservations/templates/reservations/reservation_detail.html:19
 #: apps/reservations/templates/reservations/reservation_list.html:43
@@ -179,9 +179,9 @@ msgid "Mobile"
 msgstr "Móvil"
 
 #: apps/clients/models.py:16 apps/payments/models.py:19
-#: apps/payments/templates/payments/payment_detail.html:29
+#: apps/payments/templates/payments/payment_detail.html:31
 #: apps/payments/templates/payments/payment_list.html:34
-#: apps/reservations/forms.py:15 apps/reservations/models.py:21
+#: apps/reservations/forms.py:16 apps/reservations/models.py:21
 #: apps/reservations/templates/reservations/reservation_detail.html:7
 #: apps/reservations/templates/reservations/reservation_list.html:43
 #: apps/reservations/templates/reservations/reservation_list_by_slot.html:5
@@ -240,16 +240,16 @@ msgstr "Sí,No"
 #: apps/clients/templates/clients/_search_results.html:34
 #: apps/equipment/templates/equipment/equipment_detail.html:14
 #: apps/equipment/templates/equipment/equipment_list.html:17
-#: apps/payments/templates/payments/partials/payment_row.html:10
-#: apps/payments/templates/payments/payment_detail.html:20
+#: apps/payments/templates/payments/partials/payment_row.html:11
+#: apps/payments/templates/payments/payment_detail.html:22
 #: apps/payments/templates/payments/payment_list.html:53
 msgid "Edit"
 msgstr "Editar"
 
 #: apps/clients/templates/clients/_search_results.html:35
 #: apps/equipment/templates/equipment/equipment_list.html:16
-#: apps/payments/templates/payments/partials/payment_row.html:9
-#: apps/payments/templates/payments/payment_detail.html:56
+#: apps/payments/templates/payments/partials/payment_row.html:10
+#: apps/payments/templates/payments/payment_detail.html:58
 #: apps/payments/templates/payments/payment_list.html:52
 #: apps/reservations/templates/reservations/partials/reservation_row.html:10
 #: apps/reservations/templates/reservations/reservation_list.html:53
@@ -299,9 +299,9 @@ msgstr "Descargar Plantilla"
 #: apps/clients/templates/clients/client_csv_upload.html:17
 #: apps/clients/templates/clients/client_form.html:17
 #: apps/equipment/templates/equipment/equipment_form.html:17
-#: apps/payments/templates/payments/payment_confirm_delete.html:20
-#: apps/payments/templates/payments/payment_form.html:31
-#: apps/reservations/templates/reservations/reservation_form.html:17
+#: apps/payments/templates/payments/payment_confirm_delete.html:22
+#: apps/payments/templates/payments/payment_form.html:20
+#: apps/reservations/templates/reservations/reservation_form.html:27
 msgid "Cancel"
 msgstr "Cancelar"
 
@@ -330,10 +330,10 @@ msgstr "Historial de Reservas"
 
 #: apps/clients/templates/clients/client_detail.html:35
 #: apps/payments/models.py:30
-#: apps/payments/templates/payments/payment_detail.html:38
-#: apps/payments/templates/payments/payment_detail.html:71
+#: apps/payments/templates/payments/payment_detail.html:40
+#: apps/payments/templates/payments/payment_detail.html:73
 #: apps/payments/templates/payments/payment_list.html:37
-#: apps/reservations/forms.py:18 apps/reservations/models.py:31
+#: apps/reservations/forms.py:19 apps/reservations/models.py:31
 #: apps/reservations/templates/reservations/reservation_detail.html:13
 #: apps/reservations/templates/reservations/reservation_list.html:33
 #: apps/reservations/templates/reservations/reservation_list.html:43
@@ -355,8 +355,8 @@ msgstr "Clase"
 #: apps/equipment/apps.py:8 apps/equipment/models.py:28
 #: apps/equipment/templates/equipment/equipment_list.html:3
 #: apps/equipment/templates/equipment/equipment_list.html:5
-#: apps/payments/templates/payments/payment_detail.html:72
-#: apps/reservations/forms.py:16 apps/reservations/models.py:25
+#: apps/payments/templates/payments/payment_detail.html:74
+#: apps/reservations/forms.py:17 apps/reservations/models.py:25
 #: apps/reservations/templates/reservations/reservation_detail.html:9
 #: apps/reservations/templates/reservations/reservation_list.html:43
 #: apps/reservations/templates/reservations/reservation_list_by_slot.html:5
@@ -427,7 +427,6 @@ msgid "The start date must be before the end date."
 msgstr "La fecha de inicio debe ser anterior a la fecha de fin."
 
 #: apps/clients/views.py:138
-#| msgid "No reservations found."
 msgid "No reservations found for the selected date range."
 msgstr "No se encontraron reservaciones para el rango de fechas seleccionado."
 
@@ -464,8 +463,8 @@ msgstr "Tipo de equipo"
 #: apps/equipment/forms.py:15 apps/equipment/models.py:22
 #: apps/equipment/templates/equipment/equipment_detail.html:11
 #: apps/payments/models.py:41
-#: apps/payments/templates/payments/payment_detail.html:50
-#: apps/reservations/forms.py:19 apps/reservations/models.py:48
+#: apps/payments/templates/payments/payment_detail.html:52
+#: apps/reservations/forms.py:20 apps/reservations/models.py:48
 #: apps/reservations/templates/reservations/reservation_detail.html:17
 msgid "Notes"
 msgstr "Notas"
@@ -554,23 +553,23 @@ msgstr "Eliminación suave"
 msgid "Pagos"
 msgstr "Pagos"
 
-#: apps/payments/forms.py:24
+#: apps/payments/forms.py:37
 msgid "Leave empty for auto-generation"
 msgstr "Dejar vacío para auto-generación"
 
-#: apps/payments/forms.py:38
+#: apps/payments/forms.py:56
 msgid "File too large. Max 5 MB."
 msgstr "Archivo demasiado grande. Máx. 5 MB."
 
-#: apps/payments/forms.py:40
+#: apps/payments/forms.py:58
 msgid "Only JPEG and PNG images are allowed."
 msgstr "Solo se permiten imágenes JPEG y PNG."
 
-#: apps/payments/forms.py:46
+#: apps/payments/forms.py:64
 msgid "Amount must be positive."
 msgstr "El monto debe ser positivo."
 
-#: apps/payments/forms.py:52
+#: apps/payments/forms.py:70
 msgid "Class slot count must be at least 1."
 msgstr "La cantidad de bloques de clase debe ser al menos 1."
 
@@ -603,7 +602,7 @@ msgid "Payments App"
 msgstr "App de pagos"
 
 #: apps/payments/models.py:22
-#: apps/payments/templates/payments/payment_detail.html:32
+#: apps/payments/templates/payments/payment_detail.html:34
 #: apps/payments/templates/payments/payment_list.html:35
 msgid "Amount"
 msgstr "Monto"
@@ -621,12 +620,12 @@ msgid "Class slot count"
 msgstr "Cantidad de bloques de clase"
 
 #: apps/payments/models.py:35
-#: apps/payments/templates/payments/payment_detail.html:45
+#: apps/payments/templates/payments/payment_detail.html:47
 msgid "Reference"
 msgstr "Referencia"
 
 #: apps/payments/models.py:39
-#: apps/payments/templates/payments/payment_detail.html:55
+#: apps/payments/templates/payments/payment_detail.html:57
 msgid "Evidence"
 msgstr "Comprobante"
 
@@ -652,10 +651,11 @@ msgid "Payment"
 msgstr "Pago"
 
 #: apps/payments/models.py:65
-#: apps/payments/templates/payments/payment_detail.html:4
-#: apps/payments/templates/payments/payment_detail.html:11
+#: apps/payments/templates/payments/payment_detail.html:6
+#: apps/payments/templates/payments/payment_detail.html:13
 #: apps/payments/templates/payments/payment_list.html:5
 #: apps/payments/templates/payments/payment_list.html:9 templates/base.html:25
+#: templates/base.html:30
 msgid "Payments"
 msgstr "Pagos"
 
@@ -681,66 +681,66 @@ msgstr "Reservas de pago"
 msgid "{} → {}"
 msgstr "{} → {}"
 
-#: apps/payments/templates/payments/payment_confirm_delete.html:4
+#: apps/payments/templates/payments/payment_confirm_delete.html:6
 msgid "Delete Payment"
 msgstr "Eliminar pago"
 
-#: apps/payments/templates/payments/payment_confirm_delete.html:11
+#: apps/payments/templates/payments/payment_confirm_delete.html:13
 msgid "Confirm Delete"
 msgstr "Confirmar eliminación"
 
-#: apps/payments/templates/payments/payment_confirm_delete.html:14
+#: apps/payments/templates/payments/payment_confirm_delete.html:16
 msgid "Are you sure you want to delete this payment?"
 msgstr "¿Está seguro de que desea eliminar este pago?"
 
-#: apps/payments/templates/payments/payment_confirm_delete.html:16
+#: apps/payments/templates/payments/payment_confirm_delete.html:18
 msgid ""
 "This action soft-deletes the payment. It can be restored by an administrator."
 msgstr ""
-"Esta acción realiza una eliminación suave del pago. Puede ser restaurado "
-"por un administrador."
+"Esta acción realiza una eliminación suave del pago. Puede ser restaurado por "
+"un administrador."
 
-#: apps/payments/templates/payments/payment_confirm_delete.html:21
-#: apps/payments/templates/payments/payment_detail.html:23
+#: apps/payments/templates/payments/payment_confirm_delete.html:23
+#: apps/payments/templates/payments/payment_detail.html:25
 msgid "Delete"
 msgstr "Eliminar"
 
-#: apps/payments/templates/payments/payment_detail.html:21
+#: apps/payments/templates/payments/payment_detail.html:23
 msgid "Are you sure?"
 msgstr "¿Está seguro?"
 
-#: apps/payments/templates/payments/payment_detail.html:35
+#: apps/payments/templates/payments/payment_detail.html:37
 msgid "Payment Type"
 msgstr "Tipo de pago"
 
-#: apps/payments/templates/payments/payment_detail.html:41
+#: apps/payments/templates/payments/payment_detail.html:43
 msgid "Class Slot Count"
 msgstr "Cantidad de bloques"
 
-#: apps/payments/templates/payments/payment_detail.html:65
+#: apps/payments/templates/payments/payment_detail.html:67
 msgid "Associated Reservations"
 msgstr "Reservas asociadas"
 
-#: apps/payments/templates/payments/payment_detail.html:73
+#: apps/payments/templates/payments/payment_detail.html:75
 msgid "Class Slot"
 msgstr "Bloque de clase"
 
-#: apps/payments/templates/payments/payment_form.html:4
-#: apps/payments/templates/payments/payment_form.html:11
+#: apps/payments/templates/payments/payment_form.html:3
+#: apps/payments/templates/payments/payment_form.html:5
 msgid "Edit Payment"
 msgstr "Editar pago"
 
-#: apps/payments/templates/payments/payment_form.html:4
-#: apps/payments/templates/payments/payment_form.html:13
+#: apps/payments/templates/payments/payment_form.html:3
+#: apps/payments/templates/payments/payment_form.html:5
 #: apps/payments/templates/payments/payment_list.html:10
 msgid "New Payment"
 msgstr "Nuevo pago"
 
-#: apps/payments/templates/payments/payment_form.html:33
+#: apps/payments/templates/payments/payment_form.html:18
 msgid "Save Changes"
 msgstr "Guardar cambios"
 
-#: apps/payments/templates/payments/payment_form.html:33
+#: apps/payments/templates/payments/payment_form.html:18
 msgid "Create Payment"
 msgstr "Crear pago"
 
@@ -814,11 +814,7 @@ msgstr "Generar reporte"
 msgid "Totals by Payment Type"
 msgstr "Totales por tipo de pago"
 
-#: apps/payments/templates/payments/payment_reports.html:51
-msgid "Distribution"
-msgstr "Distribución"
-
-#: apps/payments/templates/payments/payment_reports.html:93
+#: apps/payments/templates/payments/payment_reports.html:83
 msgid "Total Amount"
 msgstr "Monto total"
 
@@ -828,6 +824,15 @@ msgstr "Monto total"
 #: templates/base.html:17
 msgid "Reservations"
 msgstr "Reservaciones"
+
+#: apps/reservations/forms.py:51
+#, python-format
+msgid ""
+"%(equipment)s is UNAVAILABLE for %(date)s — %(class_slot)s (already "
+"reserved)."
+msgstr ""
+"%(equipment)s está NO DISPONIBLE para %(date)s — %(class_slot)s (ya "
+"reservado)."
 
 #: apps/reservations/management/commands/seed_data.py:12
 msgid "Seed initial data: class slots, equipment, and sample clients"
@@ -904,7 +909,11 @@ msgstr "Marcar como No usado"
 msgid "Mark as Reserved"
 msgstr "Marcar como Reservado"
 
-#: apps/reservations/templates/reservations/reservation_form.html:16
+#: apps/reservations/templates/reservations/reservation_form.html:14
+msgid "Close"
+msgstr ""
+
+#: apps/reservations/templates/reservations/reservation_form.html:26
 msgid "Create Reservation"
 msgstr "Crear Reserva"
 
@@ -962,15 +971,15 @@ msgstr "Reserva de Cardio"
 msgid "Schedule"
 msgstr "Horario"
 
-#: templates/base.html:27
+#: templates/base.html:28
 msgid "Reports"
 msgstr "Reportes"
 
-#: templates/base.html:26
+#: templates/base.html:34
 msgid "Admin"
 msgstr "Admin"
 
-#: templates/base.html:30
+#: templates/base.html:38
 msgid "Logout"
 msgstr "Cerrar sesión"
 
@@ -978,6 +987,9 @@ msgstr "Cerrar sesión"
 #: templates/registration/login.html:11
 msgid "Login"
 msgstr "Iniciar sesión"
+
+#~ msgid "Distribution"
+#~ msgstr "Distribución"
 
 #~ msgid "Email or mobile number..."
 #~ msgstr "Correo electrónico o número móvil..."
