@@ -7,6 +7,21 @@ from django.utils.translation import gettext_lazy as _
 from .models import Payment
 
 
+class PaymentSearchForm(forms.Form):
+    q = forms.CharField(
+        label=_("Search by client"),
+        max_length=100,
+        required=False,
+        widget=forms.TextInput(
+            attrs={
+                "class": "form-control",
+                "placeholder": _("Search by client name, email or mobile..."),
+                "id": "id_q",
+            },
+        ),
+    )
+
+
 class PaymentForm(forms.ModelForm):
     class Meta:
         model = Payment
