@@ -1,7 +1,7 @@
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db import transaction
-from django.db.models import Count, Sum
-from django.shortcuts import get_object_or_404, redirect
+from django.db.models import Count, Q, Sum
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.views.generic import (
     CreateView,
@@ -11,6 +11,8 @@ from django.views.generic import (
     UpdateView,
     View,
 )
+
+from apps.clients.models import Client
 
 from .forms import PaymentForm
 from .models import Payment, PaymentReservation
@@ -26,15 +28,41 @@ class PaymentListView(LoginRequiredMixin, ListView):
         qs = Payment.objects.filter(is_deleted=False).select_related(
             "client", "created_by",
         )
-        client_id = self.request.GET.get("client")
-        if client_id:
-            qs = qs.filter(client_id=client_id)
+        q = self.request.GET.get("q", "").strip()
+        if q and len(q) >= 3:
+            matching_client_ids = Client.objects.filter(
+                is_active=True,
+            ).filter(
+                Q(first_name__icontains=q)
+                | Q(last_name__icontains=q)
+                | Q(email__icontains=q)
+                | Q(mobile__icontains=q),
+            ).values_list("id", flat=True)
+            qs = qs.filter(client_id__in=matching_client_ids)
         return qs.order_by("-date", "-created_at")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["client_filter"] = self.request.GET.get("client", "")
+        q = self.request.GET.get("q", "")
+        context["q"] = q
+        page_obj = context.get("page_obj")
+        if page_obj is not None:
+            context["not_found"] = (
+                bool(q) and len(q) >= 3 and page_obj.paginator.count == 0
+            )
+        else:
+            context["not_found"] = False
+        context["client_filter"] = q
         return context
+
+    def render_to_response(self, context, **response_kwargs):
+        if self.request.headers.get("HX-Request"):
+            return render(
+                self.request,
+                "payments/partials/_payment_search_results.html",
+                context,
+            )
+        return super().render_to_response(context, **response_kwargs)
 
 
 class ClientPaymentHistoryView(LoginRequiredMixin, ListView):

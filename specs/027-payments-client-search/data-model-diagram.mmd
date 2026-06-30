@@ -1,0 +1,30 @@
+erDiagram
+    Client {
+        CharField first_name
+        CharField last_name
+        EmailField_nullable email
+        CharField_nullable mobile
+        BooleanField is_active
+        DateTimeField created_at
+        DateTimeField updated_at
+    }
+
+    Payment {
+        ForeignKey client
+        DecimalField amount
+        CharField payment_type
+        CharField payment_identifier
+        DateField date
+        PositiveSmallIntegerField class_slot_count
+        CharField_nullable reference
+        ImageField_nullable evidence
+        TextField_nullable notes
+        BooleanField is_deleted
+        DateTimeField_nullable deleted_at
+        ForeignKey created_by
+        ForeignKey_nullable updated_by
+        DateTimeField created_at
+        DateTimeField updated_at
+    }
+
+    Client ||--o{ Payment : "has"

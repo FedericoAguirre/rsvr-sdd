@@ -1,0 +1,61 @@
+{% load i18n %}
+{% load payment_extras %}
+
+<div id="payment-search-results" aria-live="polite" aria-atomic="true">
+    {% if not_found %}
+    <div class="alert alert-warning" role="alert">{% translate "No payments found matching your search." %}</div>
+    {% elif payments %}
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>{% translate "Identifier" %}</th>
+                    <th>{% translate "Client" %}</th>
+                    <th class="text-end">{% translate "Amount" %}</th>
+                    <th>{% translate "Type" %}</th>
+                    <th>{% translate "Date" %}</th>
+                    <th class="text-end">{% translate "Slots" %}</th>
+                    <th>{% translate "Actions" %}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for payment in payments %}
+                <tr>
+                    <td><a href="{% url 'payments:detail' payment.pk %}">{{ payment.payment_identifier }}</a></td>
+                    <td>{{ payment.client }}</td>
+                    <td class="text-end">{{ payment.amount|currency }}</td>
+                    <td>{{ payment.get_payment_type_display }}</td>
+                    <td>{{ payment.date|date:"SHORT_DATE_FORMAT" }}</td>
+                    <td class="text-end">{{ payment.class_slot_count }}</td>
+                    <td>
+                        <a href="{% url 'payments:detail' payment.pk %}" class="btn btn-sm btn-outline-info">{% translate "View" %}</a>
+                        <a href="{% url 'payments:edit' payment.pk %}" class="btn btn-sm btn-outline-primary">{% translate "Edit" %}</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if is_paginated %}
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if q %}&q={{ q }}{% endif %}" hx-get="?page={{ page_obj.previous_page_number }}{% if q %}&q={{ q }}{% endif %}" hx-target="#payment-search-results">{% translate "Previous" %}</a>
+            </li>
+            {% endif %}
+            <li class="page-item disabled"><span class="page-link">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span></li>
+            {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if q %}&q={{ q }}{% endif %}" hx-get="?page={{ page_obj.next_page_number }}{% if q %}&q={{ q }}{% endif %}" hx-target="#payment-search-results">{% translate "Next" %}</a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+
+    {% else %}
+    <p class="text-muted">{% translate "No payments found." %}</p>
+    {% endif %}
+</div>

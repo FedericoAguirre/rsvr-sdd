@@ -744,13 +744,21 @@ msgstr "Guardar cambios"
 msgid "Create Payment"
 msgstr "Crear pago"
 
-#: apps/payments/templates/payments/payment_list.html:17
-msgid "Filter by Client"
-msgstr "Filtrar por cliente"
+#: apps/payments/forms.py:13
+msgid "Search by client"
+msgstr "Buscar por cliente"
 
-#: apps/payments/templates/payments/payment_list.html:18
-msgid "Client ID"
-msgstr "ID de cliente"
+#: apps/payments/forms.py:20
+msgid "Search by client name, email or mobile..."
+msgstr "Buscar por nombre, correo electrónico o móvil del cliente..."
+
+#: apps/payments/templates/payments/payment_list.html:17
+msgid "Search by Client"
+msgstr "Buscar por cliente"
+
+#: apps/payments/templates/payments/partials/_payment_search_results.html:5
+msgid "No payments found matching your search."
+msgstr "No se encontraron pagos que coincidan con su búsqueda."
 
 #: apps/payments/templates/payments/payment_list.html:21
 #: apps/reservations/templates/reservations/reservation_list.html:25

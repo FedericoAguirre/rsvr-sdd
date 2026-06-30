@@ -12,71 +12,25 @@
 
 <div class="card mb-4">
     <div class="card-body">
-        <form method="get" class="row g-3 align-items-end">
+        <form method="get" class="row g-3 align-items-end"
+              hx-get="{% url 'payments:list' %}"
+              hx-trigger="keyup changed delay:300ms"
+              hx-target="#payment-search-results"
+              hx-select="#payment-search-results"
+              hx-swap="outerHTML"
+              hx-indicator="#search-indicator">
             <div class="col-auto">
-                <label for="client" class="form-label">{% translate "Filter by Client" %}</label>
-                <input type="text" name="client" id="client" class="form-control" value="{{ client_filter }}" placeholder="{% translate 'Client ID' %}">
+                <label for="id_q" class="form-label">{% translate "Search by Client" %}</label>
+                <input type="text" name="q" id="id_q" class="form-control" value="{{ q }}" placeholder="{% translate 'Search by client name, email or mobile...' %}">
             </div>
             <div class="col-auto">
-                <button type="submit" class="btn btn-outline-secondary">{% translate "Filter" %}</button>
+                <button type="submit" class="btn btn-outline-secondary">{% translate "Search" %}</button>
                 <a href="{% url 'payments:list' %}" class="btn btn-outline-danger">{% translate "Clear" %}</a>
+                <span id="search-indicator" class="htmx-indicator text-muted">{% translate "Searching..." %}</span>
             </div>
         </form>
     </div>
 </div>
 
-{% if payments %}
-<div class="table-responsive">
-    <table class="table table-striped table-hover">
-        <thead>
-            <tr>
-                <th>{% translate "Identifier" %}</th>
-                <th>{% translate "Client" %}</th>
-                <th class="text-end">{% translate "Amount" %}</th>
-                <th>{% translate "Type" %}</th>
-                <th>{% translate "Date" %}</th>
-                <th class="text-end">{% translate "Slots" %}</th>
-                <th>{% translate "Actions" %}</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for payment in payments %}
-            <tr>
-                <td><a href="{% url 'payments:detail' payment.pk %}">{{ payment.payment_identifier }}</a></td>
-                <td>{{ payment.client }}</td>
-                <td class="text-end">{{ payment.amount|currency }}</td>
-                <td>{{ payment.get_payment_type_display }}</td>
-                <td>{{ payment.date|date:"SHORT_DATE_FORMAT" }}</td>
-                <td class="text-end">{{ payment.class_slot_count }}</td>
-                <td>
-                    <a href="{% url 'payments:detail' payment.pk %}" class="btn btn-sm btn-outline-info">{% translate "View" %}</a>
-                    <a href="{% url 'payments:edit' payment.pk %}" class="btn btn-sm btn-outline-primary">{% translate "Edit" %}</a>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
-
-{% if is_paginated %}
-<nav aria-label="Page navigation">
-    <ul class="pagination justify-content-center">
-        {% if page_obj.has_previous %}
-        <li class="page-item">
-            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if client_filter %}&client={{ client_filter }}{% endif %}">{% translate "Previous" %}</a>
-        </li>
-        {% endif %}
-        <li class="page-item disabled"><span class="page-link">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span></li>
-        {% if page_obj.has_next %}
-        <li class="page-item">
-            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if client_filter %}&client={{ client_filter }}{% endif %}">{% translate "Next" %}</a>
-        </li>
-        {% endif %}
-    </ul>
-</nav>
-{% endif %}
-
-{% else %}
-<p class="text-muted">{% translate "No payments found." %}</p>
-{% endif %}
+{% include "payments/partials/_payment_search_results.html" %}
 {% endblock %}
