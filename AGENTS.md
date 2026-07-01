@@ -1,7 +1,7 @@
 <!-- SPECKIT START -->
 For additional context about technologies to be used, project structure,
 shell commands, and other important information, read the current plan at
-`specs/027-payments-client-search/plan.md`
+`specs/028-windows-deployment-guide/plan.md`
 <!-- SPECKIT END -->
 
 ## Session Summary (2026-06-29)

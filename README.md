@@ -31,6 +31,8 @@ Reservas SDD is a web application for gym staff to reserve cardio equipment for 
 - [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/)
 - `uv` (optional — only for local development outside Docker)
 
+> **Windows 11 Home deployment**: See [docs/windows11_deployment.md](docs/windows11_deployment.md) for a container-free setup guide.
+
 ## Setup
 
 ```bash
