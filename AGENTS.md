@@ -1,15 +1,14 @@
 <!-- SPECKIT START -->
 For additional context about technologies to be used, project structure,
 shell commands, and other important information, read the current plan at
-`specs/028-windows-deployment-guide/plan.md`
+`specs/029-payments-associate-button/plan.md`
 <!-- SPECKIT END -->
 
-## Session Summary (2026-06-29)
+## Session Summary (2026-07-02)
 
-This session is on branch **027-payments-client-search** — see `specs/027-payments-client-search/plan.md`.
+This session is on branch **029-payments-associate-button** — see `specs/029-payments-associate-button/plan.md`.
 
 ### Completed
-- Specified payments client search feature via `/speckit.specify`
-- Clarified 2 items: search trigger mechanism (real-time + submit button), soft-deleted clients exclusion
-- Planned implementation: HTMX-based search field replacing client ID filter, PaymentSearchForm, modified PaymentListView, partial template
+- Specified payments associate button feature via `/speckit.specify`
+- Planned implementation: Associate button in payment detail header, GET handler for PaymentAssociateView, new associate template
 - Generated plan artifacts: plan, research, data-model, quickstart, contracts
