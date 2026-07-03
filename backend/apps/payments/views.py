@@ -146,6 +146,30 @@ class PaymentDeleteView(LoginRequiredMixin, View):
 
 
 class PaymentAssociateView(LoginRequiredMixin, View):
+    def get(self, request, *args, **kwargs):
+        payment = get_object_or_404(Payment, pk=kwargs["pk"])
+        from apps.reservations.models import Reservation
+        associated_ids = payment.payment_reservations.values_list(
+            "reservation_id", flat=True,
+        )
+        available_reservations = Reservation.objects.filter(
+            client=payment.client,
+        ).exclude(pk__in=associated_ids).select_related(
+            "equipment", "class_slot",
+        ).order_by("-date", "class_slot__time")
+        remaining_slots = (
+            payment.class_slot_count - payment.payment_reservations.count()
+        )
+        return render(
+            request,
+            "payments/payment_associate.html",
+            {
+                "payment": payment,
+                "available_reservations": available_reservations,
+                "remaining_slots": remaining_slots,
+            },
+        )
+
     def post(self, request, *args, **kwargs):
         payment = get_object_or_404(Payment, pk=kwargs["pk"])
         reservation_ids = request.POST.getlist("reservations")

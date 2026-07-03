@@ -1,8 +1,8 @@
 # Priority list
 
-1. Create deployment script for Windows 11 home
+~~1. Create deployment script for Windows 11 home~~
 2. Create permissions for 2 groups: Administrators and Operators
-3. Create a Menu access to reservations_payments webpage
+3. Create a Menu access to reservations_payments webpage (1/2)
 4. Add payment button to the clients/{client_id}/ webpage
 5. Add payment-reservations button to the clients/{client_id}/ webpage
 6. Create the stacked graph for daily grouping
