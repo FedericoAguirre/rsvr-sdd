@@ -1,15 +1,15 @@
 <!-- SPECKIT START -->
 For additional context about technologies to be used, project structure,
 shell commands, and other important information, read the current plan at
-`specs/030-update-restart-docs/plan.md`
+`specs/001-add-postgres-ready-check/plan.md`
 <!-- SPECKIT END -->
 
-## Session Summary (2026-07-06)
+## Session Summary (2026-07-07)
 
-This session is on branch **030-update-restart-docs** — see `specs/030-update-restart-docs/plan.md`.
+This session is on branch **001-add-postgres-ready-check** — see `specs/001-add-postgres-ready-check/plan.md`.
 
 ### Completed
-- Specified update restart docs feature via `/speckit.specify`
-- Clarified 5 open questions: Task Scheduler format, test scope, all 3 options, app start command, security note
-- Planned implementation: Update `docs/windows11_deployment.md` Options 1–3, new test file
+- Specified PostgreSQL readiness check feature via `/speckit.specify`
+- Planned implementation: Modify `backend/start_app01.ps1` to check PostgreSQL readiness before startup
 - Generated plan artifacts: plan, research, data-model, quickstart, contracts
+- Implemented PostgreSQL readiness check in `backend/start_app01.ps1` with TCP socket + pg_isready two-tier probe, retry loop (2s interval, 30s max), DATABASE_URL regex parsing + POSTGRES_* fallback, and contract-compliant exit codes 0–4
