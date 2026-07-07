@@ -296,26 +296,39 @@ Press `Ctrl + C` in the terminal where `waitress-serve` is running.
 
 If the laptop is restarted or shut down, follow these steps to restore the web application.
 
-### Option 1: Manual Start (Quick)
-
-Run this command in a terminal:
+All three options below use the same core PowerShell command that loads environment variables from `.env` and starts the application:
 
 ```powershell
-cd C:\projects\rsvr-sdd\backend
-waitress-serve --host=0.0.0.0 --port=8000 config.wsgi:application
+Get-Content .env | Where-Object { $_ -match '=' -and $_ -notmatch '^#' } | ForEach-Object { $name, $value = $_ -split '=', 2; [System.Environment]::SetEnvironmentVariable($name.Trim(), $value.Trim(), 'Process') }; uv run .\manage.py runserver
 ```
+
+> **Security**: The `.env` file contains database credentials and the Django `SECRET_KEY`. Restrict access with:
+> ```powershell
+> icacls .env /inheritance:r /grant "Administrators:R"
+> ```
+> Task Scheduler stores the command in plain text — any user with read access to the task can see the credentials. Consider using Windows Credential Manager for additional security.
+
+### Option 1: Manual Start (Quick)
+
+Open a PowerShell terminal and run:
+
+```powershell
+cd D:\Descargas\codigo\rsvr-sdd
+Get-Content .env | Where-Object { $_ -match '=' -and $_ -notmatch '^#' } | ForEach-Object { $name, $value = $_ -split '=', 2; [System.Environment]::SetEnvironmentVariable($name.Trim(), $value.Trim(), 'Process') }; uv run .\manage.py runserver
+```
+
+Press **Ctrl + C** to stop the server.
 
 ### Option 2: Use a Launcher Script
 
-Create a file named `start_app.bat` in `C:\projects\rsvr-sdd`:
+Create a file named `start_app.ps1` in `D:\Descargas\codigo\rsvr-sdd`:
 
-```batch
-@echo off
-cd /d C:\projects\rsvr-sdd\backend
-waitress-serve --host=0.0.0.0 --port=8000 config.wsgi:application
+```powershell
+Set-Location D:\Descargas\codigo\rsvr-sdd
+Get-Content .env | Where-Object { $_ -match '=' -and $_ -notmatch '^#' } | ForEach-Object { $name, $value = $_ -split '=', 2; [System.Environment]::SetEnvironmentVariable($name.Trim(), $value.Trim(), 'Process') }; uv run .\manage.py runserver
 ```
 
-Double-click `start_app.bat` to start the application. Close the window to stop it.
+Right-click `start_app.ps1` and select **"Run with PowerShell"** to start the application. Press **Ctrl + C** to stop it.
 
 ### Option 3: Auto-Start Using Task Scheduler
 
@@ -326,8 +339,11 @@ For automatic startup when Windows boots:
 3. **Name**: `RSVR Web App`
 4. **Trigger**: **"When the computer starts"** (or **"When I log on"** for user-specific)
 5. **Action**: **"Start a program"**
-   - **Program/script**: `cmd.exe`
-   - **Arguments**: `/c cd /d C:\projects\rsvr-sdd\backend && waitress-serve --host=0.0.0.0 --port=8000 config.wsgi:application`
+   - **Program/script**: `powershell.exe`
+   - **Arguments**:
+     ```
+     -Command "cd D:\Descargas\codigo\rsvr-sdd; Get-Content .env | Where-Object { $_ -match '=' -and $_ -notmatch '^#' } | ForEach-Object { $name, $value = $_ -split '=', 2; [System.Environment]::SetEnvironmentVariable($name.Trim(), $value.Trim(), 'Process') }; uv run .\manage.py runserver"
+     ```
 6. Click **Finish**
 
 The application will now start automatically on every boot. To verify:
