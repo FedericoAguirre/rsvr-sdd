@@ -328,7 +328,20 @@ Set-Location D:\Descargas\codigo\rsvr-sdd
 Get-Content .env | Where-Object { $_ -match '=' -and $_ -notmatch '^#' } | ForEach-Object { $name, $value = $_ -split '=', 2; [System.Environment]::SetEnvironmentVariable($name.Trim(), $value.Trim(), 'Process') }; uv run .\manage.py runserver
 ```
 
-Right-click `start_app.ps1` and select **"Run with PowerShell"** to start the application. Press **Ctrl + C** to stop it.
+PowerShell blocks `.ps1` scripts by default. To run the script, use one of these methods:
+
+- **Permanent (recommended)**: Run this once to allow local scripts:
+  ```powershell
+  Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
+  ```
+  Then right-click `start_app.ps1` and select **"Run with PowerShell"**.
+
+- **One-time bypass**: Use the `-ExecutionPolicy` flag (no policy change):
+  ```powershell
+  powershell -ExecutionPolicy Bypass -File D:\Descargas\codigo\rsvr-sdd\start_app.ps1
+  ```
+
+Press **Ctrl + C** to stop the server.
 
 ### Option 3: Auto-Start Using Task Scheduler
 
