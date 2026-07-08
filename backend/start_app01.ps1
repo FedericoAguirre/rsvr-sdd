@@ -116,7 +116,7 @@ $stopwatch.Stop()
 if ($ready) {
     if ($result.Reason -eq "tcp-only") {
         Write-Host ""
-        Write-Host "  ✔ Database ready (TCP check only — pg_isready not found)" -ForegroundColor Yellow
+        Write-Host "  ✔ Database ready TCP check only — pg_isready not found" -ForegroundColor Yellow
     } else {
         $elapsed = [math]::Floor($stopwatch.Elapsed.TotalSeconds)
         if ($elapsed -eq 0) {
