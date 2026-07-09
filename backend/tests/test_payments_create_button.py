@@ -50,16 +50,16 @@ class TestNewPaymentButtonPresence:
         html = response.content.decode()
         assert "Nuevo pago" in html
 
-    def test_button_after_new_reservation_in_dom(self, logged_client, client):
+    def test_button_before_new_reservation_in_dom(self, logged_client, client):
         response = logged_client.get(f"/clients/{client.pk}/")
         html = response.content.decode()
-        new_res_idx = html.find("Nueva Reserva")
         new_pay_idx = html.find("Nuevo pago")
-        assert new_res_idx != -1, "New Reservation button not found in page"
+        new_res_idx = html.find("Nueva Reserva")
         assert new_pay_idx != -1, "New Payment button not found in page"
-        assert new_res_idx < new_pay_idx, (
-            f"New Reservation (pos {new_res_idx}) must appear before "
-            f"New Payment (pos {new_pay_idx}) in DOM"
+        assert new_res_idx != -1, "New Reservation button not found in page"
+        assert new_pay_idx < new_res_idx, (
+            f"New Payment (pos {new_pay_idx}) must appear before "
+            f"New Reservation (pos {new_res_idx}) in DOM"
         )
 
     def test_button_href_contains_client_param(self, logged_client, client):
