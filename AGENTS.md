@@ -1,15 +1,14 @@
 <!-- SPECKIT START -->
 For additional context about technologies to be used, project structure,
 shell commands, and other important information, read the current plan at
-`specs/030-update-restart-docs/plan.md`
+`specs/031-add-payment-button/plan.md`
 <!-- SPECKIT END -->
 
-## Session Summary (2026-07-06)
+## Session Summary (2026-07-08)
 
-This session is on branch **030-update-restart-docs** — see `specs/030-update-restart-docs/plan.md`.
+This session is on branch **032-add-payment-button** — see `specs/031-add-payment-button/plan.md`.
 
 ### Completed
-- Specified update restart docs feature via `/speckit.specify`
-- Clarified 5 open questions: Task Scheduler format, test scope, all 3 options, app start command, security note
-- Planned implementation: Update `docs/windows11_deployment.md` Options 1–3, new test file
+- Specified payment button client feature via `/speckit.specify`
+- Planned implementation: Add **New Payment** button to `clients/{client_id}/` detail page with client preselection in `payments/create/`
 - Generated plan artifacts: plan, research, data-model, quickstart, contracts

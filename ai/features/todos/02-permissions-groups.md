@@ -55,3 +55,9 @@ The Operators can access to ALL the URLS, except the next sections:
 - `"create/"` → `views.reservation_create` (name: `reservation-create`)
 - `"<int:pk>/"` → `views.reservation_detail` (name: `reservation-detail`)
 - `"<int:pk>/status/"` → `views.reservation_change_status` (name: `reservation-change-status`)
+
+## Acceptance criteria
+
+- The Django permissions have two groups: Administrators and Operators
+- Administrators and operators can see only their respective web pages
+- A Django data migration exists to fill out the accesses

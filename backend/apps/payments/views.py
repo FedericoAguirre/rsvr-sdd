@@ -87,6 +87,13 @@ class PaymentCreateView(LoginRequiredMixin, CreateView):
     form_class = PaymentForm
     template_name = "payments/payment_form.html"
 
+    def get_initial(self):
+        initial = super().get_initial()
+        client_id = self.request.GET.get("client")
+        if client_id:
+            initial["client"] = client_id
+        return initial
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["mode"] = "create"
