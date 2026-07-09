@@ -239,6 +239,14 @@ With multiple developers:
    - Developer C: User Story 3
 3. Stories complete and integrate independently
 
+### Environment Reference
+
+When writing script fragments, task execution steps, or running the code, always use these exact commands:
+- **Run migrations**: `docker compose exec web uv run manage.py migrate`
+- **Run tests**: `docker compose exec web uv run manage.py test`
+- **Install packages**: `docker compose run --rm web uv add <package>`
+- **Sync dependencies**: `docker compose exec web uv sync --system`
+
 ---
 
 ## Notes

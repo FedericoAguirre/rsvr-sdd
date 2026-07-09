@@ -1,10 +1,8 @@
 <!--
   Sync Impact Report
-  Version change: 2.0.2 → 2.1.0
-  Modified principles:
-    - III. User Experience Consistency — expanded i18n rule with explicit
-      element types, 3-step implementation contract, and AI agent directive
-  Added sections: None
+  Version change: 2.1.0 → 2.2.0
+  Modified principles: None
+  Added sections: Development Environment & Package Management
   Removed sections: None
   Templates requiring updates:
     - .specify/templates/plan-template.md ✅ (no change needed — generic)
@@ -90,6 +88,15 @@ This project uses opencode as its AI integration. Runtime targets are
 POSIX-compatible (Linux/macOS). All dependencies MUST be declared
 explicitly. No proprietary or closed-source build tools are permitted.
 
+## Development Environment & Package Management
+
+- **Package Manager**: Always use `uv` via the system environment inside
+  Docker (`UV_SYSTEM_PYTHON=true`). Do not use raw `pip`.
+- **Task Execution**: All backend tasks, test executions, and database
+  migrations MUST be executed inside the container using
+  `docker compose exec web uv run manage.py <command>` or
+  `docker compose run --rm web uv ...`.
+
 ## Development Workflow
 
 All work follows the Specify → Plan → Tasks → Implement cycle with
@@ -122,4 +129,4 @@ only clarified. All project artifacts follow MAJOR.MINOR.PATCH semantic
 versioning. Breaking changes MUST increment MAJOR; new backward-
 compatible functionality increments MINOR; bug fixes increment PATCH.
 
-**Version**: 2.1.0 | **Ratified**: 2026-06-07 | **Last Amended**: 2026-06-24
+**Version**: 2.2.0 | **Ratified**: 2026-06-07 | **Last Amended**: 2026-07-09

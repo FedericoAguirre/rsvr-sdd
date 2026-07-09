@@ -23,11 +23,16 @@ services:
       - "8000:8000"
     environment:
       DATABASE_URL: postgres://${POSTGRES_USER:-rsvr}:${POSTGRES_PASSWORD:-rsvr}@db:5432/${POSTGRES_DB:-rsvr}
+      # Forces uv to use the system Python instead of looking for a virtualenv
+      UV_SYSTEM_PYTHON: "true" 
     depends_on:
       db:
         condition: service_healthy
     volumes:
       - ./backend:/app
+      # Prevents local .venv from leaking into the container
+      - /app/.venv 
+
 
 volumes:
   postgres_data:
