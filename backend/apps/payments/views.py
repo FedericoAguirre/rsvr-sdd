@@ -1,3 +1,5 @@
+from datetime import date, timedelta
+
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db import transaction
 from django.db.models import Count, Q, Sum
@@ -209,6 +211,16 @@ class PaymentReportView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
         grouping = self.request.GET.get("grouping", "month")
         start = self.request.GET.get("start", "")
         end = self.request.GET.get("end", "")
+        if grouping == "week" and start and end:
+            try:
+                start_dt = date.fromisoformat(start)
+                end_dt = date.fromisoformat(end)
+                start_dt -= timedelta(days=start_dt.weekday())
+                end_dt += timedelta(days=6 - end_dt.weekday())
+                start = start_dt.isoformat()
+                end = end_dt.isoformat()
+            except (ValueError, TypeError):
+                pass
         qs = Payment.objects.filter(is_deleted=False)
         if start and end:
             qs = qs.filter(date__gte=start, date__lte=end)

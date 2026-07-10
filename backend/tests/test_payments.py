@@ -354,6 +354,104 @@ class TestReportsMenuNonSuperuser:
         assert response.status_code == 403
 
 
+# ── T001-T003: 034 — Stacked Graph Weekly Grouping ─────────────────────────
+
+
+@pytest.mark.django_db
+class TestDateSnapping:
+    """Date snapping for Week grouping — start→Monday, end→Sunday."""
+
+    def test_start_snaps_friday_to_previous_monday(self, http_client):
+        admin = User.objects.create_superuser(username="snap1", password="pass")
+        http_client.force_login(admin)
+        response = http_client.get(
+            "/payments/reports/?grouping=week&start=2026-07-03&end=2026-07-19",
+        )
+        assert response.context["start_date"] == "2026-06-29"
+        assert response.context["end_date"] == "2026-07-19"
+
+    def test_start_monday_stays_unchanged(self, http_client):
+        admin = User.objects.create_superuser(username="snap2", password="pass")
+        http_client.force_login(admin)
+        response = http_client.get(
+            "/payments/reports/?grouping=week&start=2026-07-06&end=2026-07-19",
+        )
+        assert response.context["start_date"] == "2026-07-06"
+
+    def test_end_tuesday_snaps_to_following_sunday(self, http_client):
+        admin = User.objects.create_superuser(username="snap3", password="pass")
+        http_client.force_login(admin)
+        response = http_client.get(
+            "/payments/reports/?grouping=week&start=2026-07-06&end=2026-07-14",
+        )
+        assert response.context["end_date"] == "2026-07-19"
+
+    def test_end_sunday_stays_unchanged(self, http_client):
+        admin = User.objects.create_superuser(username="snap4", password="pass")
+        http_client.force_login(admin)
+        response = http_client.get(
+            "/payments/reports/?grouping=week&start=2026-07-06&end=2026-07-19",
+        )
+        assert response.context["end_date"] == "2026-07-19"
+
+    def test_snapping_only_applies_to_week_grouping(self, http_client):
+        admin = User.objects.create_superuser(username="snap5", password="pass")
+        http_client.force_login(admin)
+        response = http_client.get(
+            "/payments/reports/?grouping=day&start=2026-07-03&end=2026-07-19",
+        )
+        assert response.context["start_date"] == "2026-07-03"
+        assert response.context["end_date"] == "2026-07-19"
+
+
+@pytest.mark.django_db
+class TestWeeklyChartRendering:
+    """Weekly chart returns correctly formatted data."""
+
+    def test_weekly_grouping_returns_week_keys(self, http_client, client, staff_user):
+        admin = User.objects.create_superuser(username="wk1", password="pass")
+        http_client.force_login(admin)
+        Payment.objects.create(
+            client=client, amount=100.00, payment_type="CASH",
+            date=datetime.date(2026, 7, 6), class_slot_count=2,
+            reference="WEEK-1", created_by=staff_user,
+        )
+        Payment.objects.create(
+            client=client, amount=200.00, payment_type="CC",
+            date=datetime.date(2026, 7, 8), class_slot_count=2,
+            reference="WEEK-2", created_by=staff_user,
+        )
+        response = http_client.get(
+            "/payments/reports/?grouping=week&start=2026-07-06&end=2026-07-12",
+        )
+        assert response.status_code == 200
+        import re
+        html = response.content.decode()
+        match = re.search(
+            r'<script id="report-data"[^>]*>(.*?)</script>', html, re.DOTALL,
+        )
+        assert match is not None
+        report_data = json.loads(match.group(1))
+        assert isinstance(report_data, list)
+        assert len(report_data) > 0
+        for row in report_data:
+            assert "week" in row, f"Expected 'week' key in row: {row}"
+            assert row["payment_type"] in ("CASH", "CC")
+            assert float(row["total"]) in (100.0, 200.0)
+            # Week keys should be Monday dates in YYYYMMDD
+            assert row["week"] == "2026-07-06"
+
+    def test_weekly_empty_state(self, http_client):
+        admin = User.objects.create_superuser(username="wk2", password="pass")
+        http_client.force_login(admin)
+        response = http_client.get(
+            "/payments/reports/?grouping=week&start=2020-01-01&end=2020-01-31",
+        )
+        assert response.status_code == 200
+        html = response.content.decode()
+        assert "No payment data for the selected period." in html or "No hay datos de pago" in html
+
+
 # ── T050-T052: US4 — Payment Reports ─────────────────────────────────────────
 
 

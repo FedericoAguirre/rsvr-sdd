@@ -59,9 +59,15 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
     }
 
-    var labels = [...new Set(data.map(function(r) {
-        return r.date || r.week || (r.date__year + '-' + String(r.date__month).padStart(2, '0'));
-    }))];
+    var isWeek = data[0] && data[0].hasOwnProperty('week');
+
+    function formatLabel(r) {
+        var raw = r.date || r.week || (r.date__year + '-' + String(r.date__month).padStart(2, '0'));
+        if (r.week) return raw.replace(/-/g, '');
+        return raw;
+    }
+
+    var labels = [...new Set(data.map(formatLabel))];
     labels.sort();
 
     var types = [...new Set(data.map(function(r) { return r.payment_type; }))];
@@ -74,22 +80,50 @@ document.addEventListener('DOMContentLoaded', function() {
         'PAPP': 'rgba(153, 102, 255, 0.7)',
     };
 
-    function getLabel(r) {
-        return r.date || r.week || (r.date__year + '-' + String(r.date__month).padStart(2, '0'));
-    }
-
     var datasets = types.map(function(type) {
         return {
             label: type,
             data: labels.map(function(label) {
                 var match = data.find(function(r) {
-                    return getLabel(r) === label && r.payment_type === type;
+                    return formatLabel(r) === label && r.payment_type === type;
                 });
                 return match ? parseFloat(match.total) : 0;
             }),
             backgroundColor: colors[type] || 'rgba(200, 200, 200, 0.7)',
         };
     });
+
+    var totalsByLabel = {};
+    labels.forEach(function(label, i) {
+        var sum = 0;
+        datasets.forEach(function(ds) {
+            sum += ds.data[i];
+        });
+        totalsByLabel[label] = sum;
+    });
+
+    var totalsPlugin = {
+        id: 'barTotals',
+        afterDraw: function(chart) {
+            var ctx = chart.ctx;
+            chart.data.datasets.forEach(function(ds, dsIdx) {
+                var meta = chart.getDatasetMeta(dsIdx);
+                meta.data.forEach(function(bar, barIdx) {
+                    var label = chart.data.labels[barIdx];
+                    if (dsIdx === chart.data.datasets.length - 1) {
+                        var total = totalsByLabel[label];
+                        if (total > 0) {
+                            ctx.fillStyle = '#333';
+                            ctx.font = 'bold 12px sans-serif';
+                            ctx.textAlign = 'center';
+                            ctx.textBaseline = 'bottom';
+                            ctx.fillText('$' + total.toFixed(2), bar.x, bar.y - 2);
+                        }
+                    }
+                });
+            });
+        }
+    };
 
     var totalsCtx = document.getElementById('totalsChart');
     if (totalsCtx) {
@@ -102,8 +136,8 @@ document.addEventListener('DOMContentLoaded', function() {
             options: {
                 responsive: true,
                 scales: {
-                    x: { stacked: true },
-                    y: { stacked: true, beginAtZero: true },
+                    x: { stacked: true, grid: { display: true } },
+                    y: { stacked: true, beginAtZero: true, grid: { display: true } },
                 },
                 plugins: {
                     legend: { display: true },
@@ -116,6 +150,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     },
                 },
             },
+            plugins: [totalsPlugin],
         });
     }
 
