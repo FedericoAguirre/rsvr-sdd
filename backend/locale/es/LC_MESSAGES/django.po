@@ -856,6 +856,10 @@ msgstr "Totales por tipo de pago"
 msgid "No payment data for the selected period."
 msgstr "No hay datos de pago para el período seleccionado."
 
+#: apps/payments/templates/payments/payment_reports.html:42
+msgid "Failed to load chart data."
+msgstr "Error al cargar los datos del gráfico."
+
 #: apps/payments/templates/payments/payment_reports.html:83
 msgid "Total Amount"
 msgstr "Monto total"
