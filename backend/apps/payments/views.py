@@ -226,10 +226,6 @@ class PaymentReportView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
             ).values("week", "payment_type").annotate(
                 total=Sum("amount"), count=Count("id"),
             ).order_by("week", "payment_type")
-        elif grouping == "range":
-            rows = qs.values("date", "payment_type").annotate(
-                total=Sum("amount"), count=Count("id"),
-            ).order_by("date", "payment_type")
         else:
             rows = qs.values("date__year", "date__month", "payment_type").annotate(
                 total=Sum("amount"), count=Count("id"),

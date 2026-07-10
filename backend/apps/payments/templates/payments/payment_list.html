@@ -7,7 +7,7 @@
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h1>{% translate "Payments" %}</h1>
-    <a href="{% url 'payments:create' %}" class="btn btn-primary">{% translate "New Payment" %}</a>
+    <a href="{% url 'payments:create' %}" class="btn btn-success">{% translate "New Payment" %}</a>
 </div>
 
 <div class="card mb-4">
@@ -20,11 +20,11 @@
               hx-swap="outerHTML"
               hx-indicator="#search-indicator">
             <div class="col-auto">
-                <label for="id_q" class="form-label">{% translate "Search by Client" %}</label>
-                <input type="text" name="q" id="id_q" class="form-control" value="{{ q }}" placeholder="{% translate 'Search by client name, email or mobile...' %}">
+                <label for="id_q" class="form-label">{% translate "Search Clients" %}</label>
+                <input type="text" name="q" id="id_q" class="form-control" value="{{ q }}" placeholder="{% translate 'Search clients...' %}">
             </div>
             <div class="col-auto">
-                <button type="submit" class="btn btn-outline-secondary">{% translate "Search" %}</button>
+                <button type="submit" class="btn btn-primary">{% translate "Search" %}</button>
                 <a href="{% url 'payments:list' %}" class="btn btn-outline-danger">{% translate "Clear" %}</a>
                 <span id="search-indicator" class="htmx-indicator text-muted">{% translate "Searching..." %}</span>
             </div>

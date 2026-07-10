@@ -16,7 +16,6 @@
                     <option value="day" {% if grouping == "day" %}selected{% endif %}>{% translate "Day" %}</option>
                     <option value="week" {% if grouping == "week" %}selected{% endif %}>{% translate "Week" %}</option>
                     <option value="month" {% if grouping == "month" %}selected{% endif %}>{% translate "Month" %}</option>
-                    <option value="range" {% if grouping == "range" %}selected{% endif %}>{% translate "Custom Range" %}</option>
                 </select>
             </div>
             <div class="col-auto">
@@ -55,23 +54,42 @@ document.addEventListener('DOMContentLoaded', function() {
     if (!raw) return;
     var data = JSON.parse(raw.textContent);
 
-    var paymentTypes = {};
-    data.forEach(function(row) {
-        var pt = row.payment_type || 'Unknown';
-        if (!paymentTypes[pt]) paymentTypes[pt] = 0;
-        paymentTypes[pt] += parseFloat(row.total) || 0;
+    if (!data || data.length === 0) {
+        document.querySelector('.card-body').innerHTML += '<p class="text-muted mb-0">{% translate "No payment data for the selected period." %}</p>';
+        return;
+    }
+
+    var labels = [...new Set(data.map(function(r) {
+        return r.date || r.week || (r.date__year + '-' + String(r.date__month).padStart(2, '0'));
+    }))];
+    labels.sort();
+
+    var types = [...new Set(data.map(function(r) { return r.payment_type; }))];
+
+    var colors = {
+        'CASH': 'rgba(54, 162, 235, 0.7)',
+        'CC': 'rgba(255, 99, 132, 0.7)',
+        'DC': 'rgba(255, 206, 86, 0.7)',
+        'TRANSF': 'rgba(75, 192, 192, 0.7)',
+        'PAPP': 'rgba(153, 102, 255, 0.7)',
+    };
+
+    function getLabel(r) {
+        return r.date || r.week || (r.date__year + '-' + String(r.date__month).padStart(2, '0'));
+    }
+
+    var datasets = types.map(function(type) {
+        return {
+            label: type,
+            data: labels.map(function(label) {
+                var match = data.find(function(r) {
+                    return getLabel(r) === label && r.payment_type === type;
+                });
+                return match ? parseFloat(match.total) : 0;
+            }),
+            backgroundColor: colors[type] || 'rgba(200, 200, 200, 0.7)',
+        };
     });
-
-    var labels = Object.keys(paymentTypes);
-    var values = Object.values(paymentTypes);
-
-    if (labels.length === 0) return;
-
-    var colors = [
-        'rgba(54, 162, 235, 0.7)', 'rgba(255, 99, 132, 0.7)',
-        'rgba(255, 206, 86, 0.7)', 'rgba(75, 192, 192, 0.7)',
-        'rgba(153, 102, 255, 0.7)',
-    ];
 
     var totalsCtx = document.getElementById('totalsChart');
     if (totalsCtx) {
@@ -79,18 +97,25 @@ document.addEventListener('DOMContentLoaded', function() {
             type: 'bar',
             data: {
                 labels: labels,
-                datasets: [{
-                    label: '{% translate "Total Amount" %}',
-                    data: values,
-                    backgroundColor: colors.slice(0, labels.length),
-                }]
+                datasets: datasets,
             },
             options: {
                 responsive: true,
+                scales: {
+                    x: { stacked: true },
+                    y: { stacked: true, beginAtZero: true },
+                },
                 plugins: {
-                    legend: { display: false },
-                }
-            }
+                    legend: { display: true },
+                    tooltip: {
+                        callbacks: {
+                            label: function(ctx) {
+                                return ctx.dataset.label + ': $' + ctx.parsed.y.toFixed(2);
+                            },
+                        },
+                    },
+                },
+            },
         });
     }
 

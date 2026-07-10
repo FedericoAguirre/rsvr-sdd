@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: rsvr-sdd\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-02 19:37-0600\n"
+"POT-Creation-Date: 2026-07-09 20:38+0000\n"
 "PO-Revision-Date: 2026-06-11 10:30-0600\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -139,6 +139,7 @@ msgid "Search by email or mobile"
 msgstr "Buscar por correo electrónico o móvil"
 
 #: apps/clients/forms.py:12
+#: apps/payments/templates/payments/payment_list.html:24
 msgid "Search clients..."
 msgstr "Buscar clientes..."
 
@@ -308,29 +309,36 @@ msgid "Cancel"
 msgstr "Cancelar"
 
 #: apps/clients/templates/clients/client_detail.html:12
+#: apps/payments/templates/payments/payment_form.html:3
+#: apps/payments/templates/payments/payment_form.html:5
+#: apps/payments/templates/payments/payment_list.html:10
+msgid "New Payment"
+msgstr "Nuevo pago"
+
+#: apps/clients/templates/clients/client_detail.html:13
 #: apps/reservations/templates/reservations/reservation_form.html:3
 #: apps/reservations/templates/reservations/reservation_form.html:5
 #: apps/reservations/templates/reservations/reservation_list.html:9
 msgid "New Reservation"
 msgstr "Nueva Reserva"
 
-#: apps/clients/templates/clients/client_detail.html:16
+#: apps/clients/templates/clients/client_detail.html:17
 msgid "Start date"
 msgstr "Fecha de inicio"
 
-#: apps/clients/templates/clients/client_detail.html:22
+#: apps/clients/templates/clients/client_detail.html:23
 msgid "End date"
 msgstr "Fecha de fin"
 
-#: apps/clients/templates/clients/client_detail.html:28
+#: apps/clients/templates/clients/client_detail.html:29
 msgid "Download Calendar"
 msgstr "Descargar Calendario"
 
-#: apps/clients/templates/clients/client_detail.html:32
+#: apps/clients/templates/clients/client_detail.html:33
 msgid "Reservation History"
 msgstr "Historial de Reservas"
 
-#: apps/clients/templates/clients/client_detail.html:35
+#: apps/clients/templates/clients/client_detail.html:36
 #: apps/payments/models.py:30
 #: apps/payments/templates/payments/partials/_payment_search_results.html:16
 #: apps/payments/templates/payments/payment_associate.html:35
@@ -345,7 +353,7 @@ msgstr "Historial de Reservas"
 msgid "Date"
 msgstr "Fecha"
 
-#: apps/clients/templates/clients/client_detail.html:35
+#: apps/clients/templates/clients/client_detail.html:36
 #: apps/reservations/templates/reservations/reservation_detail.html:11
 #: apps/reservations/templates/reservations/reservation_list.html:34
 #: apps/reservations/templates/reservations/reservation_list.html:43
@@ -354,7 +362,7 @@ msgstr "Fecha"
 msgid "Class"
 msgstr "Clase"
 
-#: apps/clients/templates/clients/client_detail.html:35
+#: apps/clients/templates/clients/client_detail.html:36
 #: apps/equipment/apps.py:8 apps/equipment/models.py:28
 #: apps/equipment/templates/equipment/equipment_list.html:3
 #: apps/equipment/templates/equipment/equipment_list.html:5
@@ -369,11 +377,11 @@ msgstr "Clase"
 msgid "Equipment"
 msgstr "Equipo"
 
-#: apps/clients/templates/clients/client_detail.html:47
+#: apps/clients/templates/clients/client_detail.html:48
 msgid "No reservations yet."
 msgstr "Sin reservas aún."
 
-#: apps/clients/templates/clients/client_detail.html:49
+#: apps/clients/templates/clients/client_detail.html:50
 msgid "Back to Search"
 msgstr "Volver a Búsqueda"
 
@@ -390,6 +398,7 @@ msgstr "Guardar"
 
 #: apps/clients/templates/clients/search.html:3
 #: apps/clients/templates/clients/search.html:5
+#: apps/payments/templates/payments/payment_list.html:23
 msgid "Search Clients"
 msgstr "Buscar Clientes"
 
@@ -564,7 +573,6 @@ msgid "Search by client"
 msgstr "Buscar por cliente"
 
 #: apps/payments/forms.py:18
-#: apps/payments/templates/payments/payment_list.html:24
 msgid "Search by client name, email or mobile..."
 msgstr "Buscar por nombre, correo electrónico o móvil del cliente..."
 
@@ -677,7 +685,6 @@ msgid "Payments"
 msgstr "Pagos"
 
 #: apps/payments/models.py:72
-#, python-brace-format
 msgid "{} – {} – {}"
 msgstr "{} – {} – {}"
 
@@ -694,7 +701,6 @@ msgid "Payment Reservations"
 msgstr "Reservas de pago"
 
 #: apps/payments/models.py:123
-#, python-brace-format
 msgid "{} → {}"
 msgstr "{} → {}"
 
@@ -739,7 +745,8 @@ msgid ""
 "                    "
 msgstr ""
 "\n"
-"                    Puede asociar hasta %(remaining)s reserva(s) con este pago.\n"
+"                    Puede asociar hasta %(remaining)s reserva(s) con este "
+"pago.\n"
 "                    "
 
 #: apps/payments/templates/payments/payment_associate.html:34
@@ -800,12 +807,6 @@ msgstr "Reservas asociadas"
 msgid "Edit Payment"
 msgstr "Editar pago"
 
-#: apps/payments/templates/payments/payment_form.html:3
-#: apps/payments/templates/payments/payment_form.html:5
-#: apps/payments/templates/payments/payment_list.html:10
-msgid "New Payment"
-msgstr "Nuevo pago"
-
 #: apps/payments/templates/payments/payment_form.html:18
 msgid "Save Changes"
 msgstr "Guardar cambios"
@@ -813,10 +814,6 @@ msgstr "Guardar cambios"
 #: apps/payments/templates/payments/payment_form.html:18
 msgid "Create Payment"
 msgstr "Crear pago"
-
-#: apps/payments/templates/payments/payment_list.html:23
-msgid "Search by Client"
-msgstr "Buscar por cliente"
 
 #: apps/payments/templates/payments/payment_list.html:28
 msgid "Clear"
@@ -839,10 +836,6 @@ msgstr "Semana"
 msgid "Month"
 msgstr "Mes"
 
-#: apps/payments/templates/payments/payment_reports.html:19
-msgid "Custom Range"
-msgstr "Rango personalizado"
-
 #: apps/payments/templates/payments/payment_reports.html:23
 msgid "Start Date"
 msgstr "Fecha de inicio"
@@ -858,6 +851,10 @@ msgstr "Generar reporte"
 #: apps/payments/templates/payments/payment_reports.html:41
 msgid "Totals by Payment Type"
 msgstr "Totales por tipo de pago"
+
+#: apps/payments/templates/payments/payment_reports.html:41
+msgid "No payment data for the selected period."
+msgstr "No hay datos de pago para el período seleccionado."
 
 #: apps/payments/templates/payments/payment_reports.html:83
 msgid "Total Amount"

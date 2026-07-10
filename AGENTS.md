@@ -1,14 +1,14 @@
 <!-- SPECKIT START -->
 For additional context about technologies to be used, project structure,
 shell commands, and other important information, read the current plan at
-`specs/031-add-payment-button/plan.md`
+`specs/033-remove-custom-range/plan.md`
 <!-- SPECKIT END -->
 
-## Session Summary (2026-07-08)
+## Session Summary (2026-07-10)
 
-This session is on branch **032-add-payment-button** — see `specs/031-add-payment-button/plan.md`.
+This session is on branch **033-remove-custom-range** — see `specs/033-remove-custom-range/plan.md`.
 
 ### Completed
-- Specified payment button client feature via `/speckit.specify`
-- Planned implementation: Add **New Payment** button to `clients/{client_id}/` detail page with client preselection in `payments/create/`
-- Generated plan artifacts: plan, research, data-model, quickstart, contracts
+- Implemented removal of Custom Range grouping option via `/speckit.implement`
+- Removed dropdown option, backend code, i18n entry, updated test
+- All 12 report tests pass (180/188 total, 8 pre-existing unrelated failures)
