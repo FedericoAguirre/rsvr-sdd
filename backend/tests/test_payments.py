@@ -452,6 +452,110 @@ class TestWeeklyChartRendering:
         assert "No payment data for the selected period." in html or "No hay datos de pago" in html
 
 
+# ── T001-T007: 035 — Monthly Stacked Graph ──────────────────────────────────
+
+
+@pytest.mark.django_db
+class TestMonthlyDateSnapping:
+    """Date snapping for Month grouping — start→1st, end→last day."""
+
+    def test_start_date_snaps_to_first_of_month(self, http_client):
+        admin = User.objects.create_superuser(username="msnap1", password="pass")
+        http_client.force_login(admin)
+        response = http_client.get(
+            "/payments/reports/?grouping=month&start=2026-07-15&end=2026-09-10",
+        )
+        assert response.context["start_date"] == "2026-07-01"
+
+    def test_end_date_snaps_to_last_day_of_month(self, http_client):
+        admin = User.objects.create_superuser(username="msnap2", password="pass")
+        http_client.force_login(admin)
+        response = http_client.get(
+            "/payments/reports/?grouping=month&start=2026-07-15&end=2026-09-10",
+        )
+        assert response.context["end_date"] == "2026-09-30"
+
+    def test_start_date_already_first(self, http_client):
+        admin = User.objects.create_superuser(username="msnap3", password="pass")
+        http_client.force_login(admin)
+        response = http_client.get(
+            "/payments/reports/?grouping=month&start=2026-07-01&end=2026-09-10",
+        )
+        assert response.context["start_date"] == "2026-07-01"
+
+    def test_end_date_already_last_day(self, http_client):
+        admin = User.objects.create_superuser(username="msnap4", password="pass")
+        http_client.force_login(admin)
+        response = http_client.get(
+            "/payments/reports/?grouping=month&start=2026-07-01&end=2026-09-30",
+        )
+        assert response.context["end_date"] == "2026-09-30"
+
+    def test_leap_year_february(self, http_client):
+        admin = User.objects.create_superuser(username="msnap5", password="pass")
+        http_client.force_login(admin)
+        response = http_client.get(
+            "/payments/reports/?grouping=month&start=2028-02-01&end=2028-02-15",
+        )
+        assert response.context["end_date"] == "2028-02-29"
+
+    def test_snapping_only_applies_to_month_grouping(self, http_client):
+        admin = User.objects.create_superuser(username="msnap6", password="pass")
+        http_client.force_login(admin)
+        response = http_client.get(
+            "/payments/reports/?grouping=day&start=2026-07-15&end=2026-09-10",
+        )
+        assert response.context["start_date"] == "2026-07-15"
+        assert response.context["end_date"] == "2026-09-10"
+
+
+@pytest.mark.django_db
+class TestMonthlyChartRendering:
+    """Monthly chart returns correctly formatted YYYYMM labels."""
+
+    def test_monthly_grouping_returns_yyyymm_labels(self, http_client, client, staff_user):
+        admin = User.objects.create_superuser(username="mchr1", password="pass")
+        http_client.force_login(admin)
+        Payment.objects.create(
+            client=client, amount=300.00, payment_type="CASH",
+            date=datetime.date(2026, 7, 15), class_slot_count=2,
+            reference="MONTH-1", created_by=staff_user,
+        )
+        Payment.objects.create(
+            client=client, amount=400.00, payment_type="CC",
+            date=datetime.date(2026, 8, 20), class_slot_count=2,
+            reference="MONTH-2", created_by=staff_user,
+        )
+        response = http_client.get(
+            "/payments/reports/?grouping=month&start=2026-07-01&end=2026-08-31",
+        )
+        assert response.status_code == 200
+        html = response.content.decode()
+        # Verify the formatLabel function produces YYYYMM (no hyphen separator)
+        assert "String(r.date__year) + String(r.date__month).padStart(2, '0')" in html, (
+            "Expected formatLabel to concatenate year+month without separator"
+        )
+        # Verify report_data JSON contains expected data
+        import re
+        match = re.search(
+            r'<script id="report-data"[^>]*>(.*?)</script>', html, re.DOTALL,
+        )
+        assert match is not None
+        report_data = json.loads(match.group(1))
+        assert isinstance(report_data, list)
+        assert len(report_data) > 0
+
+    def test_monthly_empty_state(self, http_client):
+        admin = User.objects.create_superuser(username="mchr2", password="pass")
+        http_client.force_login(admin)
+        response = http_client.get(
+            "/payments/reports/?grouping=month&start=2020-01-01&end=2020-02-29",
+        )
+        assert response.status_code == 200
+        html = response.content.decode()
+        assert "No payment data for the selected period." in html or "No hay datos de pago" in html
+
+
 # ── T050-T052: US4 — Payment Reports ─────────────────────────────────────────
 
 

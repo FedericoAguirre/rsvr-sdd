@@ -62,7 +62,7 @@ document.addEventListener('DOMContentLoaded', function() {
     var isWeek = data[0] && data[0].hasOwnProperty('week');
 
     function formatLabel(r) {
-        var raw = r.date || r.week || (r.date__year + '-' + String(r.date__month).padStart(2, '0'));
+        var raw = r.date || r.week || (String(r.date__year) + String(r.date__month).padStart(2, '0'));
         if (r.week) return raw.replace(/-/g, '');
         return raw;
     }
