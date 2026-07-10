@@ -1,3 +1,4 @@
+import calendar
 from datetime import date, timedelta
 
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
@@ -217,6 +218,17 @@ class PaymentReportView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
                 end_dt = date.fromisoformat(end)
                 start_dt -= timedelta(days=start_dt.weekday())
                 end_dt += timedelta(days=6 - end_dt.weekday())
+                start = start_dt.isoformat()
+                end = end_dt.isoformat()
+            except (ValueError, TypeError):
+                pass
+        elif grouping == "month" and start and end:
+            try:
+                start_dt = date.fromisoformat(start)
+                end_dt = date.fromisoformat(end)
+                start_dt = start_dt.replace(day=1)
+                _, last_day = calendar.monthrange(end_dt.year, end_dt.month)
+                end_dt = end_dt.replace(day=last_day)
                 start = start_dt.isoformat()
                 end = end_dt.isoformat()
             except (ValueError, TypeError):
