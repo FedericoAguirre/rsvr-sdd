@@ -80,6 +80,13 @@ As a developer, I want the skill to ask targeted questions when my initial descr
 - What happens when the output directory (`ai/features/todo/`) does not exist? — Skill should create it automatically.
 - What happens when the user provides contradictory information in follow-up answers? — Skill should flag the contradiction and ask for confirmation.
 - How does the sequence number behave when the highest existing file is `07` but `08` is already taken? — Skill should find the next available gap in the sequence.
+- What happens when the skill cannot write to `ai/features/todo/` (permission denied, disk full)? — Skill should catch the error and display a clear message to the user with the OS-level reason.
+
+### Out of Scope
+
+- Editing or deleting existing user story files in `ai/features/todo/`
+- Integration with external issue trackers (Jira, GitHub Issues, Linear, etc.)
+- Web UI or CLI — the skill operates exclusively through opencode conversation
 
 ## Requirements *(mandatory)*
 
@@ -89,12 +96,13 @@ As a developer, I want the skill to ask targeted questions when my initial descr
 - **FR-002**: Skill MUST detect information gaps in the user's description for at least these fields: user type, goal, reason/benefit, acceptance criteria
 - **FR-003**: Skill MUST ask follow-up questions for detected gaps, up to a maximum of 3 questions per session
 - **FR-004**: Skill MUST generate the filename as `[NN]_[slug].md` where `NN` is the next available 2-digit sequence and `slug` is a lowercase, underscore-separated version of the story title
-- **FR-005**: Skill MUST save the filled template to `ai/features/todo/[filename]`
+- **FR-005**: Skill MUST save the filled template to `ai/features/todo/[filename]`. If the file already exists, the skill MUST prompt the user with three options: overwrite, use next available sequence number, or cancel.
 - **FR-006**: Skill MUST trigger on phrases including "I want to create a new feature", "I want to create a user story", "new feature idea", and similar variants
 - **FR-007**: Skill MUST NOT activate on unrelated conversational phrases
 - **FR-008**: Skill MUST gracefully handle the case where `ai/templates/user_story_template.md` does not exist, with a clear error message
 - **FR-009**: Skill MUST create the `ai/features/todo/` directory if it does not exist
 - **FR-010**: Skill MUST wrap the skill definition in the opencode-compatible SKILL.md format with YAML frontmatter including name, description (with trigger phrases), and license metadata
+- **FR-011**: Skill MUST perform soft validation on the generated output — check for missing required template sections and warn the user if any are blank, but still save the file
 
 ### Key Entities
 
@@ -110,6 +118,16 @@ As a developer, I want the skill to ask targeted questions when my initial descr
 - **SC-002**: The skill saves a file with all template sections filled (no blank sections) at least 90% of the time
 - **SC-003**: The sequence number in the filename correctly increments by 1 from the highest existing todo file
 - **SC-004**: The skill activates correctly for each of the specified trigger phrases and does not activate for unrelated phrases (verified via test conversation)
+
+## Clarifications
+
+### Session 2026-07-10
+
+- Q: Should the skill support editing or deleting existing todo files, or only creation? → A: Create-only. Editing and deleting existing user stories is out of scope.
+- Q: When the generated filename already exists, what should the skill do? → A: Prompt the user with three choices — overwrite existing file, create a new file with the next available sequence number, or cancel.
+- Q: Should the skill explicitly handle file-system write errors (permission denied, disk full)? → A: Yes — catch and report a clear error message to the user with the OS-level reason.
+- Q: Should the skill validate the generated markdown before saving? → A: Soft validation — check for missing required template sections, warn the user, but still save the file.
+- Q: Should the skill list specific compatible AI models? → A: Model-agnostic — no model restrictions; works with any opencode-compatible model.
 
 ## Assumptions
 
