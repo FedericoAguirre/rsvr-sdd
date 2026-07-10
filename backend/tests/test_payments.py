@@ -375,7 +375,7 @@ class TestPaymentReports:
         admin = User.objects.create_superuser(username="admin2", password="pass")
         http_client.force_login(admin)
         Payment.objects.create(**{**payment_data, "created_by": admin})
-        response = http_client.get("/payments/reports/?grouping=range&start=2026-01-01&end=2026-12-31")
+        response = http_client.get("/payments/reports/?grouping=day&start=2026-01-01&end=2026-12-31")
         assert response.status_code == 200
 
     def test_reports_day_grouping_with_date_range(self, http_client, client, staff_user):

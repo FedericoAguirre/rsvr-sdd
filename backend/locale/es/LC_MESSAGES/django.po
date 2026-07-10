@@ -836,10 +836,6 @@ msgstr "Semana"
 msgid "Month"
 msgstr "Mes"
 
-#: apps/payments/templates/payments/payment_reports.html:19
-msgid "Custom Range"
-msgstr "Rango personalizado"
-
 #: apps/payments/templates/payments/payment_reports.html:23
 msgid "Start Date"
 msgstr "Fecha de inicio"
