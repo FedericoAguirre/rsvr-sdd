@@ -1,0 +1,28 @@
+erDiagram
+    Payment {
+        bigint id PK
+        decimal amount
+        varchar payment_type
+        date date
+        varchar payment_identifier UK
+        smallint class_slot_count
+        varchar reference_nullable
+        varchar evidence_nullable
+        text notes_nullable
+        bool is_deleted
+        datetime deleted_at_nullable
+        datetime created_at
+        datetime updated_at
+        bigint client_id FK
+        int created_by_id FK
+        int updated_by_id_nullable FK
+    }
+
+    PaymentReservation {
+        bigint id PK
+        bigint payment_id FK
+        bigint reservation_id FK UK
+        datetime created_at
+    }
+
+    Payment ||--o{ PaymentReservation : "payment"

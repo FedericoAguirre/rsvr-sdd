@@ -2,12 +2,12 @@
 
 ~~1. Create deployment script for Windows 11 home~~
 2. Create permissions for 2 groups: Administrators and Operators
-3. Create a Menu access to reservations_payments webpage (1/2)
-4. Add payment button to the clients/{client_id}/ webpage
-5. Add payment-reservations button to the clients/{client_id}/ webpage
-6. Create the stacked graph for daily grouping
-7. Create the stacked graph for monthly grouping
-8. Create the payment grid for a date range
+~~3. Create a Menu access to reservations_payments webpage~~
+~~4. Add payment button to the clients/{client_id}/ webpage~~
+~~5. Add payment-reservations button to the clients/{client_id}/ webpageñ~~
+~~6. Create the stacked graph for daily grouping~~
+~~7. Create the stacked graph for monthly grouping~~
+8. Export payments for a date range using payments/reports
 9. In the reservations/ webpage make the date be associated with the day of the class slot
 10. Order payments/ webpage disposition
 11. Check file upload functionality in the payments/create/ webpage
