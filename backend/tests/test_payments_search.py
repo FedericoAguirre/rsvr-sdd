@@ -135,6 +135,16 @@ class TestPaymentClientSearch:
         content = response.content.decode()
         assert "No se encontraron pagos que coincidan con su búsqueda" in content
 
+    def test_page_renders_updated_labels_and_classes(
+        self, logged_client,
+    ):
+        response = logged_client.get("/payments/")
+        content = response.content.decode()
+        assert "Buscar Clientes" in content
+        assert "Buscar clientes..." in content
+        assert 'class="btn btn-primary"' in content
+        assert 'class="btn btn-success"' in content
+
     def test_clear_search_shows_all_payments(
         self, logged_client, payment_for_active, inactive_client,
     ):
