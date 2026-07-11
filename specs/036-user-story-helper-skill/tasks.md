@@ -15,8 +15,8 @@ description: "Task list for user-story-helper skill implementation"
 
 **Purpose**: Confirm existing project structure is in place.
 
-- [ ] T001 Verify `ai/templates/user_story_template.md` exists and is readable
-- [ ] T002 Verify `.agents/skills/` directory convention (7 existing skills already present)
+- [X] T001 Verify `ai/templates/user_story_template.md` exists and is readable
+- [X] T002 Verify `.agents/skills/` directory convention (7 existing skills already present)
 
 ---
 
@@ -26,7 +26,7 @@ description: "Task list for user-story-helper skill implementation"
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete.
 
-- [ ] T003 Confirm `ai/features/todo/` directory exists (create if missing)
+- [X] T003 Confirm `ai/features/todo/` directory exists (create if missing)
 
 **Checkpoint**: Foundation ready — skill implementation can begin.
 
@@ -40,13 +40,13 @@ description: "Task list for user-story-helper skill implementation"
 
 ### Implementation for User Story 1
 
-- [ ] T004 [P] [US1] Write SKILL.md frontmatter with name `user-story-helper`, capability summary, and trigger phrases: "I want to create a new feature", "I want to create a user story", "new feature idea"
-- [ ] T005 [P] [US1] In SKILL.md, add instruction: load template from `ai/templates/user_story_template.md` when triggered
-- [ ] T006 [US1] In SKILL.md, add instruction: detect missing template fields (user_type, goal, reason, acceptance_criteria, definition_of_done) from user input
-- [ ] T007 [US1] In SKILL.md, add instruction: ask up to 3 targeted follow-up questions for detected gaps
-- [ ] T008 [US1] In SKILL.md, add instruction: fill template sections with user answers
-- [ ] T009 [US1] In SKILL.md, add instruction: perform soft validation — warn if required template sections are blank but still save
-- [ ] T010 [US1] In SKILL.md, add instruction: save filled template to `ai/features/todo/[NN]_[slug].md`
+- [X] T004 [P] [US1] Write SKILL.md frontmatter with name `user-story-helper`, capability summary, and trigger phrases: "I want to create a new feature", "I want to create a user story", "new feature idea"
+- [X] T005 [P] [US1] In SKILL.md, add instruction: load template from `ai/templates/user_story_template.md` when triggered
+- [X] T006 [US1] In SKILL.md, add instruction: detect missing template fields (user_type, goal, reason, acceptance_criteria, definition_of_done) from user input
+- [X] T007 [US1] In SKILL.md, add instruction: ask up to 3 targeted follow-up questions for detected gaps
+- [X] T008 [US1] In SKILL.md, add instruction: fill template sections with user answers
+- [X] T009 [US1] In SKILL.md, add instruction: perform soft validation — warn if required template sections are blank but still save
+- [X] T010 [US1] In SKILL.md, add instruction: save filled template to `ai/features/todo/[NN]_[slug].md`
 
 **Checkpoint**: User Story 1 is complete — a user can go from trigger phrase to saved file with filled template.
 
@@ -60,10 +60,10 @@ description: "Task list for user-story-helper skill implementation"
 
 ### Implementation for User Story 2
 
-- [ ] T011 [P] [US2] In SKILL.md, add instruction: scan `ai/features/todo/` for existing files to determine next available 2-digit sequence number
-- [ ] T012 [P] [US2] In SKILL.md, add instruction: generate filename as `[NN]_[slug].md` where `NN` is next available sequence and `slug` is lowercase underscore-separated title
-- [ ] T013 [US2] In SKILL.md, add instruction: handle gap collisions — if `08` is taken, find the next available gap
-- [ ] T014 [US2] In SKILL.md, add instruction: slugify title — lowercase, spaces to underscores, remove special characters
+- [X] T011 [P] [US2] In SKILL.md, add instruction: scan `ai/features/todo/` for existing files to determine next available 2-digit sequence number
+- [X] T012 [P] [US2] In SKILL.md, add instruction: generate filename as `[NN]_[slug].md` where `NN` is next available sequence and `slug` is lowercase underscore-separated title
+- [X] T013 [US2] In SKILL.md, add instruction: handle gap collisions — if `08` is taken, find the next available gap
+- [X] T014 [US2] In SKILL.md, add instruction: slugify title — lowercase, spaces to underscores, remove special characters
 
 **Checkpoint**: User Stories 1 AND 2 are complete — sequence numbering works correctly.
 
@@ -77,9 +77,9 @@ description: "Task list for user-story-helper skill implementation"
 
 ### Implementation for User Story 3
 
-- [ ] T015 [P] [US3] In SKILL.md, add instruction for trigger phrase matching: exact/fuzzy match for "I want to create a new feature", "I want to create a user story", "new feature idea" and similar variants
-- [ ] T016 [US3] In SKILL.md, add instruction: do not activate on unrelated conversational phrases (negative matching patterns)
-- [ ] T017 [US3] In SKILL.md, add instruction: confirm skill path is `.agents/skills/user-story-helper/SKILL.md` following the 7 existing skills convention
+- [X] T015 [P] [US3] In SKILL.md, add instruction for trigger phrase matching: exact/fuzzy match for "I want to create a new feature", "I want to create a user story", "new feature idea" and similar variants
+- [X] T016 [US3] In SKILL.md, add instruction: do not activate on unrelated conversational phrases (negative matching patterns)
+- [X] T017 [US3] In SKILL.md, add instruction: confirm skill path is `.agents/skills/user-story-helper/SKILL.md` following the 7 existing skills convention
 
 **Checkpoint**: All three user stories should now be independently functional.
 
@@ -93,10 +93,10 @@ description: "Task list for user-story-helper skill implementation"
 
 ### Implementation for User Story 4
 
-- [ ] T018 [P] [US4] In SKILL.md, add instruction: prioritize follow-up questions by missing field importance (user_type first, then goal, then reason, then acceptance_criteria)
-- [ ] T019 [P] [US4] In SKILL.md, add instruction: format follow-up questions with the template field syntax (e.g., "As a [type_of_user] — who is the user for this feature?")
-- [ ] T020 [US4] In SKILL.md, add instruction: handle contradictory information in follow-up answers — flag contradiction and ask for confirmation
-- [ ] T021 [US4] In SKILL.md, add instruction: limit to maximum 3 follow-up questions per session
+- [X] T018 [P] [US4] In SKILL.md, add instruction: prioritize follow-up questions by missing field importance (user_type first, then goal, then reason, then acceptance_criteria)
+- [X] T019 [P] [US4] In SKILL.md, add instruction: format follow-up questions with the template field syntax (e.g., "As a [type_of_user] — who is the user for this feature?")
+- [X] T020 [US4] In SKILL.md, add instruction: handle contradictory information in follow-up answers — flag contradiction and ask for confirmation
+- [X] T021 [US4] In SKILL.md, add instruction: limit to maximum 3 follow-up questions per session
 
 **Checkpoint**: All user stories are complete.
 
@@ -106,12 +106,12 @@ description: "Task list for user-story-helper skill implementation"
 
 **Purpose**: Edge cases, error handling, and final review.
 
-- [ ] T022 Handle missing template file: skill warns the user and aborts gracefully if `ai/templates/user_story_template.md` is missing
-- [ ] T023 Handle missing output directory: skill creates `ai/features/todo/` automatically if it does not exist
-- [ ] T024 Handle duplicate filename: when generated filename already exists, present three options — (A) overwrite, (B) use next available sequence, (C) cancel
-- [ ] T025 Handle write errors: catch permission denied / disk full and display clear OS-level error message to user
-- [ ] T026 [P] Review SKILL.md against spec requirements (FR-001 through FR-011) for completeness
-- [ ] T027 [P] Review SKILL.md against quickstart.md for usage accuracy consistency
+- [X] T022 Handle missing template file: skill warns the user and aborts gracefully if `ai/templates/user_story_template.md` is missing
+- [X] T023 Handle missing output directory: skill creates `ai/features/todo/` automatically if it does not exist
+- [X] T024 Handle duplicate filename: when generated filename already exists, present three options — (A) overwrite, (B) use next available sequence, (C) cancel
+- [X] T025 Handle write errors: catch permission denied / disk full and display clear OS-level error message to user
+- [X] T026 [P] Review SKILL.md against spec requirements (FR-001 through FR-011) for completeness
+- [X] T027 [P] Review SKILL.md against quickstart.md for usage accuracy consistency
 
 ---
 
