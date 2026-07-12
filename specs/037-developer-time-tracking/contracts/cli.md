@@ -31,11 +31,11 @@ No positional arguments. The script analyzes the repository at `$(pwd)`.
 
 ### Success
 
-A UTF-8 CSV file with the following columns (no BOM). Developer and Date fields quoted with double quotes; Minutes and Files Count are unquoted integers:
+A UTF-8 CSV file with the following columns (no BOM). Developer, Date, First Commit, and Last Commit fields quoted with double quotes; Minutes, Journal Minutes, Commits, and Files Count are unquoted integers:
 
 ```csv
-"Developer","Date",Minutes,"Files Count"
-"Jane Smith","2026-07-11",210,12
+"Developer","Date","First Commit","Last Commit",Minutes,"Journal Minutes",Commits,"Files Count"
+"Jane Smith","2026-07-11","09:00","11:30",210,150,5,12
 ```
 
 - **Developer**: Author name from git commit metadata

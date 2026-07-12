@@ -4,7 +4,7 @@
 # Usage: developer-time.sh [-o <output_path>] [--help]
 #
 # Analyzes the git repository at the current working directory and generates
-# a CSV report with columns: Developer, Date, Minutes, Files Count.
+# a CSV report with columns: Developer, Date, First Commit, Last Commit, Minutes, Journal Minutes, Commits, Files Count.
 #
 # Dependencies: git, standard POSIX utilities (awk, sort, uniq, cut)
 
@@ -69,7 +69,7 @@ fi
 
 # Check if repository has commits
 if ! git rev-parse HEAD >/dev/null 2>&1; then
-    echo '"Developer","Date",Minutes,"Files Count"' > "$OUTPUT_PATH"
+    echo '"Developer","Date","First Commit","Last Commit",Minutes,"Journal Minutes",Commits,"Files Count"' > "$OUTPUT_PATH"
     echo "Generated: $OUTPUT_PATH (empty repository — no commits found)" >&2
     exit 0
 fi
@@ -78,13 +78,13 @@ echo "Analyzing git history..." >&2
 
 # Use single git log call combining format and name-only, then pipe through awk.
 # Output format from git log:
-#   hash|email|name|epoch|date
+#   hash|email|name|epoch|datetime
 #   file1\nfile2\n...
 #   (empty line)
+# datetime = YYYY-MM-DDTHH:MM:SS (parsed into date + time in awk)
 # Then sort by email|date|epoch and group by email+date.
-# Hours = first-to-last timestamp per group (enhanced later with gap handling).
 # Files = distinct file paths per group.
-git log --all --reverse --format="%H|%ae|%an|%at|%ad" --date=format:%Y-%m-%d --name-only \
+git log --all --reverse --format="%H|%ae|%an|%at|%ad" --date=format:%Y-%m-%dT%H:%M:%S --name-only \
 | awk '
 BEGIN {
     FS = "|"
@@ -92,7 +92,7 @@ BEGIN {
     commit_count = 0
 }
 
-# Lines containing commit metadata: hash|email|name|epoch|date — starts with hex hash
+# Lines containing commit metadata: hash|email|name|epoch|datetime — starts with hex hash
 /^[0-9a-f]{40}\|/ {
     if (commit_count > 0) {
         commits[commit_count, "files"] = file_list
@@ -102,7 +102,9 @@ BEGIN {
     commits[commit_count, "email"] = $2
     commits[commit_count, "name"] = $3
     commits[commit_count, "epoch"] = $4
-    commits[commit_count, "date"] = $5
+    split($5, dt, "T")
+    commits[commit_count, "date"] = dt[1]
+    commits[commit_count, "time"] = substr(dt[2], 1, 5)
     file_list = ""
     next
 }
@@ -138,13 +140,15 @@ END {
     #   - 3+ commits: detect gaps >= 3600s between consecutive commits.
     #     Each gap splits the work into blocks. Total = sum of block durations.
     #     (The gap separates distinct work sessions with activity on both sides.)
-    printf "\"Developer\",\"Date\",Minutes,\"Files Count\"\n"
+    printf "\"Developer\",\"Date\",\"First Commit\",\"Last Commit\",Minutes,\"Journal Minutes\",Commits,\"Files Count\"\n"
     prev_key = ""
     group_count = 0
     block_start = 0
     block_last = 0
     first_ts = 0
     last_ts = 0
+    first_time = ""
+    last_time = ""
     total_min = 0
     author_name = ""
     current_date = ""
@@ -153,6 +157,7 @@ END {
     for (i = 1; i <= commit_count; i++) {
         key = commits[i, "email"] "|" commits[i, "date"]
         ts = commits[i, "epoch"] + 0
+        tm = commits[i, "time"]
         files = commits[i, "files"]
 
         if (key != prev_key) {
@@ -165,7 +170,9 @@ END {
                 }
                 if (total_min < 0) total_min = 0
                 count = count_distinct(file_set)
-                printf "\"%s\",\"%s\",%d,%d\n", author_name, current_date, total_min, count
+                journal_min = int((last_ts - first_ts) / 60 + 0.5)
+                if (journal_min < 0) journal_min = 0
+                printf "\"%s\",\"%s\",\"%s\",\"%s\",%d,%d,%d,%d\n", author_name, current_date, first_time, last_time, total_min, journal_min, group_count, count
             }
 
             # Start new group
@@ -175,6 +182,8 @@ END {
             block_last = ts
             first_ts = ts
             last_ts = ts
+            first_time = tm
+            last_time = tm
             total_min = 0
             author_name = commits[i, "name"]
             current_date = commits[i, "date"]
@@ -194,8 +203,8 @@ END {
                 }
                 block_last = ts
             }
-            if (ts < first_ts) first_ts = ts
-            if (ts > last_ts) last_ts = ts
+            if (ts < first_ts) { first_ts = ts; first_time = tm }
+            if (ts > last_ts) { last_ts = ts; last_time = tm }
             if (files != "") {
                 if (file_set == "") file_set = files
                 else file_set = file_set "," files
@@ -212,7 +221,9 @@ END {
         }
         if (total_min < 0) total_min = 0
         count = count_distinct(file_set)
-        printf "\"%s\",\"%s\",%d,%d\n", author_name, current_date, total_min, count
+        journal_min = int((last_ts - first_ts) / 60 + 0.5)
+        if (journal_min < 0) journal_min = 0
+        printf "\"%s\",\"%s\",\"%s\",\"%s\",%d,%d,%d,%d\n", author_name, current_date, first_time, last_time, total_min, journal_min, group_count, count
     }
 }
 

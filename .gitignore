@@ -15,4 +15,4 @@ backend/staticfiles/
 .idea/
 backend/payments/evidence/*
 .ruff_cache/
-.pytest_cache/
+.pytest_cache/developer-time.csv
