@@ -1,10 +1,11 @@
 import datetime
+import io
 import json
 
 import pytest
 from django.contrib.auth.models import User
-from django.template.loader import render_to_string
 from django.test import Client as HttpClient
+from pdfminer.high_level import extract_text
 
 from apps.classes.models import ClassSlot
 from apps.clients.models import Client
@@ -115,6 +116,24 @@ class TestReservationsListPDF:
         )
         content = response.content.decode()
         assert "/reservations/pdf/" in content
+
+    def test_pdf_content_contains_reservation_data(self, logged_client, class_slot, reservations_for_slot):
+        response = logged_client.get(
+            f"/reservations/pdf/?class_slot={class_slot.pk}&date=2026-06-15"
+        )
+        assert response.status_code == 200
+        text = extract_text(io.BytesIO(response.content))
+        assert "Treadmill" in text
+        assert "Alice" in text
+        assert str(class_slot) in text
+
+    def test_pdf_empty_state_shows_no_reservations_message(self, logged_client, class_slot):
+        response = logged_client.get(
+            f"/reservations/pdf/?class_slot={class_slot.pk}&date=2026-06-15"
+        )
+        assert response.status_code == 200
+        text = extract_text(io.BytesIO(response.content))
+        assert "No se encontraron reservaciones" in text
 
 
 @pytest.mark.django_db
@@ -350,13 +369,12 @@ class TestReservationStatusInPDF:
         reservation = Reservation.objects.first()
         reservation.status = "used"
         reservation.save()
-        html_string = render_to_string("reservations/reservation_list_pdf.html", {
-            "reservations": Reservation.objects.filter(class_slot=class_slot, date="2026-06-15"),
-            "class_slot": class_slot,
-            "date_str": "2026-06-15",
-            "date_display": "2026/06/15",
-        })
-        assert "Usado" in html_string
+        response = logged_client.get(
+            f"/reservations/pdf/?class_slot={class_slot.pk}&date=2026-06-15"
+        )
+        assert response.status_code == 200
+        text = extract_text(io.BytesIO(response.content))
+        assert "Usado" in text
 
 
 @pytest.mark.django_db
