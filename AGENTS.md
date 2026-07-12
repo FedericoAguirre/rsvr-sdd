@@ -1,7 +1,7 @@
 <!-- SPECKIT START -->
 For additional context about technologies to be used, project structure,
 shell commands, and other important information, read the current plan at
-`specs/037-developer-time-tracking/plan.md`
+`specs/038-replace-weasyprint-pdf/plan.md`
 <!-- SPECKIT END -->
 
 ## Session Summary (2026-07-11)
