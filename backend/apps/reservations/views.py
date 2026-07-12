@@ -1,3 +1,4 @@
+import io
 import json
 import logging
 
@@ -5,9 +6,13 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
-from django.template.loader import render_to_string
 from django.utils import timezone
 from django.utils.translation import gettext as _
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.units import cm
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
 
 from apps.classes.models import ClassSlot
 
@@ -36,14 +41,55 @@ def reservation_list_pdf(request):
     reservations, class_slot = _get_slot_reservations(class_slot_pk, date_str)
     date_display = date_str.replace("-", "/") if date_str else ""
     try:
-        from weasyprint import HTML
-        html_string = render_to_string("reservations/reservation_list_pdf.html", {
-            "reservations": reservations,
-            "class_slot": class_slot,
-            "date_str": date_str,
-            "date_display": date_display,
-        })
-        pdf = HTML(string=html_string).write_pdf()
+        buffer = io.BytesIO()
+        doc = SimpleDocTemplate(
+            buffer, pagesize=A4,
+            topMargin=2 * cm, bottomMargin=2 * cm,
+            leftMargin=2 * cm, rightMargin=2 * cm,
+        )
+        styles = getSampleStyleSheet()
+        elements = []
+
+        elements.append(Paragraph(_("Reservations by Class"), styles["h2"]))
+        elements.append(Spacer(1, 0.5 * cm))
+        header_text = f"<b>{_('Date')}:</b> {date_display} &mdash; <b>{_('Class')}:</b> {class_slot}"
+        elements.append(Paragraph(header_text, styles["Normal"]))
+        elements.append(Spacer(1, 0.5 * cm))
+
+        if reservations:
+            data = [[
+                Paragraph(_("Equipment"), styles["Normal"]),
+                Paragraph(_("Client"), styles["Normal"]),
+                Paragraph(_("Status"), styles["Normal"]),
+            ]]
+            for r in reservations:
+                data.append([
+                    Paragraph(r.equipment.name, styles["Normal"]),
+                    Paragraph(" ".join(p for p in [r.client.first_name, r.client.last_name] if p), styles["Normal"]),
+                    Paragraph(r.get_status_display(), styles["Normal"]),
+                ])
+            col_widths = [doc.width * 0.35, doc.width * 0.40, doc.width * 0.25]
+            table = Table(data, colWidths=col_widths, repeatRows=1)
+            table.setStyle(TableStyle([
+                ("GRID", (0, 0), (-1, -1), 0.5, colors.grey),
+                ("BACKGROUND", (0, 0), (-1, 0), colors.Color(0.9, 0.9, 0.9)),
+                ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+                ("VALIGN", (0, 0), (-1, -1), "TOP"),
+                ("TOPPADDING", (0, 0), (-1, -1), 4),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
+                ("LEFTPADDING", (0, 0), (-1, -1), 6),
+            ]))
+            elements.append(table)
+        else:
+            elements.append(Paragraph(
+                _("No reservations found for this class and date."),
+                styles["Normal"],
+            ))
+
+        doc.build(elements)
+        pdf = buffer.getvalue()
+        buffer.close()
+
         response = HttpResponse(pdf, content_type="application/pdf")
         safe_name = (
             str(class_slot).replace(" ", "_").translate(
