@@ -17,8 +17,6 @@ help:
 	@echo "  prune    Stop services and prune Docker resources"
 	@echo "  weblog   Tail web container logs"
 	@echo "  build    Build web image without cache"
-	@echo "  ai_local_m3    Executes locally opencode with qwen3.6"
-	@echo "  ai_local_old   Executes locally opencode with qwen2.5-coder:3b"
 
 .PHONY: stop
 stop:
@@ -44,13 +42,4 @@ weblog:
 .PHONY: build
 build:
 	$(DOCKER_COMPOSE) build --no-cache
-
-.PHONY: ai_local_m3
-ai_local_m3:
-	$env:OLLAMA_CONTEXT_LENGTH="65536"
-	ollama launch opencode --model qwen3.6:latest
-
-.PHONY: ai_local_old
-ai_local_old:
-	ollama launch opencode --model qwen2.5-coder:3b
 

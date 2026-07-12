@@ -1,10 +1,10 @@
 ---
 name: user-story-helper
-description: Create structured user story markdown files from feature descriptions. Use when the user says "I want to create a new feature", "I want to create a user story", "new feature idea", or similar phrases about creating a feature or user story for a backlog. Triggers the template-based flow: loads template, detects gaps, asks up to 3 follow-up questions, saves filled file to ai/features/todo/[NN]_[slug].md.
+description: Create structured user story markdown files from feature descriptions. Use when the user says "I want to create a new feature", "I want to create a user story", "new feature idea", or similar phrases about creating a feature or user story for a backlog. Triggers the template-based flow: loads template, detects gaps, asks up to 3 follow-up questions, saves filled file to ai/features/todos/[NN]_[slug].md.
 license: Complete terms in LICENSE.txt
 ---
 
-This skill guides creation of structured user story markdown files following the project's user story template. It converts a user's feature description into a filled template file in the project's todo directory.
+This skill guides creation of structured user story markdown files following the project's user story template. It converts a user's feature description into a filled template file in the project's todos directory.
 
 ## Workflow
 
@@ -55,7 +55,7 @@ Prioritize questions by importance if more than 3 gaps are detected:
 4. acceptance_criteria
 5. definition_of_done
 
-Limit to a maximum of 3 follow-up questions per session. Collect the user's responses.
+Limit to a maximum of 3 follow-up questions per session. Collect the user's responses. Ask the user one question at the time.
 
 Handle contradictory information (e.g., user type conflicts with goal context) — flag it and ask for confirmation.
 
@@ -75,7 +75,7 @@ Perform soft validation: check that all required template sections are filled. I
 ### 6. Generate filename
 
 **6a. Determine sequence number (NN):**
-1. Scan the directory `ai/features/todo/` for existing user story files matching the pattern `[NN]_*.md`
+1. Scan the directory `ai/features/todos/` for existing user story files matching the pattern `[NN]_*.md`
 2. Extract the highest numeric sequence number present (e.g., if files `01_login.md` and `07_payment.md` exist, highest is `07`)
 3. Set `NN = highest + 1`
 4. If `NN` is already in use (gap collision), scan for the next available gap in the sequence (e.g., if `01`–`07` are taken and `08` is taken, use `09` or the next gap)
@@ -91,7 +91,7 @@ Perform soft validation: check that all required template sections are filled. I
 [NN]_[slug].md
 ```
 
-Check if the generated filename already exists in `ai/features/todo/`. If it does:
+Check if the generated filename already exists in `ai/features/todos/`. If it does:
 - Present three options to the user:
   - (A) Overwrite the existing file
   - (B) Create with the next available sequence number
@@ -100,11 +100,11 @@ Check if the generated filename already exists in `ai/features/todo/`. If it doe
 
 ### 7. Ensure output directory exists
 
-If `ai/features/todo/` does not exist, create it automatically.
+If `ai/features/todos/` does not exist, create it automatically.
 
 ### 8. Save the file
 
-Write the filled template to `ai/features/todo/[filename]`.
+Write the filled template to `ai/features/todos/[filename]`.
 
 If the write operation fails:
 - Catch the error (permission denied, disk full, etc.)
@@ -116,7 +116,7 @@ If the write operation fails:
 Tell the user the file has been saved and provide the full path. Example:
 ```
 Done! The user story has been saved as:
-ai/features/todo/[NN]_[slug].md
+ai/features/todos/[NN]_[slug].md
 ```
 
 ## Edge Cases Summary
@@ -133,7 +133,7 @@ ai/features/todo/[NN]_[slug].md
 ## Sequence Number Lifecycle
 
 ```
-Start → Scan ai/features/todo/ for existing [NN]_*.md files
+Start → Scan ai/features/todos/ for existing [NN]_*.md files
       → Extract highest numeric prefix (e.g., 07 from 07_login.md)
       → Set NN = highest + 1 (e.g., 08)
       → If NN already exists → scan for next gap
@@ -151,6 +151,6 @@ Skill: I want [goal] — what should this feature accomplish?
 User: Export payment data filtered by date range
 Skill: So that [reason_or_benefit] — why do admins need this?
 User: To run financial analysis offline
-Skill: [Saves ai/features/todo/08_export_payment_reports_csv.md]
+Skill: [Saves ai/features/todos/08_export_payment_reports_csv.md]
 Skill: Done! File saved as 08_export_payment_reports_csv.md
 ```

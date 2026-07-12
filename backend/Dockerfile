@@ -5,7 +5,6 @@ WORKDIR /app
 # Install system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libpq-dev gcc \
-    libpango-1.0-0 libpangoft2-1.0-0 libpangocairo-1.0-0 libcairo2 libgdk-pixbuf-2.0-0 \
     fonts-dejavu fonts-liberation \
     curl ca-certificates && \
     rm -rf /var/lib/apt/lists/*
@@ -17,7 +16,8 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 COPY pyproject.toml uv.lock* ./
 
 # Install dependencies into the system environment using uv
-RUN uv sync --frozen --no-dev --system
+ENV UV_SYSTEM_PYTHON=1
+RUN uv sync --frozen --no-dev
 
 # Copy the rest of the application
 COPY . .
@@ -25,4 +25,4 @@ COPY . .
 EXPOSE 8000
 
 # Use uv run to execute your production command safely
-CMD uv run --system python manage.py collectstatic --noinput && uv run --system gunicorn config.wsgi:application --bind 0.0.0.0:8000
+CMD uv run python manage.py collectstatic --noinput && uv run gunicorn config.wsgi:application --bind 0.0.0.0:8000
