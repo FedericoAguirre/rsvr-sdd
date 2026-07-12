@@ -44,3 +44,13 @@ weblog:
 .PHONY: build
 build:
 	$(DOCKER_COMPOSE) build --no-cache
+
+.PHONY: ai_local_m3
+ai_local_m3:
+	$env:OLLAMA_CONTEXT_LENGTH="65536"
+	ollama launch opencode --model qwen3.6:latest
+
+.PHONY: ai_local_old
+ai_local_old:
+	ollama launch opencode --model qwen2.5-coder:3b
+
