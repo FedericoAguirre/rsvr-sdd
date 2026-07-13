@@ -1,7 +1,7 @@
 <!-- SPECKIT START -->
 For additional context about technologies to be used, project structure,
 shell commands, and other important information, read the current plan at
-`specs/001-current-month-report/plan.md`
+`specs/040-reports-graph-adjustment/plan.md`
 <!-- SPECKIT END -->
 
 ## Session Summary (2026-07-11)
