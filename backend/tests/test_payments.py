@@ -2,6 +2,7 @@ import calendar
 import datetime
 import io
 import json
+import re
 
 import pytest
 from django.contrib.auth.models import User
@@ -775,3 +776,38 @@ class TestPaymentManualOverride:
         assert response.status_code == 200
         assert response.context["start_date"] == _current_month_start()
         assert response.context["end_date"] == _current_month_end()
+
+
+@pytest.mark.django_db
+class TestChartContainer:
+    """TDD tests for US1 — chart container sizing."""
+
+    def test_canvas_height_is_adjusted(self, http_client):
+        """T001: Canvas height attribute is set to adjusted value 250."""
+        admin = User.objects.create_superuser(username="cht1", password="pass")
+        http_client.force_login(admin)
+        response = http_client.get("/payments/reports/")
+        assert response.status_code == 200
+        html = response.content.decode()
+        match = re.search(
+            r'<canvas[^>]*id="totalsChart"[^>]*>', html,
+        )
+        assert match is not None, "totalsChart canvas not found"
+        assert 'height="250"' in match.group(0), (
+            f"Expected height=250 in canvas, got: {match.group(0)}"
+        )
+
+    def test_chart_container_has_max_height(self, http_client):
+        """T002: Card-body containing chart has max-height style."""
+        admin = User.objects.create_superuser(username="cht2", password="pass")
+        http_client.force_login(admin)
+        response = http_client.get("/payments/reports/")
+        assert response.status_code == 200
+        html = response.content.decode()
+        pattern = r'<div class="card-body"[^>]*>.*?<canvas[^>]*id="totalsChart"'
+        match = re.search(pattern, html, re.DOTALL)
+        assert match is not None, "card-body with totalsChart not found"
+        card_body = match.group(0)
+        assert "max-height" in card_body or "max-height" in html, (
+            "Expected max-height on chart container"
+        )
