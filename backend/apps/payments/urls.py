@@ -20,4 +20,5 @@ urlpatterns = [
         name="client_history",
     ),
     path("reports/", views.PaymentReportView.as_view(), name="reports"),
+    path("reports/export/", views.PaymentExportView.as_view(), name="export"),
 ]

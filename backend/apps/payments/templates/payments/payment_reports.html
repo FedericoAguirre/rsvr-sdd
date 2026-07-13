@@ -29,6 +29,12 @@
             <div class="col-auto">
                 <button type="submit" class="btn btn-primary">{% translate "Generate Report" %}</button>
             </div>
+            <div class="col-auto">
+                <button type="button" id="exportBtn" class="btn btn-success"
+                    onclick="document.getElementById('exportBtn').disabled = true; window.location.href = '{% url "payments:export" %}?fecha_inicio=' + document.getElementById('start').value + '&fecha_fin=' + document.getElementById('end').value; setTimeout(function(){ document.getElementById('exportBtn').disabled = false; }, 5000);">
+                    {% translate "Export" %}
+                </button>
+            </div>
         </form>
     </div>
 </div>

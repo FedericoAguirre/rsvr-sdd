@@ -16,6 +16,6 @@ Given there are no payments in the selected date range, when I click export, the
 
 ## Definition of Done
 
-- Reuse the payments/reports webpage functionaly, and views as much as possible,
+- Reuse the payments/reports webpage functionality, and views as much as possible,
     add the "Exportar" button next to the right of "Generar reporte" button.
 - Code reviewed, tested in staging, downloaded file validated against database data.
