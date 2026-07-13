@@ -1,3 +1,4 @@
+import calendar
 import datetime
 import io
 import json
@@ -661,3 +662,116 @@ class TestPaymentReports:
             row["payment_type"] == "CASH" and float(row["total"]) == 150.0
             for row in report_data
         ), f"No CASH payment with total 150.0 found in {report_data}"
+
+
+# ── T001-T003: US1 — Current Month Default Dates ──────────────────────────────
+
+
+def _current_month_start():
+    today = datetime.date.today()
+    return today.replace(day=1).isoformat()
+
+
+def _current_month_end():
+    today = datetime.date.today()
+    _, last = calendar.monthrange(today.year, today.month)
+    return today.replace(day=last).isoformat()
+
+
+@pytest.mark.django_db
+class TestPaymentReportDefaults:
+    """TDD tests — must fail before default dates are implemented."""
+
+    def test_default_dates_match_current_month(self, http_client):
+        """T001: No query params → dates default to current month."""
+        admin = User.objects.create_superuser(username="def1", password="pass")
+        http_client.force_login(admin)
+        response = http_client.get("/payments/reports/")
+        assert response.status_code == 200
+        assert response.context["start_date"] == _current_month_start()
+        assert response.context["end_date"] == _current_month_end()
+
+    def test_explicit_params_override_defaults(self, http_client):
+        """T002: Explicit start/end params are respected."""
+        admin = User.objects.create_superuser(username="def2", password="pass")
+        http_client.force_login(admin)
+        response = http_client.get(
+            "/payments/reports/?start=2026-06-01&end=2026-06-30",
+        )
+        assert response.status_code == 200
+        assert response.context["start_date"] == "2026-06-01"
+        assert response.context["end_date"] == "2026-06-30"
+
+    def test_empty_dates_fallback_to_current_month(self, http_client):
+        """T003: Empty start/end params fall back to current month."""
+        admin = User.objects.create_superuser(username="def3", password="pass")
+        http_client.force_login(admin)
+        response = http_client.get("/payments/reports/?start=&end=")
+        assert response.status_code == 200
+        assert response.context["start_date"] == _current_month_start()
+        assert response.context["end_date"] == _current_month_end()
+
+
+@pytest.mark.django_db
+class TestPaymentAutoRender:
+    """TDD tests for US2 — auto-render with current month data."""
+
+    def test_report_data_present_in_initial_context(self, http_client, client, staff_user):
+        """T005: Current month report data is in the initial page context."""
+        admin = User.objects.create_superuser(username="aut1", password="pass")
+        http_client.force_login(admin)
+        today = datetime.date.today()
+        Payment.objects.create(
+            client=client, amount=250.00, payment_type="CASH",
+            date=today, class_slot_count=2,
+            reference="AUTO-1", created_by=staff_user,
+        )
+        response = http_client.get("/payments/reports/")
+        assert response.status_code == 200
+        assert len(response.context["report_data"]) > 0
+        html = response.content.decode()
+        assert "report-data" in html
+
+    def test_empty_current_month_shows_message(self, http_client):
+        """T006: No payments in current month displays empty state."""
+        admin = User.objects.create_superuser(username="aut2", password="pass")
+        http_client.force_login(admin)
+        response = http_client.get("/payments/reports/")
+        assert response.status_code == 200
+        html = response.content.decode()
+        if not response.context["report_data"]:
+            assert any(msg in html for msg in (
+                "No payment data for the selected period.",
+                "No hay datos de pago",
+            ))
+
+
+@pytest.mark.django_db
+class TestPaymentManualOverride:
+    """TDD tests for US3 — manual date override."""
+
+    def test_non_current_month_params_override_defaults(self, http_client, client, staff_user):
+        """T008: Explicit non-current-month dates override defaults."""
+        admin = User.objects.create_superuser(username="ovr1", password="pass")
+        http_client.force_login(admin)
+        Payment.objects.create(
+            client=client, amount=500.00, payment_type="CC",
+            date=datetime.date(2026, 5, 15), class_slot_count=2,
+            reference="OVR-1", created_by=staff_user,
+        )
+        response = http_client.get(
+            "/payments/reports/?start=2026-05-01&end=2026-05-31",
+        )
+        assert response.status_code == 200
+        assert response.context["start_date"] == "2026-05-01"
+        assert response.context["end_date"] == "2026-05-31"
+        assert len(response.context["report_data"]) > 0
+
+    def test_nav_away_and_back_resets_to_current_month(self, http_client):
+        """T009: Navigating without params resets to current month defaults."""
+        admin = User.objects.create_superuser(username="ovr2", password="pass")
+        http_client.force_login(admin)
+        response = http_client.get("/payments/reports/")
+        assert response.status_code == 200
+        assert response.context["start_date"] == _current_month_start()
+        assert response.context["end_date"] == _current_month_end()
