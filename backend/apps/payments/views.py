@@ -1,11 +1,15 @@
 import calendar
+import logging
 from datetime import date, timedelta
 
+import openpyxl
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db import transaction
 from django.db.models import Count, Q, Sum
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 from django.views.generic import (
     CreateView,
     DetailView,
@@ -19,6 +23,8 @@ from apps.clients.models import Client
 
 from .forms import PaymentForm
 from .models import Payment, PaymentReservation
+
+logger = logging.getLogger(__name__)
 
 
 class PaymentListView(LoginRequiredMixin, ListView):
@@ -197,6 +203,75 @@ class PaymentAssociateView(LoginRequiredMixin, View):
                     reservation=reservation,
                 )
         return redirect("payments:detail", pk=payment.pk)
+
+
+class PaymentExportView(LoginRequiredMixin, UserPassesTestMixin, View):
+    def test_func(self):
+        return self.request.user.is_superuser or self.request.user.groups.filter(
+            name="Administrators",
+        ).exists()
+
+    def get(self, request, *args, **kwargs):
+        try:
+            start = request.GET.get("fecha_inicio", "")
+            end = request.GET.get("fecha_fin", "")
+            if not start or not end:
+                return JsonResponse(
+                    {"error": str(_("Start date must be before end date."))},
+                    status=400,
+                )
+            try:
+                start_dt = date.fromisoformat(start)
+                end_dt = date.fromisoformat(end)
+            except (ValueError, TypeError):
+                return JsonResponse(
+                    {"error": str(_("Start date must be before end date."))},
+                    status=400,
+                )
+            if start_dt > end_dt:
+                return JsonResponse(
+                    {"error": str(_("Start date must be before end date."))},
+                    status=400,
+                )
+            qs = Payment.objects.filter(
+                is_deleted=False, date__gte=start_dt, date__lte=end_dt,
+            ).select_related("client").order_by("date")
+            if not qs.exists():
+                return JsonResponse(
+                    {"error": str(_("No payments found for the selected date range."))},
+                    status=404,
+                )
+            wb = openpyxl.Workbook(write_only=True)
+            ws = wb.create_sheet()
+            ws.append(["Identificador", "Cliente", "Monto", "Tipo", "Fecha", "Clases"])
+            for p in qs:
+                ws.append([
+                    p.payment_identifier,
+                    str(p.client),
+                    float(p.amount),
+                    p.payment_type,
+                    p.date.isoformat(),
+                    p.class_slot_count,
+                ])
+            start_str = start_dt.strftime("%Y%m%d")
+            end_str = end_dt.strftime("%Y%m%d")
+            filename = f"pagos_{start_str}_{end_str}.xlsx"
+            response = HttpResponse(
+                content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            )
+            response["Content-Disposition"] = f'attachment; filename="{filename}"'
+            wb.save(response)
+            logger.info(
+                "Export: user=%s start=%s end=%s count=%d",
+                request.user, start, end, qs.count(),
+            )
+            return response
+        except Exception:
+            logger.exception("Export failed for user=%s", request.user)
+            return JsonResponse(
+                {"error": str(_("Could not generate the file. Please try again."))},
+                status=500,
+            )
 
 
 class PaymentReportView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):

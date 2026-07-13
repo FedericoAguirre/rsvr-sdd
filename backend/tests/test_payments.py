@@ -556,6 +556,57 @@ class TestMonthlyChartRendering:
         assert "No payment data for the selected period." in html or "No hay datos de pago" in html
 
 
+# ── T005-T014: US1-US2 — Export Payments ─────────────────────────────────────
+
+
+@pytest.mark.django_db
+class TestPaymentExport:
+    """TDD tests for PaymentExportView."""
+
+    def test_successful_export_returns_xlsx(self, http_client, payment_data):
+        """US1: Export with valid date range returns xlsx file."""
+        admin = User.objects.create_superuser(username="export1", password="pass")
+        http_client.force_login(admin)
+        Payment.objects.create(**{**payment_data, "created_by": admin})
+        response = http_client.get(
+            "/payments/reports/export/?fecha_inicio=2026-01-01&fecha_fin=2026-12-31",
+        )
+        assert response.status_code == 200
+        assert response["Content-Type"] == (
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        )
+        assert "pagos_" in response["Content-Disposition"]
+        assert ".xlsx" in response["Content-Disposition"]
+
+    def test_export_no_data_returns_404(self, http_client):
+        """US2: No payments in range returns 404."""
+        admin = User.objects.create_superuser(username="export2", password="pass")
+        http_client.force_login(admin)
+        response = http_client.get(
+            "/payments/reports/export/?fecha_inicio=2020-01-01&fecha_fin=2020-01-31",
+        )
+        assert response.status_code == 404
+        assert "No hay pagos" in response.json()["error"]
+
+    def test_export_inverted_dates_returns_400(self, http_client):
+        """US2: Start > end returns validation error."""
+        admin = User.objects.create_superuser(username="export3", password="pass")
+        http_client.force_login(admin)
+        response = http_client.get(
+            "/payments/reports/export/?fecha_inicio=2026-12-31&fecha_fin=2026-01-01",
+        )
+        assert response.status_code == 400
+        assert "anterior" in response.json()["error"]
+
+    def test_export_operator_denied(self, http_client, staff_user):
+        """US1: Non-admin users are blocked."""
+        http_client.force_login(staff_user)
+        response = http_client.get(
+            "/payments/reports/export/?fecha_inicio=2026-01-01&fecha_fin=2026-12-31",
+        )
+        assert response.status_code == 403
+
+
 # ── T050-T052: US4 — Payment Reports ─────────────────────────────────────────
 
 
