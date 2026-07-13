@@ -284,9 +284,15 @@ class PaymentReportView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        grouping = self.request.GET.get("grouping", "month")
+        grouping = self.request.GET.get("grouping", "day")
         start = self.request.GET.get("start", "")
         end = self.request.GET.get("end", "")
+        today = date.today()
+        if not start:
+            start = today.replace(day=1).isoformat()
+        if not end:
+            _, last_day = calendar.monthrange(today.year, today.month)
+            end = today.replace(day=last_day).isoformat()
         if grouping == "week" and start and end:
             try:
                 start_dt = date.fromisoformat(start)
