@@ -45,8 +45,14 @@ The auto-date logic correctly handles time boundaries: same-day slots before ear
 ### Edge Cases
 
 - What happens at midnight exactly (00:00)? Should be treated as the start of the new day.
-- What if the user changes date after auto-fill, then changes class slot again? The date should recalculate from the new class slot, overriding the manual value.
+- What if the user changes date after auto-fill, then changes class slot again? The date stays as the user manually set it — it does NOT recalculate.
 - What if there are no future occurrences (e.g., the last class of the week just ended)? Should be addressed gracefully — maybe fall back to next week.
+
+## Clarifications
+
+### Session 2026-07-13
+
+- Q: After a user manually edits the date, should changing the class slot override it (recalculate) or preserve the manual value? → A: Preserve manual date — once user manually edits the date, changing class slot does NOT recalculate it.
 
 ## Requirements *(mandatory)*
 
