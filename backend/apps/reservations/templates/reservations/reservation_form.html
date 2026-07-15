@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load i18n %}
+{% load static %}
 {% block title %}{% translate "New Reservation" %}{% endblock %}
 {% block content %}
 <h2 class="mb-4">{% translate "New Reservation" %}</h2>
@@ -27,4 +28,6 @@
         <a href="{% url 'reservations:reservation-list' %}" class="btn btn-secondary">{% translate "Cancel" %}</a>
     </div>
 </form>
+{{ slots_data|json_script:"class-slots-data" }}
+<script src="{% static 'reservations/js/auto-date.js' %}"></script>
 {% endblock %}

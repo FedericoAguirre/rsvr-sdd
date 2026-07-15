@@ -1,5 +1,9 @@
 import io
+import calendar
 import json
+from datetime import date, datetime
+
+from apps.classes.models import ClassSlot
 import logging
 
 from django.contrib import messages
@@ -170,6 +174,26 @@ def reservation_change_status(request, pk):
     return redirect("reservations:reservation-detail", pk=reservation.pk)
 
 
+def auto_date_for_slot(selected_slot_id):
+    """Calculate the auto-date for a given class slot based on today's date/time."""
+    try:
+        slot = ClassSlot.objects.get(pk=selected_slot_id, is_active=True)
+    except ClassSlot.DoesNotExist:
+        return None
+    today = date.today()
+    now = datetime.now().time()
+    slot_day = slot.day_of_week
+    today_day = today.weekday()  # 0=Mon..4=Fri
+    days_ahead = slot_day - today_day
+    if days_ahead < 0:
+        days_ahead += 7
+    elif days_ahead == 0:
+        days_ahead = 7
+    result = today
+    result = date.fromordinal(today.toordinal() + days_ahead)
+    return result.isoformat()
+
+
 @login_required
 def reservation_create(request):
     initial = {}
@@ -186,4 +210,13 @@ def reservation_create(request):
             return redirect("reservations:reservation-detail", pk=reservation.pk)
     else:
         form = ReservationForm(initial=initial)
-    return render(request, "reservations/reservation_form.html", {"form": form})
+    slots_qs = ClassSlot.objects.filter(is_active=True).values("id", "day_of_week", "time")
+    slots_data = [{
+        "id": s["id"],
+        "day_of_week": s["day_of_week"],
+        "time": s["time"].strftime("%H:%M"),
+    } for s in slots_qs]
+    return render(request, "reservations/reservation_form.html", {
+        "form": form,
+        "slots_data": slots_data,
+    })
