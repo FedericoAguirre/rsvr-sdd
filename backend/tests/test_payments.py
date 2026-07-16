@@ -261,12 +261,85 @@ class TestPaymentHistory:
 # ── T038-T042: US3 — Payment-Reservation Association ─────────────────────────
 
 
+@pytest.fixture
+def equipment(db):
+    from apps.equipment.models import Equipment
+    return Equipment.objects.create(name="Test Equipment", equipment_type="climber")
+
+
+@pytest.fixture
+def class_slot_early(db):
+    from apps.classes.models import ClassSlot
+    return ClassSlot.objects.create(day_of_week=0, time="17:30")
+
+
+@pytest.fixture
+def class_slot_late(db):
+    from apps.classes.models import ClassSlot
+    return ClassSlot.objects.create(day_of_week=0, time="18:30")
+
+
 @pytest.mark.django_db
 class TestPaymentReservation:
     def test_payment_detail_shows_associated_reservations(self, logged_client, payment_data):
         payment = Payment.objects.create(**payment_data)
         response = logged_client.get(f"/payments/{payment.pk}/")
         assert response.status_code == 200
+
+    def test_reservations_sorted_by_date_descending(self, logged_client, payment_data, client, equipment, class_slot_early, staff_user):
+        from apps.reservations.models import Reservation
+        from apps.payments.models import PaymentReservation
+        payment = Payment.objects.create(**payment_data)
+        dates = [
+            datetime.date(2026, 7, 10),  # 10/07/2026
+            datetime.date(2026, 7, 12),  # 12/07/2026
+            datetime.date(2026, 7, 8),   # 08/07/2026
+        ]
+        for d in dates:
+            r = Reservation.objects.create(
+                client=client, equipment=equipment, class_slot=class_slot_early,
+                date=d, created_by=staff_user,
+            )
+            PaymentReservation.objects.create(payment=payment, reservation=r)
+        response = logged_client.get(f"/payments/{payment.pk}/")
+        assert response.status_code == 200
+        html = response.content.decode()
+        sorted_dates = sorted(dates, reverse=True)
+        from django.template.defaultfilters import date as date_filter
+        prev = -1
+        for d in sorted_dates:
+            formatted = date_filter(d, "SHORT_DATE_FORMAT")
+            pos = html.find(formatted, prev + 1)
+            assert pos > prev, f"Expected {formatted} to appear after previous date, pos={pos}, prev={prev}"
+            prev = pos
+
+    def test_same_date_sorted_by_time_descending(self, logged_client, payment_data, client, equipment, class_slot_early, class_slot_late, staff_user):
+        from apps.reservations.models import Reservation
+        from apps.payments.models import PaymentReservation
+        payment = Payment.objects.create(**payment_data)
+        common_date = datetime.date(2026, 7, 10)
+        r1 = Reservation.objects.create(
+            client=client, equipment=equipment, class_slot=class_slot_early,
+            date=common_date, created_by=staff_user,
+        )
+        r2 = Reservation.objects.create(
+            client=client, equipment=equipment, class_slot=class_slot_late,
+            date=common_date, created_by=staff_user,
+        )
+        PaymentReservation.objects.create(payment=payment, reservation=r2)
+        PaymentReservation.objects.create(payment=payment, reservation=r1)
+        response = logged_client.get(f"/payments/{payment.pk}/")
+        assert response.status_code == 200
+        html = response.content.decode()
+        pos_late = html.find("18:30")
+        pos_early = html.find("17:30")
+        assert pos_late < pos_early, "Expected 18:30 (late) to appear before 17:30 (early)"
+
+    def test_empty_reservation_list_renders(self, logged_client, payment_data):
+        payment = Payment.objects.create(**payment_data)
+        response = logged_client.get(f"/payments/{payment.pk}/")
+        assert response.status_code == 200
+        assert "Associated Reservations" not in response.content.decode()
 
 
 # ── T080-T081: US1 — Form widget styling and layout ────────────────────────────

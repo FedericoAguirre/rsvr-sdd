@@ -127,7 +127,7 @@ class PaymentDetailView(LoginRequiredMixin, DetailView):
         context = super().get_context_data(**kwargs)
         context["reservations"] = self.object.payment_reservations.select_related(
             "reservation__client", "reservation__equipment", "reservation__class_slot",
-        ).all()
+        ).order_by("-reservation__date", "-reservation__class_slot__time")
         context["remaining_slots"] = (
             self.object.class_slot_count - self.object.payment_reservations.count()
         )
