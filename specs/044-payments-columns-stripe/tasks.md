@@ -47,12 +47,12 @@
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T001 [P] [US1] Write test for column order on payment detail page in `backend/tests/test_payments_detail.py`
-- [ ] T002 [P] [US1] Write test for empty reservations and stripe rendering in `backend/tests/test_payments_detail.py`
+- [x] T001 [P] [US1] Write test for column order on payment detail page in `backend/tests/test_payments_detail.py`
+- [x] T002 [P] [US1] Write test for empty reservations and stripe rendering in `backend/tests/test_payments_detail.py`
 
 ### Implementation for User Story 1
 
-- [ ] T003 [US1] Reorder `<th>` and `<td>` elements and add `table-striped` class in `backend/apps/payments/templates/payments/payment_detail.html`
+- [x] T003 [US1] Reorder `<th>` and `<td>` elements and add `table-striped` class in `backend/apps/payments/templates/payments/payment_detail.html`
 
 **Checkpoint**: User Story 1 should be fully functional and testable independently. Run `docker compose exec web uv run pytest backend/tests/test_payments_detail.py -v` to verify.
 
@@ -62,8 +62,8 @@
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T004 Update the feature todo file: move `ai/features/todos/19_switch_date_and_class_block_in_payments.md` to `ai/features/done/`
-- [ ] T005 [P] Save AI session file to `ai/sessions/`
+- [x] T004 Update the feature todo file: move `ai/features/todos/19_switch_date_and_class_block_in_payments.md` to `ai/features/done/`
+- [x] T005 [P] Save AI session file to `ai/sessions/`
 
 ---
 
