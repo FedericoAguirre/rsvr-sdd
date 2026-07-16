@@ -68,21 +68,21 @@
                 <h4>{% translate "Associated Reservations" %}</h4>
             </div>
             <div class="card-body">
-                <table class="table table-sm">
+                <table class="table table-sm table-striped">
                     <thead>
                         <tr>
+                            <th>{% translate "Class Slot" %}</th>
                             <th>{% translate "Date" %}</th>
                             <th>{% translate "Equipment" %}</th>
-                            <th>{% translate "Class Slot" %}</th>
                             <th>{% translate "Status" %}</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for pr in reservations %}
                         <tr>
+                            <td>{{ pr.reservation.class_slot }}</td>
                             <td>{{ pr.reservation.date|date:"SHORT_DATE_FORMAT" }}</td>
                             <td>{{ pr.reservation.equipment }}</td>
-                            <td>{{ pr.reservation.class_slot }}</td>
                             <td>{{ pr.reservation.get_status_display }}</td>
                         </tr>
                         {% endfor %}
