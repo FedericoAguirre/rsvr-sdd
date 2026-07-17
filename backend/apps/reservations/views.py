@@ -184,12 +184,7 @@ def auto_date_for_slot(selected_slot_id):
     now = datetime.now().time()
     slot_day = slot.day_of_week
     today_day = today.weekday()  # 0=Mon..4=Fri
-    days_ahead = slot_day - today_day
-    if days_ahead < 0:
-        days_ahead += 7
-    elif days_ahead == 0:
-        days_ahead = 7
-    result = today
+    days_ahead = slot_day - today_day + 7
     result = date.fromordinal(today.toordinal() + days_ahead)
     return result.isoformat()
 
