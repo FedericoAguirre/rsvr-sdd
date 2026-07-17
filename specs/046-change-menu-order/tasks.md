@@ -33,12 +33,12 @@ N/A — no blocking infrastructure prerequisites. This is a single template reor
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation (TDD per Constitution §II)**
 
-- [ ] T001 [P] [US1] Write TDD test for nav menu item order in `backend/tests/test_i18n.py` — render any authenticated page, extract nav `<li>` items, and assert left-to-right order: Clientes, Pagos, Reservaciones, Equipo, Horario, Reportes, Admin, Cerrar Sesión. Confirm test FAILS before implementation.
+- [x] T001 [P] [US1] Write TDD test for nav menu item order in `backend/tests/test_i18n.py` — render any authenticated page, extract nav `<li>` items, and assert left-to-right order: Clientes, Pagos, Reservaciones, Equipo, Horario, Reportes, Admin, Cerrar Sesión. Confirm test FAILS before implementation.
 
 ### Implementation for User Story 1
 
-- [ ] T002 [US1] Reorder `<li>` elements in `backend/templates/base.html` lines 17-40 to match: Clientes, Pagos, Reservaciones, Equipo, Horario, Reportes, Admin, Cerrar Sesión — move each `<li>` block (including `{% if %}` wrappers for conditional items) as a complete unit. Confirm T001 now PASSES.
-- [ ] T003 [US1] Run full test suite (`docker compose exec web uv run manage.py test`) and lint to confirm zero regressions
+- [x] T002 [US1] Reorder `<li>` elements in `backend/templates/base.html` lines 17-40 to match: Clientes, Pagos, Reservaciones, Equipo, Horario, Reportes, Admin, Cerrar Sesión — move each `<li>` block (including `{% if %}` wrappers for conditional items) as a complete unit. Confirm T001 now PASSES.
+- [x] T003 [US1] Run full test suite (`docker compose exec web uv run manage.py test`) and lint to confirm zero regressions
 
 **Checkpoint**: At this point, User Story 1 should be fully functional and testable independently.
 
@@ -48,9 +48,9 @@ N/A — no blocking infrastructure prerequisites. This is a single template reor
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T004 Update feature todo file: move `ai/features/todos/20-change-menu-order.md` to `ai/features/done/`
-- [ ] T005 Save AI session file to `ai/sessions/`
-- [ ] T006 [P] Run quickstart.md validation
+- [x] T004 Update feature todo file: move `ai/features/todos/20-change-menu-order.md` to `ai/features/done/`
+- [x] T005 Save AI session file to `ai/sessions/`
+- [x] T006 [P] Run quickstart.md validation
 
 ---
 

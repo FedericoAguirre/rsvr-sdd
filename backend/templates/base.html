@@ -14,15 +14,15 @@
             <a class="navbar-brand" href="/">{% translate "Cardio Reservation" %}</a>
             {% if user.is_authenticated %}
             <ul class="navbar-nav ms-auto">
-                <li class="nav-item"><a class="nav-link" href="{% url 'reservations:reservation-list' %}">{% translate "Reservations" %}</a></li>
                 <li class="nav-item"><a class="nav-link" href="{% url 'clients:client-search' %}">{% translate "Clients" %}</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'payments:list' %}">{% translate "Payments" %}</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'reservations:reservation-list' %}">{% translate "Reservations" %}</a></li>
                 {% if perms.equipment.view_equipment %}
                 <li class="nav-item"><a class="nav-link" href="{% url 'equipment:equipment-list' %}">{% translate "Equipment" %}</a></li>
                 {% endif %}
                 {% if perms.classes.view_classslot %}
                 <li class="nav-item"><a class="nav-link" href="{% url 'classes:class-schedule' %}">{% translate "Schedule" %}</a></li>
                 {% endif %}
-                <li class="nav-item"><a class="nav-link" href="{% url 'payments:list' %}">{% translate "Payments" %}</a></li>
                 {% if user.is_superuser %}
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">{% translate "Reports" %}</a>
