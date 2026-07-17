@@ -13,32 +13,37 @@
         <div class="container-fluid">
             <a class="navbar-brand" href="/">{% translate "Cardio Reservation" %}</a>
             {% if user.is_authenticated %}
-            <ul class="navbar-nav ms-auto">
-                <li class="nav-item"><a class="nav-link" href="{% url 'clients:client-search' %}">{% translate "Clients" %}</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'payments:list' %}">{% translate "Payments" %}</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'reservations:reservation-list' %}">{% translate "Reservations" %}</a></li>
-                {% if perms.equipment.view_equipment %}
-                <li class="nav-item"><a class="nav-link" href="{% url 'equipment:equipment-list' %}">{% translate "Equipment" %}</a></li>
-                {% endif %}
-                {% if perms.classes.view_classslot %}
-                <li class="nav-item"><a class="nav-link" href="{% url 'classes:class-schedule' %}">{% translate "Schedule" %}</a></li>
-                {% endif %}
-                {% if user.is_superuser %}
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">{% translate "Reports" %}</a>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="{% url 'payments:reports' %}">{% translate "Payments" %}</a></li>
-                    </ul>
-                </li>
-                {% endif %}
-                <li class="nav-item"><a class="nav-link" href="{% url 'admin:index' %}">{% translate "Admin" %}</a></li>
-                <li class="nav-item">
-                    <form method="post" action="{% url 'logout' %}" class="d-inline">
-                        {% csrf_token %}
-                        <button type="submit" class="nav-link btn btn-link">{% translate "Logout" %}</button>
-                    </form>
-                </li>
-            </ul>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="{% url 'clients:client-search' %}">{% translate "Clients" %}</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'payments:list' %}">{% translate "Payments" %}</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'reservations:reservation-list' %}">{% translate "Reservations" %}</a></li>
+                    {% if perms.equipment.view_equipment %}
+                    <li class="nav-item"><a class="nav-link" href="{% url 'equipment:equipment-list' %}">{% translate "Equipment" %}</a></li>
+                    {% endif %}
+                    {% if perms.classes.view_classslot %}
+                    <li class="nav-item"><a class="nav-link" href="{% url 'classes:class-schedule' %}">{% translate "Schedule" %}</a></li>
+                    {% endif %}
+                    {% if user.is_superuser %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">{% translate "Reports" %}</a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{% url 'payments:reports' %}">{% translate "Payments" %}</a></li>
+                        </ul>
+                    </li>
+                    {% endif %}
+                    <li class="nav-item"><a class="nav-link" href="{% url 'admin:index' %}">{% translate "Admin" %}</a></li>
+                    <li class="nav-item">
+                        <form method="post" action="{% url 'logout' %}" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="nav-link btn btn-link">{% translate "Logout" %}</button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
             {% endif %}
         </div>
     </nav>

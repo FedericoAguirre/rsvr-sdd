@@ -36,6 +36,7 @@ def class_slots(db):
     ClassSlot.objects.create(day_of_week=2, time="18:30")  # Wednesday 18:30
     ClassSlot.objects.create(day_of_week=3, time="17:30")  # Thursday 17:30
     ClassSlot.objects.create(day_of_week=4, time="17:30")  # Friday 17:30
+    ClassSlot.objects.create(day_of_week=4, time="18:30")  # Friday 18:30
 
 
 @pytest.mark.django_db

@@ -4,7 +4,7 @@ from django.urls import include, path
 
 
 def home_redirect(request):
-    return redirect("reservations:reservation-list")
+    return redirect("clients:client-search")
 
 
 urlpatterns = [
