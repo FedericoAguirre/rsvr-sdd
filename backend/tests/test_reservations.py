@@ -1,3 +1,4 @@
+import datetime
 import json
 from datetime import date
 
@@ -53,16 +54,24 @@ class TestAutoDate:
         diff = (result_date - date.today()).days
         assert diff == 7, f"Expected exactly 7 days ahead (next week), got {diff}"
 
-    def test_future_day_this_week(self, class_slots):
-        """T002: Slot day is a future day this week → this week."""
-        today = date.today().weekday()
-        future_day = (today + 1) % 5  # Tomorrow (wrapping to Mon if today is Fri)
+    def test_future_day_goes_to_next_week(self, class_slots, monkeypatch):
+        """T002: Slot day is a future day this week → next week (not this week)."""
+
+        class MockDate(datetime.date):
+            @classmethod
+            def today(cls):
+                return datetime.date(2026, 7, 13)  # Monday
+
+        monkeypatch.setattr("apps.reservations.views.date", MockDate)
+        frozen_today = MockDate.today()
+        future_day = 2  # Wednesday
+        expected_diff = future_day - 0 + 7  # 9 days
         slot_id = self._slot_id(future_day, "17:30")
         result = auto_date_for_slot(slot_id)
         assert result is not None
         result_date = date.fromisoformat(result)
-        diff = (result_date - date.today()).days
-        assert diff >= 1, f"Expected at least 1 day ahead, got {diff}"
+        diff = (result_date - frozen_today).days
+        assert diff == expected_diff, f"Expected diff {expected_diff} (next week), got {diff}"
         assert result_date.weekday() == future_day, (
             f"Expected weekday {future_day}, got {result_date.weekday()}"
         )

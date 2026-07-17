@@ -13,7 +13,7 @@
 
 **Purpose**: Verify environment is ready
 
-- [ ] T001 Ensure Docker is up and existing tests pass: `docker compose exec web uv run manage.py test backend.tests.test_reservations.TestAutoDate --verbosity=2`
+- [x] T001 Ensure Docker is up and existing tests pass: `docker compose exec web uv run pytest tests/test_reservations.py::TestAutoDate -v`
 
 ---
 
@@ -25,10 +25,10 @@
 
 ### TDD: Write test FIRST, confirm RED, then implement
 
-- [ ] T002 [US1] Update `test_future_day_this_week` in `backend/tests/test_reservations.py` to expect the future-day date to be in the following week (current diff + 7). Run test — confirm it FAILS (RED) because implementation still uses old algorithm.
-- [ ] T003 [US1] Change JS algorithm in `backend/apps/reservations/static/reservations/js/auto-date.js` — update `autoDate()` so future-day case adds 7 to `daysAhead` (always next week).
-- [ ] T004 [US1] Change Python algorithm in `backend/apps/reservations/views.py` — update `auto_date_for_slot()` to match new JS logic for future-day case.
-- [ ] T005 [US1] Run full `TestAutoDate` test suite — confirm all tests PASS (GREEN).
+- [x] T002 [US1] Update `test_future_day_this_week` in `backend/tests/test_reservations.py` to expect the future-day date to be in the following week (current diff + 7). Run test — confirm it FAILS (RED) because implementation still uses old algorithm.
+- [x] T003 [US1] Change JS algorithm in `backend/apps/reservations/static/reservations/js/auto-date.js` — update `autoDate()` so future-day case adds 7 to `daysAhead` (always next week).
+- [x] T004 [US1] Change Python algorithm in `backend/apps/reservations/views.py` — update `auto_date_for_slot()` to match new JS logic for future-day case.
+- [x] T005 [US1] Run full `TestAutoDate` test suite — confirm all tests PASS (GREEN).
 
 **Checkpoint**: Auto-date algorithm now always sets date to following week.
 
@@ -38,9 +38,9 @@
 
 **Purpose**: Final verification and session recording
 
-- [ ] T006 Run quickstart.md validation — confirm JS + Python algorithm changes produce correct dates per spec acceptance scenarios
-- [ ] T007 [P] Save AI session file to `ai/sessions/`
-- [ ] T008 [P] Move feature todo file if applicable
+- [x] T006 Run quickstart.md validation — confirm JS + Python algorithm changes produce correct dates per spec acceptance scenarios
+- [x] T007 [P] Save AI session file to `ai/sessions/`
+- [x] T008 [P] Move feature todo file if applicable (N/A — no todo file)
 
 ---
 
@@ -73,5 +73,5 @@
 
 ## Environment Reference
 
-- **Run tests**: `docker compose exec web uv run manage.py test`
-- **Specific test class**: `docker compose exec web uv run manage.py test backend.tests.test_reservations.TestAutoDate --verbosity=2`
+- **Run tests**: `docker compose exec web uv run pytest`
+- **Specific test class**: `docker compose exec web uv run pytest tests/test_reservations.py::TestAutoDate -v`

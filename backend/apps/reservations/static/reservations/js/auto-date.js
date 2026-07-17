@@ -21,12 +21,7 @@
         var todayDay = (now.getDay() + 6) % 7; // Convert JS Sun=0 to Mon=0..Sun=6
         var slotDay = slot.day_of_week;
 
-        var daysAhead = slotDay - todayDay;
-        if (daysAhead < 0) {
-            daysAhead += 7;
-        } else if (daysAhead === 0) {
-            daysAhead = 7;
-        }
+        var daysAhead = slotDay - todayDay + 7;
 
         var result = new Date(today);
         result.setDate(result.getDate() + daysAhead);
