@@ -62,20 +62,20 @@ class TestAssociateButtonPresence:
     def test_associate_button_appears_on_detail_page(self, logged_client, payment):
         response = logged_client.get(f"/payments/{payment.pk}/")
         html = response.content.decode()
-        assert "Associate" in html
-        assert "Edit" in html
+        assert "Asociar" in html
+        assert "Editar" in html
 
     def test_associate_button_before_edit_in_dom(self, logged_client, payment):
         response = logged_client.get(f"/payments/{payment.pk}/")
         html = response.content.decode()
         card_header_start = html.find('class="card-header')
         card_header = html[card_header_start:]
-        associate_idx = card_header.find("Associate")
-        edit_idx = card_header.find("Edit")
+        associate_idx = card_header.find("Asociar")
+        edit_idx = card_header.find("Editar")
         assert associate_idx != -1, "Associate button not found in card header"
         assert edit_idx != -1, "Edit button not found in card header"
         assert associate_idx < edit_idx, (
-            f"Associate (pos {associate_idx}) must appear before Edit (pos {edit_idx}) "
+            f"Asociar (pos {associate_idx}) must appear before Editar (pos {edit_idx}) "
             f"in card header DOM"
         )
 

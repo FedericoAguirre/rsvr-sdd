@@ -138,10 +138,13 @@ msgstr "Clientes"
 msgid "Search by email or mobile"
 msgstr "Buscar por correo electrónico o móvil"
 
-#: apps/clients/forms.py:12
 #: apps/payments/templates/payments/payment_list.html:24
 msgid "Search clients..."
 msgstr "Buscar clientes..."
+
+#: apps/clients/forms.py:12
+msgid "Name, mobile, or email"
+msgstr "Nombre, móvil, o correo"
 
 #: apps/clients/forms.py:30
 msgid "CSV file"
@@ -411,7 +414,6 @@ msgstr "Buscar"
 msgid "Upload Clients"
 msgstr "Subir Clientes"
 
-#: apps/clients/templates/clients/search.html:18
 #: apps/payments/templates/payments/payment_list.html:29
 msgid "Searching..."
 msgstr "Búsqueda..."

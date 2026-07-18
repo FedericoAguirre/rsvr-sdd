@@ -457,5 +457,5 @@ class TestFilterStatePreservation:
     ):
         response = logged_client.get("/reservations/")
         content = response.content.decode()
-        assert "Clear Filters" in content
+        assert "Limpiar Filtros" in content
         assert "/reservations/" in content

@@ -9,7 +9,7 @@ class ClientSearchForm(forms.Form):
         label=_("Search by email or mobile"),
         max_length=100,
         required=False,
-        widget=forms.TextInput(attrs={"class": "form-control", "placeholder": _("Search clients..."), "id": "id_q"}),
+        widget=forms.TextInput(attrs={"class": "form-control", "placeholder": _("Name, mobile, or email"), "id": "id_q"}),
     )
 
 

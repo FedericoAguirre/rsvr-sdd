@@ -16,8 +16,8 @@
     <table class="table table-striped">
         <thead><tr>
             <th>{% translate "Name" %}</th>
-            <th>{% translate "Email" %}</th>
             <th>{% translate "Mobile" %}</th>
+            <th>{% translate "Email" %}</th>
             <th>{% translate "Active" %}</th>
             <th>{% translate "Created" %}</th>
             <th></th>
@@ -26,8 +26,8 @@
         {% for c in page_obj.object_list %}
         <tr>
             <td>{{ c.first_name|highlight:q }} {{ c.last_name|highlight:q }}</td>
-            <td>{{ c.email|highlight:q|default:"—" }}</td>
             <td>{{ c.mobile|highlight_mobile:q|default:"—" }}</td>
+            <td>{{ c.email|highlight:q|default:"—" }}</td>
             <td>{{ c.is_active|yesno:_("Yes,No") }}</td>
             <td>{{ c.created_at|date:"SHORT_DATE_FORMAT" }}</td>
             <td>

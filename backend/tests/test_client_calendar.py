@@ -94,7 +94,7 @@ class TestClientCalendarDownload:
         assert response.status_code == 302
         follow_response = logged_client.get(response.url)
         content = follow_response.content.decode()
-        assert "No reservations" in content
+        assert "Sin reservas" in content
 
     def test_invalid_date_order_shows_error(self, logged_client, client_obj, reservation):
         url = reverse("clients:client-calendar", args=[client_obj.pk])
@@ -102,7 +102,7 @@ class TestClientCalendarDownload:
         assert response.status_code == 302
         follow_response = logged_client.get(response.url)
         content = follow_response.content.decode()
-        assert "before the end date" in content
+        assert "anterior a la fecha de fin" in content
 
     def test_special_chars_in_client_name_handled(self, logged_client, class_slot, equipment, staff_user):
         client = Client.objects.create(first_name="María José", last_name="González")

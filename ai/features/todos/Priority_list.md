@@ -8,9 +8,8 @@
 ~~6. Create the stacked graph for daily grouping~~
 ~~7. Create the stacked graph for monthly grouping~~
 ~~8. Export payments for a date range using payments/reports~~
-9. In the reservations/ webpage make the date be associated with the day of the class slot
-10. Order payments/ webpage disposition
+~~9. In the reservations/ webpage make the date be associated with the day of the class slot~~
+~~10. Order payments/ webpage disposition~~
 11. Check file upload functionality in the payments/create/ webpage
 12. Limit the first reservations list, to N reservations in the reservations/ webpage
 13. Apply stripped table format in the reservations/pdf/
-14. Create videos for micro tutorials
