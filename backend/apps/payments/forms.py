@@ -83,4 +83,79 @@ class PaymentForm(forms.ModelForm):
         count = self.cleaned_data.get("class_slot_count")
         if count is not None and count < 1:
             raise ValidationError(_("Class slot count must be at least 1."))
+        if count is not None and count > 20:
+            raise ValidationError(_("Class slot count cannot exceed 20."))
         return count
+
+
+class BatchReservationForm(forms.Form):
+    payment_id = forms.IntegerField()
+    equipment_id = forms.IntegerField()
+    class_slot_id = forms.IntegerField()
+    dates = forms.JSONField()
+
+    def clean_equipment_id(self):
+        from apps.equipment.models import Equipment
+        eid = self.cleaned_data["equipment_id"]
+        try:
+            equipment = Equipment.objects.get(pk=eid, status="in-service")
+        except Equipment.DoesNotExist:
+            raise ValidationError(_("Selected equipment is not available."))
+        return equipment
+
+    def clean_class_slot_id(self):
+        from apps.classes.models import ClassSlot
+        sid = self.cleaned_data["class_slot_id"]
+        try:
+            slot = ClassSlot.objects.get(pk=sid, is_active=True)
+        except ClassSlot.DoesNotExist:
+            raise ValidationError(_("Selected class slot is not available."))
+        return slot
+
+    def clean_dates(self):
+        from apps.classes.models import ClassSlot
+        from apps.payments.models import Payment
+        from apps.reservations.models import Reservation
+        from django.db.models import Max
+        from datetime import date, timedelta
+        raw = self.cleaned_data["dates"]
+        pid = self.cleaned_data.get("payment_id")
+        payment = Payment.objects.filter(pk=pid).first()
+        if not payment:
+            raise ValidationError(_("Payment not found."))
+        block_count = payment.class_slot_count
+        parsed = []
+        for d in raw:
+            try:
+                parsed.append(date.fromisoformat(d))
+            except (ValueError, TypeError):
+                raise ValidationError(_("Invalid date format: {}.").format(d))
+        if len(parsed) != block_count:
+            raise ValidationError(
+                _("Must select exactly {} dates.").format(block_count),
+            )
+        if len(parsed) > 20:
+            raise ValidationError(_("Cannot create more than 20 reservations at once."))
+        if len(set(parsed)) != len(parsed):
+            raise ValidationError(_("Duplicate dates are not allowed."))
+        raw_start = payment.date
+        latest = Reservation.objects.filter(client=payment.client).aggregate(Max("date"))
+        if latest["date__max"] is not None:
+            raw_start = max(raw_start, latest["date__max"] + timedelta(days=1))
+        next_monday = raw_start + timedelta(days=(7 - raw_start.weekday()) % 7 or 7)
+        end = next_monday + timedelta(weeks=4)
+        for d in parsed:
+            if d < next_monday or d > end:
+                raise ValidationError(
+                    _("Date {} is outside the allowed range.").format(d),
+                )
+        slot = self.cleaned_data.get("class_slot_id")
+        if isinstance(slot, ClassSlot):
+            for d in parsed:
+                if not ClassSlot.objects.filter(
+                    day_of_week=d.weekday(), time=slot.time, is_active=True,
+                ).exists():
+                    raise ValidationError(
+                        _("No class slot at {} for date {}.").format(slot.time, d),
+                    )
+        return parsed
