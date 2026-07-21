@@ -21,4 +21,6 @@ urlpatterns = [
     ),
     path("reports/", views.PaymentReportView.as_view(), name="reports"),
     path("reports/export/", views.PaymentExportView.as_view(), name="export"),
+    path("<int:pk>/batch-data/", views.BatchDataView.as_view(), name="batch_data"),
+    path("<int:pk>/batch-create/", views.BatchCreateView.as_view(), name="batch_create"),
 ]
