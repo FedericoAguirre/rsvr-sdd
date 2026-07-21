@@ -93,4 +93,120 @@
         {% endif %}
     </div>
 </div>
+
+{% if request.GET.batch_modal and payment.class_slot_count > 0 %}
+{% include "payments/_batch_modal.html" %}
+<script>
+/* Compute Python-style day_of_week (Mon=0…Sun=6) from ISO date string,
+   using Date.UTC + getUTCDay to avoid any local-timezone interference. */
+function isoDow(isoStr) {
+    var p = isoStr.split("-");
+    var jsDow = new Date(Date.UTC(+p[0], +p[1] - 1, +p[2])).getUTCDay();
+    return (jsDow + 6) % 7;
+}
+/* Increment an ISO date string by N days using UTC-only Date methods. */
+function addDays(isoStr, n) {
+    var p = isoStr.split("-");
+    var d = new Date(Date.UTC(+p[0], +p[1] - 1, +p[2]));
+    d.setUTCDate(d.getUTCDate() + n);
+    var y = d.getUTCFullYear();
+    var m = String(d.getUTCMonth() + 1).padStart(2, "0");
+    var day = String(d.getUTCDate()).padStart(2, "0");
+    return y + "-" + m + "-" + day;
+}
+
+var DAY_ABBRS = ["L", "M", "X", "J", "V", "S", "D"];
+var selectedDates = {};
+var batchData = null;
+
+document.addEventListener("DOMContentLoaded", function() {
+    var modal = new bootstrap.Modal(document.getElementById("batchModal"));
+    modal.show();
+    var body = document.getElementById("batchModalBody");
+    fetch("{% url 'payments:batch_data' payment.pk %}")
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            batchData = data;
+            body.innerHTML = renderBatchForm(data);
+        });
+});
+function renderBatchForm(data) {
+    var html = '<div class="mb-3"><label class="form-label">{% translate "Equipment" %}</label><select class="form-select" id="batchEquipment">';
+    data.equipment_list.forEach(function(e) {
+        html += '<option value="' + e.id + '">' + e.name + '</option>';
+    });
+    html += '</select></div>';
+    html += '<div class="mb-3"><label class="form-label">{% translate "Class Slot" %}</label><select class="form-select" id="batchClassSlot">';
+    data.class_slots.forEach(function(s) {
+        html += '<option value="' + s.id + '" data-dow="' + s.day_of_week + '">' + s.label + '</option>';
+    });
+    html += '</select></div>';
+    html += '<div class="mb-3"><label class="form-label">{% translate "Select Dates" %} (<span id="dateCount">0</span>/' + data.block_class_count + ')</label><div id="dateList" class="d-flex flex-wrap gap-2">';
+    var reservedSet = {};
+    (data.reserved_dates || []).forEach(function(rd) { reservedSet[rd] = true; });
+    for (var d = data.date_range.start; d <= data.date_range.end; d = addDays(d, 1)) {
+        var pyDow = isoDow(d);
+        if (pyDow >= 5) continue;
+        if (reservedSet[d]) continue; /* exclude dates where client already has a reservation */
+        html += '<button type="button" class="btn btn-outline-secondary btn-sm date-btn" data-date="' + d + '" data-dow="' + pyDow + '" onclick="toggleDate(this)">' + DAY_ABBRS[pyDow] + ' - ' + d.replace(/-/g, "/") + '</button>';
+    }
+    html += '</div></div>';
+    html += '<div class="d-flex justify-content-end gap-2"><button type="button" class="btn btn-primary" onclick="submitBatch(' + data.payment_id + ', ' + data.block_class_count + ')">{% translate "Create Reservations" %}</button><button type="button" class="btn btn-secondary" onclick="closeBatchModal()">{% translate "Close" %}</button></div>';
+    html += '<div id="batchMessages" class="mt-2"></div>';
+    return html;
+}
+function filterDatesBySlot() {
+    /* no-op — all dates always visible */
+}
+function toggleDate(btn) {
+    var date = btn.dataset.date;
+    if (selectedDates[date]) {
+        delete selectedDates[date];
+        btn.classList.remove("btn-primary");
+        btn.classList.add("btn-outline-secondary");
+    } else {
+        selectedDates[date] = true;
+        btn.classList.remove("btn-outline-secondary");
+        btn.classList.add("btn-primary");
+    }
+    document.getElementById("dateCount").textContent = Object.keys(selectedDates).length;
+}
+function closeBatchModal() {
+    window.location.href = "{% url 'payments:detail' payment.pk %}";
+}
+function submitBatch(paymentId, blockClassCount) {
+    var dates = Object.keys(selectedDates);
+    if (dates.length !== blockClassCount) {
+        document.getElementById("batchMessages").innerHTML = '<div class="alert alert-warning">{% translate "Select exactly" %} ' + blockClassCount + ' {% translate "dates" %}.</div>';
+        return;
+    }
+    var csrf = document.querySelector("[name=csrfmiddlewaretoken]").value;
+    fetch("/payments/" + paymentId + "/batch-create/", {
+        method: "POST",
+        headers: {"Content-Type": "application/json", "X-CSRFToken": csrf},
+        body: JSON.stringify({
+            payment_id: paymentId,
+            equipment_id: parseInt(document.getElementById("batchEquipment").value),
+            class_slot_id: parseInt(document.getElementById("batchClassSlot").value),
+            dates: dates
+        })
+    }).then(function(r) { return r.json(); }).then(function(data) {
+        if (data.status === "ok" || data.status === "partial") {
+            window.location.href = "/payments/" + paymentId + "/";
+        } else {
+            var msg = '<div class="alert alert-danger">';
+            if (data.errors) {
+                for (var key in data.errors) {
+                    msg += '<p>' + data.errors[key].join(", ") + '</p>';
+                }
+            } else {
+                msg += '<p>' + (data.message || "{% translate 'An error occurred' %}") + '</p>';
+            }
+            msg += '</div>';
+            document.getElementById("batchMessages").innerHTML = msg;
+        }
+    });
+}
+</script>
+{% endif %}
 {% endblock %}

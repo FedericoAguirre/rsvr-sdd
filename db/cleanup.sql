@@ -17,6 +17,6 @@ FROM reservations_reservation;
 
 -- Restarts the clients_client table
 
-DELETE FROM clients_client;
-SELECT setval(pg_get_serial_sequence('clients_client', 'id'), COALESCE(MAX(id), 0) + 1, false) 
-FROM clients_client;
+-- DELETE FROM clients_client;
+-- SELECT setval(pg_get_serial_sequence('clients_client', 'id'), COALESCE(MAX(id), 0) + 1, false) 
+-- FROM clients_client;

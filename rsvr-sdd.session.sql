@@ -1,3 +1,6 @@
+select * from payments_payment;
+delete from payments_payment where id =2;
+
 select p.id as payment_id,
 p.amount as payment_amount,
 p.date as payment_date,
