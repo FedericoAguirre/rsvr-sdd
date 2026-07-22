@@ -3,6 +3,8 @@ import logging
 from datetime import date, timedelta
 
 import openpyxl
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db import transaction
 from django.db.models import Count, Q, Sum
@@ -19,12 +21,83 @@ from django.views.generic import (
     View,
 )
 
+from apps.clients.views import _snake_case_name
+
 from apps.clients.models import Client
 
 from .forms import BatchReservationForm, PaymentForm
 from .models import Payment, PaymentReservation
 
 logger = logging.getLogger(__name__)
+
+
+@login_required
+def payment_calendar(request, pk):
+    from icalendar import Calendar, Event, Timezone, TimezoneDaylight, TimezoneStandard
+    import datetime
+
+    payment = get_object_or_404(Payment, pk=pk)
+    qs = payment.payment_reservations.select_related(
+        "reservation__client", "reservation__equipment", "reservation__class_slot",
+    ).order_by("reservation__date", "reservation__class_slot__time")
+
+    if not qs.exists():
+        messages.info(request, str(_("No reservations are associated with this payment.")))
+        return redirect("payments:detail", pk=payment.pk)
+
+    reservations = [pr.reservation for pr in qs]
+    client = payment.client
+    cal = Calendar()
+    cal.add("version", "2.0")
+    cal.add("prodid", "-//rsvr-sdd//Payment Reservations//ES")
+
+    tz = Timezone()
+    tz.add("tzid", "America/Denver")
+    tz.add("x-lic-location", "America/Denver")
+
+    std = TimezoneStandard()
+    std.add("dtstart", datetime.datetime(1970, 11, 1, 2, 0, 0, tzinfo=datetime.timezone.utc))
+    std.add("tzoffsetfrom", datetime.timedelta(hours=-6))
+    std.add("tzoffsetto", datetime.timedelta(hours=-7))
+    std.add("tzname", "MST")
+    tz.add_component(std)
+
+    dst = TimezoneDaylight()
+    dst.add("dtstart", datetime.datetime(1970, 3, 8, 2, 0, 0, tzinfo=datetime.timezone.utc))
+    dst.add("tzoffsetfrom", datetime.timedelta(hours=-7))
+    dst.add("tzoffsetto", datetime.timedelta(hours=-6))
+    dst.add("tzname", "MDT")
+    tz.add_component(dst)
+
+    cal.add_component(tz)
+
+    tzinfo = datetime.timezone(datetime.timedelta(hours=-6))
+    for r in reservations:
+        event = Event()
+        start = datetime.datetime.combine(r.date, r.class_slot.time, tzinfo=tzinfo)
+        end = start + datetime.timedelta(hours=1)
+        event.add("dtstart", start)
+        event.add("dtend", end)
+        event.add("summary", str(r.class_slot))
+        event.add("description", _("Client: %(name)s\nClass: %(slot)s\nDate: %(date)s\nEquipment: %(equipment)s\nPago: %(payment_identifier)s") % {
+            "name": str(r.client),
+            "slot": str(r.class_slot),
+            "date": r.date.isoformat(),
+            "equipment": str(r.equipment),
+            "payment_identifier": payment.payment_identifier,
+        })
+        cal.add_component(event)
+
+    ics_content = cal.to_ical()
+    snake_name = _snake_case_name(client)
+    dates = sorted(r.date for r in reservations)
+    first_date = dates[0].strftime("%Y%m%d")
+    last_date = dates[-1].strftime("%Y%m%d")
+    filename = f"{snake_name}_{payment.payment_identifier}_{first_date}_{last_date}.ics"
+
+    response = HttpResponse(ics_content, content_type="text/calendar; charset=utf-8")
+    response["Content-Disposition"] = f'attachment; filename="{filename}"'
+    return response
 
 
 class PaymentListView(LoginRequiredMixin, ListView):

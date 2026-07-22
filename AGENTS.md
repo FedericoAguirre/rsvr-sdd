@@ -1,7 +1,7 @@
 <!-- SPECKIT START -->
 For additional context about technologies to be used, project structure,
 shell commands, and other important information, read the current plan at
-`specs/048-batch-reservations-payment/plan.md`
+`specs/049-associated-reservations-calendar/plan.md`
 <!-- SPECKIT END -->
 
 <!-- CONTEXT7 START -->
