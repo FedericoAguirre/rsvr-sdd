@@ -5,6 +5,7 @@ from . import views
 app_name = "reservations"
 urlpatterns = [
     path("", views.reservation_list, name="reservation-list"),
+    path("calendar/", views.reservation_calendar, name="reservation-calendar"),
     path("pdf/", views.reservation_list_pdf, name="reservation-list-pdf"),
     path("create/", views.reservation_create, name="reservation-create"),
     path("<int:pk>/", views.reservation_detail, name="reservation-detail"),

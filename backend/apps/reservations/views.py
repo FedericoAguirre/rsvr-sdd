@@ -23,6 +23,8 @@ from apps.classes.models import ClassSlot
 from .forms import ReservationForm
 from .models import Reservation
 
+from utils.ical import generate_ics
+
 logger = logging.getLogger(__name__)
 
 
@@ -136,6 +138,50 @@ def reservation_list(request):
         "date_display": date_display,
         "status_filter": status_filter,
     })
+
+
+@login_required
+def reservation_calendar(request):
+    from django.http import HttpResponse
+
+    start_date_str = request.GET.get("start_date", "")
+    end_date_str = request.GET.get("end_date", "")
+
+    if not start_date_str or not end_date_str:
+        messages.error(request, _("Please provide both a start date and an end date."))
+        return redirect("reservations:reservation-list")
+
+    try:
+        start_date = date.fromisoformat(start_date_str)
+        end_date = date.fromisoformat(end_date_str)
+    except ValueError:
+        messages.error(request, _("Invalid date format. Use YYYY-MM-DD."))
+        return redirect("reservations:reservation-list")
+
+    if start_date > end_date:
+        messages.error(request, _("The start date must be before the end date."))
+        return redirect("reservations:reservation-list")
+
+    reservations = Reservation.objects.filter(
+        date__gte=start_date, date__lte=end_date,
+    ).select_related("client", "equipment", "class_slot").order_by("date", "class_slot__time")
+
+    from apps.payments.models import PaymentReservation
+    prs = PaymentReservation.objects.filter(
+        reservation__in=reservations,
+    ).select_related("payment", "reservation")
+    payment_map = {pr.reservation_id: pr.payment.payment_identifier for pr in prs}
+
+    def extra_fields(r):
+        payment_id = payment_map.get(r.pk)
+        return {"Pago": payment_id or _("Reservación sin asociar")}
+
+    ics_content = generate_ics(reservations, extra_fields_fn=extra_fields)
+    filename = f"{start_date_str}_{end_date_str}.ics"
+
+    response = HttpResponse(ics_content, content_type="text/calendar; charset=utf-8")
+    response["Content-Disposition"] = f'attachment; filename="{filename}"'
+    return response
 
 
 @login_required
