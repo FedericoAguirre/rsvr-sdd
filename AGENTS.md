@@ -1,7 +1,7 @@
 <!-- SPECKIT START -->
 For additional context about technologies to be used, project structure,
 shell commands, and other important information, read the current plan at
-`specs/049-associated-reservations-calendar/plan.md`
+`specs/050-calendar-downloading-reservations/plan.md`
 <!-- SPECKIT END -->
 
 <!-- CONTEXT7 START -->
@@ -26,12 +26,13 @@ instructions.
 deprecations, security patches, or version-specific behavior.
 <!-- CONTEXT7 END -->
 
-## Session Summary (2026-07-11)
+## Session Summary (2026-07-21)
 
-This session is on branch **037-developer-time-tracking** — see `specs/037-developer-time-tracking/plan.md`.
+This session is on branch **050-calendar-downloading-reservations** — see `specs/050-calendar-downloading-reservations/plan.md`.
 
 ### Completed
-- Spec written, clarified, and plan generated via Spec Kit workflow
+- Spec written and validated via Spec Kit workflow
+- Plan generated with Technical Context, Constitution Check, and Structure
 - Research artifacts (research.md, data-model.md, quickstart.md) generated
-- CLI contract documented
+- ICS contract documented
 - All quality checklist items pass

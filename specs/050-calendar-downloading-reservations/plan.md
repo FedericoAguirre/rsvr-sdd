@@ -1,113 +1,88 @@
-# Implementation Plan: [FEATURE]
+# Implementation Plan: Calendar Downloading in Reservations Page
 
-**Branch**: `[###-feature-name]` | **Date**: [DATE] | **Spec**: [link]
+**Branch**: `050-calendar-downloading-reservations` | **Date**: 2026-07-21 | **Spec**: [spec.md](spec.md)
 
-**Input**: Feature specification from `/specs/[###-feature-name]/spec.md`
-
-**Note**: This template is filled in by the `/speckit.plan` command. See `.specify/templates/plan-template.md` for the execution workflow.
+**Input**: Feature specification from `specs/050-calendar-downloading-reservations/spec.md`
 
 ## Summary
 
-[Extract from feature spec: primary requirement + technical approach from research]
+Add a "Download Calendar" button to the reservations list page that generates and serves an ICS file containing all reservations in the selected date range, with each event description including the payment identifier. The ICS generation logic will be extracted into a shared utility reused across clients, payments, and reservations apps.
 
 ## Technical Context
 
-<!--
-  ACTION REQUIRED: Replace the content in this section with the technical details
-  for the project. The structure here is presented in advisory capacity to guide
-  the iteration process.
--->
+**Language/Version**: Python 3.12 (Django 5.0)
 
-**Language/Version**: [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION]
+**Primary Dependencies**: Django 5.0, icalendar, pytest, Bootstrap 5.3, HTMX 2.x
 
-**Primary Dependencies**: [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION]
+**Storage**: PostgreSQL (existing)
 
-**Storage**: [if applicable, e.g., PostgreSQL, CoreData, files or N/A]
+**Testing**: pytest via `docker compose exec web uv run pytest`
 
-**Testing**: [e.g., pytest, XCTest, cargo test or NEEDS CLARIFICATION]
+**Target Platform**: Linux server (Docker Compose)
 
-**Target Platform**: [e.g., Linux server, iOS 15+, WASM or NEEDS CLARIFICATION]
+**Project Type**: Web application (Django)
 
-**Project Type**: [e.g., library/cli/web-service/mobile-app/compiler/desktop-app or NEEDS CLARIFICATION]
+**Performance Goals**: ICS generation < 200ms for typical date ranges (up to 100 reservations)
 
-**Performance Goals**: [domain-specific, e.g., 1000 req/s, 10k lines/sec, 60 fps or NEEDS CLARIFICATION]
+**Constraints**: 
+- Must reuse/extract existing `_generate_ics` pattern from clients app
+- ICS timezone: America/Denver
+- Event duration: 1 hour per reservation
+- All user-visible strings must be internationalized (i18n)
 
-**Constraints**: [domain-specific, e.g., <200ms p95, <100MB memory, offline-capable or NEEDS CLARIFICATION]
-
-**Scale/Scope**: [domain-specific, e.g., 10k users, 1M LOC, 50 screens or NEEDS CLARIFICATION]
+**Scale/Scope**: Small feature — one new view, one new URL, one button in template, shared utility extraction
 
 ## Constitution Check
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-[Gates determined based on constitution file]
+| Gate | Status | Notes |
+|------|--------|-------|
+| **I. Code Quality** | ✅ PASS | No dead code; refactor `_generate_ics` into shared utility to eliminate duplication |
+| **II. Testing Standards** | ✅ PASS | Red-Green-Refactor: tests before implementation, integration test for ICS generation |
+| **III. UX Consistency (i18n)** | ✅ PASS | All new strings (button, labels, empty state) must use `{% translate %}` / `gettext` |
+| **IV. Performance** | ✅ PASS | ICS generation is on-demand (not on page load); no performance regression expected |
+| **V. External Docs** | ✅ PASS | Fetch icalendar docs via Context7 MCP before writing ICS generation code |
 
 ## Project Structure
 
 ### Documentation (this feature)
 
 ```text
-specs/[###-feature]/
-├── plan.md              # This file (/speckit.plan command output)
-├── research.md          # Phase 0 output (/speckit.plan command)
-├── data-model.md        # Phase 1 output (/speckit.plan command)
-├── quickstart.md        # Phase 1 output (/speckit.plan command)
-├── contracts/           # Phase 1 output (/speckit.plan command)
-└── tasks.md             # Phase 2 output (/speckit.tasks command - NOT created by /speckit.plan)
+specs/050-calendar-downloading-reservations/
+├── plan.md              # This file
+├── spec.md              # Feature specification
+├── research.md          # Phase 0 — research artifacts
+├── data-model.md        # Phase 1 — entity definitions
+├── quickstart.md        # Phase 1 — development quickstart
+├── contracts/           # Phase 1 — interface contracts
+└── tasks.md             # Phase 2 — implementation tasks (generated later)
 ```
 
 ### Source Code (repository root)
-<!--
-  ACTION REQUIRED: Replace the placeholder tree below with the concrete layout
-  for this feature. Delete unused options and expand the chosen structure with
-  real paths (e.g., apps/admin, packages/something). The delivered plan must
-  not include Option labels.
--->
 
 ```text
-# [REMOVE IF UNUSED] Option 1: Single project (DEFAULT)
-src/
-├── models/
-├── services/
-├── cli/
-└── lib/
-
-tests/
-├── contract/
-├── integration/
-└── unit/
-
-# [REMOVE IF UNUSED] Option 2: Web application (when "frontend" + "backend" detected)
 backend/
-├── src/
-│   ├── models/
-│   ├── services/
-│   └── api/
+├── apps/
+│   ├── reservations/
+│   │   ├── views.py              # Add calendar view, shared utility import
+│   │   ├── urls.py               # Add calendar/ route
+│   │   └── templates/
+│   │       └── reservations/
+│   │           └── reservation_list.html  # Add "Download Calendar" button
+│   ├── clients/
+│   │   └── views.py              # Refactor _generate_ics into shared utility
+│   └── payments/
+│       └── views.py              # Refactor inline ICS to use shared utility
+├── utils/
+│   └── ical.py                   # NEW: shared ICS generation utility
 └── tests/
-
-frontend/
-├── src/
-│   ├── components/
-│   ├── pages/
-│   └── services/
-└── tests/
-
-# [REMOVE IF UNUSED] Option 3: Mobile + API (when "iOS/Android" detected)
-api/
-└── [same as backend above]
-
-ios/ or android/
-└── [platform-specific structure: feature modules, UI flows, platform tests]
+    ├── test_reservations_calendar.py  # NEW: calendar download tests
+    └── test_ical_utils.py             # NEW: shared utility tests
 ```
 
-**Structure Decision**: [Document the selected structure and reference the real
-directories captured above]
+**Structure Decision**: Django web application — single backend project with app-based separation.
 
 ## Complexity Tracking
 
-> **Fill ONLY if Constitution Check has violations that must be justified**
-
-| Violation | Why Needed | Simpler Alternative Rejected Because |
-|-----------|------------|-------------------------------------|
-| [e.g., 4th project] | [current need] | [why 3 projects insufficient] |
-| [e.g., Repository pattern] | [specific problem] | [why direct DB access insufficient] |
+> No constitution violations to justify. Feature is small and straightforward.
