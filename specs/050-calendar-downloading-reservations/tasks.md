@@ -22,9 +22,9 @@
 
 **Purpose**: Project initialization and context setup
 
-- [ ] T001 Fetch current icalendar docs via Context7 MCP (Principle V compliance) before writing any ICS generation code
-- [ ] T002 [P] Extract shared ICS utility from `backend/apps/clients/views.py::_generate_ics` into `backend/utils/ical.py::generate_ics`
-- [ ] T003 [P] Create tests for shared utility in `backend/tests/test_ical_utils.py`
+- [X] T001 Fetch current icalendar docs via Context7 MCP (Principle V compliance) before writing any ICS generation code
+- [X] T002 [P] Extract shared ICS utility from `backend/apps/clients/views.py::_generate_ics` into `backend/utils/ical.py::generate_ics`
+- [X] T003 [P] Create tests for shared utility in `backend/tests/test_ical_utils.py`
 
 ---
 
@@ -34,8 +34,8 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T004 Refactor `backend/apps/clients/views.py` to import and use `generate_ics` from `backend/utils/ical.py`
-- [ ] T005 Refactor `backend/apps/payments/views.py` to import and use `generate_ics` from `backend/utils/ical.py` (pass `extra_fields_fn` for the `\nPago:` line)
+- [X] T004 Refactor `backend/apps/clients/views.py` to import and use `generate_ics` from `backend/utils/ical.py`
+- [X] T005 Refactor `backend/apps/payments/views.py` to import and use `generate_ics` from `backend/utils/ical.py` (pass `extra_fields_fn` for the `\nPago:` line)
 
 **Checkpoint**: Foundation ready — shared utility exists, both existing apps use it, no regression
 
@@ -51,16 +51,16 @@
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T006 [P] [US1] Test ICS generation for reservations with payment in `backend/tests/test_reservations_calendar.py`
-- [ ] T007 [P] [US1] Test ICS filename format in `backend/tests/test_reservations_calendar.py`
-- [ ] T008 [P] [US1] Test empty date range handling in `backend/tests/test_reservations_calendar.py`
-- [ ] T009 [P] [US1] Test missing date range parameters in `backend/tests/test_reservations_calendar.py`
+- [X] T006 [P] [US1] Test ICS generation for reservations with payment in `backend/tests/test_reservations_calendar.py`
+- [X] T007 [P] [US1] Test ICS filename format in `backend/tests/test_reservations_calendar.py`
+- [X] T008 [P] [US1] Test empty date range handling in `backend/tests/test_reservations_calendar.py`
+- [X] T009 [P] [US1] Test missing date range parameters in `backend/tests/test_reservations_calendar.py`
 
 ### Implementation for User Story 1
 
-- [ ] T010 [US1] Add `reservation_calendar` view in `backend/apps/reservations/views.py` — accepts `start_date`/`end_date` query params, filters reservations, calls `generate_ics` with `extra_fields_fn` that includes payment identifier
-- [ ] T011 [US1] Add `calendar/` URL route in `backend/apps/reservations/urls.py` pointing to `reservation_calendar`
-- [ ] T012 [US1] Add "Descargar calendario" button and date range form to `backend/apps/reservations/templates/reservations/reservation_list.html`
+- [X] T010 [US1] Add `reservation_calendar` view in `backend/apps/reservations/views.py` — accepts `start_date`/`end_date` query params, filters reservations, calls `generate_ics` with `extra_fields_fn` that includes payment identifier
+- [X] T011 [US1] Add `calendar/` URL route in `backend/apps/reservations/urls.py` pointing to `reservation_calendar`
+- [X] T012 [US1] Add "Descargar calendario" button and date range form to `backend/apps/reservations/templates/reservations/reservation_list.html`
 
 **Checkpoint**: US1 should be fully functional — reservations calendar download works with payment identifiers
 
@@ -76,12 +76,12 @@
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T013 [P] [US2] Test unassociated reservation shows "Reservación sin asociar" in `backend/tests/test_reservations_calendar.py`
-- [ ] T014 [P] [US2] Test mixed reservations (some associated, some not) in `backend/tests/test_reservations_calendar.py`
+- [X] T013 [P] [US2] Test unassociated reservation shows "Reservación sin asociar" in `backend/tests/test_reservations_calendar.py`
+- [X] T014 [P] [US2] Test mixed reservations (some associated, some not) in `backend/tests/test_reservations_calendar.py`
 
 ### Implementation for User Story 2
 
-- [ ] T015 [US2] Update `extra_fields_fn` in `reservation_calendar` view to use `payment.identifier` if payment exists, else "Reservación sin asociar"
+- [X] T015 [US2] Update `extra_fields_fn` in `reservation_calendar` view to use `payment.identifier` if payment exists, else "Reservación sin asociar"
 
 **Checkpoint**: US2 should work — unassociated reservations show correct fallback text
 
@@ -97,12 +97,12 @@
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T016 [P] [US3] Test multiple payments in same date range in `backend/tests/test_reservations_calendar.py`
-- [ ] T017 [P] [US3] Test each event has correct payment identifier in `backend/tests/test_reservations_calendar.py`
+- [X] T016 [P] [US3] Test multiple payments in same date range in `backend/tests/test_reservations_calendar.py`
+- [X] T017 [P] [US3] Test each event has correct payment identifier in `backend/tests/test_reservations_calendar.py`
 
 ### Implementation for User Story 3
 
-- [ ] T018 [US3] Verify reservation query in `reservation_calendar` view includes all reservations across all payments (no per-payment filtering)
+- [X] T018 [US3] Verify reservation query in `reservation_calendar` view includes all reservations across all payments (no per-payment filtering)
 
 **Checkpoint**: All three stories should work — reservations from any payment in the date range are included
 
@@ -112,11 +112,11 @@
 
 **Purpose**: i18n, cleanup, and final verification
 
-- [ ] T019 [P] Extract all new user-visible strings with `django-admin makemessages -l es`
-- [ ] T020 [P] Translate new strings in `backend/locale/es/LC_MESSAGES/django.po`
-- [ ] T021 Run `django-admin compilemessages` to compile translations
-- [ ] T022 Remove any remaining dead code (old `_generate_ics` references after refactoring)
-- [ ] T023 Run full test suite: `docker compose exec web uv run pytest`
+- [X] T019 [P] Extract all new user-visible strings with `django-admin makemessages -l es`
+- [X] T020 [P] Translate new strings in `backend/locale/es/LC_MESSAGES/django.po`
+- [X] T021 Run `django-admin compilemessages` to compile translations
+- [X] T022 Remove any remaining dead code (old `_generate_ics` references after refactoring)
+- [X] T023 Run full test suite: `docker compose exec web uv run pytest`
 
 ---
 
