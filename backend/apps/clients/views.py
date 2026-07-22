@@ -14,6 +14,7 @@ from . import csv_import
 from .forms import ClientCsvUploadForm, ClientForm, ClientSearchForm
 from .models import Client
 
+from apps.payments.models import PaymentReservation
 from utils.ical import generate_ics, snake_case_name
 
 
@@ -88,7 +89,16 @@ def client_calendar(request, pk):
         messages.info(request, _("No reservations found for the selected date range."))
         return redirect("clients:client-detail", pk=client.pk)
 
-    ics_content = generate_ics(reservations)
+    prs = PaymentReservation.objects.filter(
+        reservation__in=reservations,
+    ).select_related("payment")
+    payment_map = {pr.reservation_id: pr.payment.payment_identifier for pr in prs}
+
+    def extra_fields(r):
+        payment_id = payment_map.get(r.pk)
+        return {"Pago": payment_id or _("Reservación sin asociar")}
+
+    ics_content = generate_ics(reservations, extra_fields_fn=extra_fields)
     snake_name = _snake_case_name(client)
     filename = f"cal_{snake_name}_{start_date.strftime('%Y%m%d')}_{end_date.strftime('%Y%m%d')}.ics"
 
