@@ -33,4 +33,40 @@
 </div>
 
 {% include "payments/partials/_payment_search_results.html" %}
+
+{% if client_filter %}
+<div class="card mt-4">
+    <div class="card-header">
+        <h5 class="mb-0">{% translate "Reservations without payment" %}</h5>
+    </div>
+    <div class="card-body">
+        {% if unassociated_reservations %}
+        <div class="table-responsive">
+            <table class="table table-sm table-hover">
+                <thead>
+                    <tr>
+                        <th>{% translate "Date" %}</th>
+                        <th>{% translate "Class slot" %}</th>
+                        <th>{% translate "Equipment" %}</th>
+                        <th>{% translate "Status" %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for reservation in unassociated_reservations %}
+                    <tr>
+                        <td>{{ reservation.date|date:"SHORT_DATE_FORMAT" }}</td>
+                        <td>{{ reservation.class_slot }}</td>
+                        <td>{{ reservation.equipment }}</td>
+                        <td>{{ reservation.get_status_display }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-muted mb-0">{% translate "This client has no reservations without payment." %}</p>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
 {% endblock %}

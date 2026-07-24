@@ -124,6 +124,11 @@ class ClientPaymentHistoryView(LoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["client_filter"] = str(self.kwargs["client_id"])
+        from apps.reservations.models import Reservation
+        context["unassociated_reservations"] = Reservation.objects.filter(
+            client_id=self.kwargs["client_id"],
+            payment_links=None,
+        ).select_related("equipment", "class_slot").order_by("-date", "class_slot__time")
         return context
 
 
@@ -202,12 +207,10 @@ class PaymentAssociateView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         payment = get_object_or_404(Payment, pk=kwargs["pk"])
         from apps.reservations.models import Reservation
-        associated_ids = payment.payment_reservations.values_list(
-            "reservation_id", flat=True,
-        )
         available_reservations = Reservation.objects.filter(
             client=payment.client,
-        ).exclude(pk__in=associated_ids).select_related(
+            payment_links=None,
+        ).select_related(
             "equipment", "class_slot",
         ).order_by("-date", "class_slot__time")
         remaining_slots = (
