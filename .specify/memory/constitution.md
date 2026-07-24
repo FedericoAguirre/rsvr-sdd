@@ -1,8 +1,9 @@
 <!--
   Sync Impact Report
-  Version change: 2.1.0 → 2.2.0
-  Modified principles: None
-  Added sections: Development Environment & Package Management
+  Version change: 2.2.0 → 2.3.0
+  Modified principles: None (new principle V added)
+  Added sections:
+    - Core Principle V: External Documentation & Dependency Integrity
   Removed sections: None
   Templates requiring updates:
     - .specify/templates/plan-template.md ✅ (no change needed — generic)
@@ -82,11 +83,43 @@ regressions MUST be caught before merge via automated benchmarks or
 profiling gates. Profiling data MUST accompany any performance-
 sensitive change.
 
+### V. External Documentation & Dependency Integrity
+
+Every line of code written against any library, package, or framework
+dependency MUST be informed by current, authoritative documentation
+fetched via Context7 MCP before implementation. This applies to ALL
+dependencies in the project, including but not limited to: Django 5.0,
+Bootstrap 5.3, HTMX 2.x, Chart.js 4.x, ReportLab 5.x, pytest,
+gunicorn, psycopg2, Whitenoise, openpyxl, icalendar, pdfminer-six,
+i18n, and any future additions.
+
+**Implementation contract — ALL three steps are REQUIRED:**
+
+1. **Resolve before code.** For every library/framework API call,
+   configuration directive, or integration pattern, resolve the
+   library ID via `context7_resolve-library-id` and query the
+   current documentation via `context7_query-docs` before writing
+   any code that uses it.
+2. **Version-aware lookups.** Use version-specific library IDs
+   (e.g., `/django/django/5.0`) when the code targets a specific
+   dependency version. Never rely on stale or generic knowledge.
+3. **Cover every dependency.** This rule applies to frontend CDN
+   libraries (Bootstrap, HTMX, Chart.js), backend packages
+   (Django, ReportLab, icalendar), test frameworks (pytest), and
+   infrastructure tooling (Docker Compose, uv).
+
+**Rationale**: LLM training data may not reflect recent API changes,
+deprecation notices, security patches, or version-specific behavior.
+Current fetched docs eliminate guesswork and prevent subtle bugs
+introduced by outdated knowledge.
+
 ## Technology Constraints
 
 This project uses opencode as its AI integration. Runtime targets are
 POSIX-compatible (Linux/macOS). All dependencies MUST be declared
 explicitly. No proprietary or closed-source build tools are permitted.
+All external dependency usage MUST comply with Principle V (External
+Documentation & Dependency Integrity).
 
 ## Development Environment & Package Management
 
@@ -103,8 +136,8 @@ All work follows the Specify → Plan → Tasks → Implement cycle with
 review gates at each stage. Feature branches MUST use sequential
 numbering (`###-feature-name`). Commits MUST be atomic and descriptive.
 Each user story MUST be independently testable and deliverable as an MVP
-increment. Code quality, UX, and performance checks MUST pass before
-merge.
+increment. Code quality, UX, performance, and external documentation
+checks MUST pass before merge.
 
 Before creating a PR, an AI session markdown file must be saved in the ai/sessions folder.
 The session must be compressed before saving.
@@ -129,4 +162,4 @@ only clarified. All project artifacts follow MAJOR.MINOR.PATCH semantic
 versioning. Breaking changes MUST increment MAJOR; new backward-
 compatible functionality increments MINOR; bug fixes increment PATCH.
 
-**Version**: 2.2.0 | **Ratified**: 2026-06-07 | **Last Amended**: 2026-07-09
+**Version**: 2.3.0 | **Ratified**: 2026-06-07 | **Last Amended**: 2026-07-21

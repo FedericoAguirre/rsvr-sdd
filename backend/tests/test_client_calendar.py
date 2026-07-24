@@ -8,6 +8,7 @@ from django.urls import reverse
 from apps.classes.models import ClassSlot
 from apps.clients.models import Client
 from apps.equipment.models import Equipment
+from apps.payments.models import Payment, PaymentReservation
 from apps.reservations.models import Reservation
 
 
@@ -103,6 +104,32 @@ class TestClientCalendarDownload:
         follow_response = logged_client.get(response.url)
         content = follow_response.content.decode()
         assert "anterior a la fecha de fin" in content
+
+    def test_download_with_payment_identifier(self, logged_client, client_obj, class_slot, equipment, staff_user):
+        reservation = Reservation.objects.create(
+            client=client_obj, equipment=equipment, class_slot=class_slot,
+            date="2026-06-15", created_by=staff_user,
+        )
+        payment = Payment.objects.create(
+            client=client_obj, payment_identifier="PAY-001", amount=100.00,
+            date="2026-06-15", payment_type="cash", class_slot_count=1,
+            created_by=staff_user,
+        )
+        PaymentReservation.objects.create(payment=payment, reservation=reservation)
+        url = reverse("clients:client-calendar", args=[client_obj.pk])
+        response = logged_client.get(url, {"start_date": "2026-06-01", "end_date": "2026-06-30"})
+        content = response.content.replace(b"\r\n ", b"")
+        assert b"PAY-001" in content
+
+    def test_download_without_payment_shows_unassociated(self, logged_client, client_obj, class_slot, equipment, staff_user):
+        Reservation.objects.create(
+            client=client_obj, equipment=equipment, class_slot=class_slot,
+            date="2026-06-15", created_by=staff_user,
+        )
+        url = reverse("clients:client-calendar", args=[client_obj.pk])
+        response = logged_client.get(url, {"start_date": "2026-06-01", "end_date": "2026-06-30"})
+        content = response.content.replace(b"\r\n ", b"")
+        assert b"Reservaci" in content
 
     def test_special_chars_in_client_name_handled(self, logged_client, class_slot, equipment, staff_user):
         client = Client.objects.create(first_name="María José", last_name="González")

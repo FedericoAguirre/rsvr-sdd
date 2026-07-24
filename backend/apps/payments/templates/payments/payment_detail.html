@@ -19,6 +19,7 @@
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h3 class="mb-0">{{ payment.payment_identifier }}</h3>
                 <div>
+                    <a href="{% url 'payments:calendar' payment.pk %}" class="btn btn-sm btn-outline-success">{% translate "Download calendar" %}</a>
                     <a href="{% url 'payments:associate' payment.pk %}" class="btn btn-sm btn-outline-info">{% translate "Associate" %}</a>
                     <a href="{% url 'payments:edit' payment.pk %}" class="btn btn-sm btn-outline-primary">{% translate "Edit" %}</a>
                     <form method="post" action="{% url 'payments:delete' payment.pk %}" class="d-inline" onsubmit="return confirm('{% translate "Are you sure?" %}')">

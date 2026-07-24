@@ -1,8 +1,11 @@
 import calendar
+import datetime
 import logging
 from datetime import date, timedelta
 
 import openpyxl
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db import transaction
 from django.db.models import Count, Q, Sum
@@ -19,12 +22,45 @@ from django.views.generic import (
     View,
 )
 
+from apps.clients.views import _snake_case_name
+
 from apps.clients.models import Client
 
 from .forms import BatchReservationForm, PaymentForm
 from .models import Payment, PaymentReservation
 
+from utils.ical import generate_ics
+
 logger = logging.getLogger(__name__)
+
+
+@login_required
+def payment_calendar(request, pk):
+    payment = get_object_or_404(Payment, pk=pk)
+    qs = payment.payment_reservations.select_related(
+        "reservation__client", "reservation__equipment", "reservation__class_slot",
+    ).order_by("reservation__date", "reservation__class_slot__time")
+
+    if not qs.exists():
+        messages.info(request, str(_("No reservations are associated with this payment.")))
+        return redirect("payments:detail", pk=payment.pk)
+
+    reservations = [pr.reservation for pr in qs]
+    client = payment.client
+
+    def extra_fields(_reservation):
+        return {"Pago": payment.payment_identifier}
+
+    ics_content = generate_ics(reservations, prodid="-//rsvr-sdd//Payment Reservations//ES", extra_fields_fn=extra_fields)
+    snake_name = _snake_case_name(client)
+    dates = sorted(r.date for r in reservations)
+    first_date = dates[0].strftime("%Y%m%d")
+    last_date = dates[-1].strftime("%Y%m%d")
+    filename = f"{snake_name}_{payment.payment_identifier}_{first_date}_{last_date}.ics"
+
+    response = HttpResponse(ics_content, content_type="text/calendar; charset=utf-8")
+    response["Content-Disposition"] = f'attachment; filename="{filename}"'
+    return response
 
 
 class PaymentListView(LoginRequiredMixin, ListView):
