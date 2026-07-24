@@ -1,7 +1,2 @@
-<<<<<<< HEAD
-{
-  "feature_directory": "specs/048-batch-reservations-payment"
-}
-=======
+
 {"feature_directory": "specs/050-calendar-downloading-reservations"}
->>>>>>> ed403bff1c23239feb9ea1a5ad1e8eb229e078af
