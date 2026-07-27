@@ -35,9 +35,13 @@ Given batch reservations were created, when I close the modal, then I'm redirect
 - Date range: from today up to the next Monday after the payment date (within ~4 weeks)
 - Only "in service" equipment shown
 - Only active class slots shown
+- The class slot hour is the batch driver, each class slot will be associated with its correspondent date weekday
 - Each reservation must respect the unique_together constraint (equipment + class_slot + date)
 - Each reservation can be linked to at most one payment (PaymentReservation.reservation is unique=True)
+- Dates shown in the UI will be like 'L - 2026/07/20', 'M - 2026-07-21', ... 'V - 2026-07-24'.
 
 ## Definition of Done
 
 Code reviewed, tested with edge cases (conflicting dates, max limits, equipment unavailability), validated that reservations appear correctly in the payment detail page.
+
+The new texts, labels, messages, errors or other i18n assests support the Spanish language.
