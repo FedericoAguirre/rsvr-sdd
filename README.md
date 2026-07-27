@@ -47,13 +47,13 @@ cp .env.example .env
 docker-compose up -d
 
 # 4. Run database migrations
-docker-compose exec web python manage.py migrate
+docker-compose exec web uv run manage.py migrate
 
 # 5. Seed demo data (class slots, equipment, sample clients)
-docker-compose exec web python manage.py seed_data
+docker-compose exec web uv run manage.py seed_data
 
 # 6. Create an admin/operator account
-docker-compose exec web python manage.py createsuperuser
+docker-compose exec web uv run manage.py createsuperuser
 
 # 7. Open in your browser
 open http://localhost:8000
@@ -83,11 +83,29 @@ open http://localhost:8000
 
 ## Running Tests
 
-No tests have been written yet. When available, run:
+```bash
+docker-compose exec web uv run pytest
+```
+
+## AI Development Data Export
+
+A management command collects data from completed AI-assisted features and outputs a CSV for SDLC process analysis. Data is sourced from `ai/features/done/`, `specs/*/spec.md`, and `ai/sessions/`.
 
 ```bash
-docker-compose exec web python -m pytest
+# Option A — Run directly with uv (no Docker required)
+cd backend && uv run manage.py collect_ai_dev_data --output ../ai_dev_data.csv
+
+# Option B — Run in Docker with repo root mounted (no DB needed)
+docker run --rm -v "$(pwd):/repo" rsvr-sdd_web uv run /app/manage.py collect_ai_dev_data \
+  --output /repo/ai_dev_data.csv \
+  --done-dir /repo/ai/features/done \
+  --specs-dir /repo/specs \
+  --sessions-dir /repo/ai/sessions
 ```
+
+The CSV includes: feature title, complexity (1/2/3/5/8), implementation minutes, AI model, timestamps, spec quality (1–5), and iteration count.
+
+For full details, see [`specs/052-ai-dev-data-collection/`](specs/052-ai-dev-data-collection/).
 
 ## Linting
 
