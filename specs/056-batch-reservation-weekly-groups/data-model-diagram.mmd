@@ -1,0 +1,29 @@
+erDiagram
+    BatchDataResponse {
+        date_range_start string "ISO date string (Monday)"
+        date_range_end string "ISO date string (Friday)"
+        block_class_count integer "Max 20"
+        payment_id integer "FK to Payment"
+        equipment_list Equipment_array
+        class_slots ClassSlot_array
+        reserved_dates string_array "ISO dates with existing reservations"
+    }
+    Payment {
+        integer id PK
+        integer class_slot_count
+    }
+    Equipment {
+        integer id PK
+        string name
+        string equipment_type
+    }
+    ClassSlot {
+        integer id PK
+        string label
+        integer day_of_week "0=Mon..4=Fri"
+    }
+    BatchDataResponse ||--o{ Payment : "payment_id refers to"
+    BatchDataResponse }|--|| Equipment_array : "contains"
+    BatchDataResponse }|--|| ClassSlot_array : "contains"
+    Equipment_array --|| Equipment : "item type"
+    ClassSlot_array --|| ClassSlot : "item type"

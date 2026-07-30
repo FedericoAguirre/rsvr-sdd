@@ -13,6 +13,8 @@ backend/staticfiles/
 *.log
 .vscode/
 .idea/
+*.swp
+*.tmp
 backend/payments/evidence/*
 .ruff_cache/
 .pytest_cache/developer-time.csv
