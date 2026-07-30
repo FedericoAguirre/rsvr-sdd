@@ -123,12 +123,16 @@ Documentation & Dependency Integrity).
 
 ## Development Environment & Package Management
 
-- **Package Manager**: Always use `uv` via the system environment inside
-  Docker (`UV_SYSTEM_PYTHON=true`). Do not use raw `pip`.
-- **Task Execution**: All backend tasks, test executions, and database
-  migrations MUST be executed inside the container using
-  `docker compose exec web uv run manage.py <command>` or
-  `docker compose run --rm web uv ...`.
+- **Package Manager**: Always use `uv` for Python dependency management.
+  Do not use raw `pip`.
+- **Local Development**: The Django application runs natively on the host
+  via `uv run manage.py <command>`. PostgreSQL runs in a Docker container
+  for reproducibility and isolation.
+- **Database**: Start/stop PostgreSQL with `make db-up` / `make db-stop`.
+  The database container preserves data across restarts via a named volume.
+- **Pre-Deployment Testing**: Before pushing to production, validate the
+  full Docker stack using `make docker-build && make docker-up` to ensure
+  the containerized build works correctly.
 
 ## Development Workflow
 
