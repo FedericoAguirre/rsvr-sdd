@@ -26,8 +26,8 @@ class PaymentForm(forms.ModelForm):
     class Meta:
         model = Payment
         fields = [
-            "client", "amount", "payment_type", "payment_identifier",
-            "date", "class_slot_count", "reference", "evidence", "notes",
+            "client", "amount", "class_slot_count", "payment_type",
+            "date", "notes", "payment_identifier", "reference", "evidence",
         ]
         widgets = {
             "client": forms.Select(attrs={"class": "form-control"}),

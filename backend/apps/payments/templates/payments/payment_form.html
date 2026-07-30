@@ -3,16 +3,99 @@
 {% block title %}{% if mode == "edit" %}{% translate "Edit Payment" %}{% else %}{% translate "New Payment" %}{% endif %} | {{ block.super }}{% endblock %}
 {% block content %}
 <h2 class="mb-4">{% if mode == "edit" %}{% translate "Edit Payment" %}{% else %}{% translate "New Payment" %}{% endif %}</h2>
-<form method="post" enctype="multipart/form-data" class="row g-3">
+<form method="post" enctype="multipart/form-data" class="payment-form">
     {% csrf_token %}
+
+    {% if mode != "edit" %}
+    <fieldset class="mb-4">
+        <legend class="text-muted small">{% translate "Transaction Data" %}</legend>
+
+        <div class="mb-3">
+            <label class="form-label">{{ form.client.label }}</label>
+            {{ form.client }}
+            {% if form.client.help_text %}<div class="form-text">{{ form.client.help_text }}</div>{% endif %}
+            {% if form.client.errors %}<div class="text-danger">{{ form.client.errors }}</div>{% endif %}
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label">{{ form.amount.label }}</label>
+                {{ form.amount }}
+                {% if form.amount.help_text %}<div class="form-text">{{ form.amount.help_text }}</div>{% endif %}
+                {% if form.amount.errors %}<div class="text-danger">{{ form.amount.errors }}</div>{% endif %}
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label class="form-label">{{ form.class_slot_count.label }}</label>
+                {{ form.class_slot_count }}
+                {% if form.class_slot_count.help_text %}<div class="form-text">{{ form.class_slot_count.help_text }}</div>{% endif %}
+                {% if form.class_slot_count.errors %}<div class="text-danger">{{ form.class_slot_count.errors }}</div>{% endif %}
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">{{ form.payment_type.label }}</label>
+            {{ form.payment_type }}
+            {% if form.payment_type.help_text %}<div class="form-text">{{ form.payment_type.help_text }}</div>{% endif %}
+            {% if form.payment_type.errors %}<div class="text-danger">{{ form.payment_type.errors }}</div>{% endif %}
+        </div>
+    </fieldset>
+
+    <fieldset class="mb-4">
+        <legend class="text-muted small">{% translate "Context" %}</legend>
+
+        <div class="mb-3">
+            <label class="form-label">{{ form.date.label }}</label>
+            {{ form.date }}
+            {% if form.date.help_text %}<div class="form-text">{{ form.date.help_text }}</div>{% endif %}
+            {% if form.date.errors %}<div class="text-danger">{{ form.date.errors }}</div>{% endif %}
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">{{ form.notes.label }}</label>
+            {{ form.notes }}
+            {% if form.notes.help_text %}<div class="form-text">{{ form.notes.help_text }}</div>{% endif %}
+            {% if form.notes.errors %}<div class="text-danger">{{ form.notes.errors }}</div>{% endif %}
+        </div>
+    </fieldset>
+
+    <fieldset class="mb-4">
+        <legend class="text-muted small">{% translate "Documentation and Reference" %}</legend>
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label">{{ form.payment_identifier.label }}</label>
+                {{ form.payment_identifier }}
+                {% if form.payment_identifier.help_text %}<div class="form-text">{{ form.payment_identifier.help_text }}</div>{% endif %}
+                {% if form.payment_identifier.errors %}<div class="text-danger">{{ form.payment_identifier.errors }}</div>{% endif %}
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label class="form-label">{{ form.reference.label }}</label>
+                {{ form.reference }}
+                {% if form.reference.help_text %}<div class="form-text">{{ form.reference.help_text }}</div>{% endif %}
+                {% if form.reference.errors %}<div class="text-danger">{{ form.reference.errors }}</div>{% endif %}
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">{{ form.evidence.label }}</label>
+            {{ form.evidence }}
+            {% if form.evidence.help_text %}<div class="form-text">{{ form.evidence.help_text }}</div>{% endif %}
+            {% if form.evidence.errors %}<div class="text-danger">{{ form.evidence.errors }}</div>{% endif %}
+        </div>
+    </fieldset>
+    {% else %}
     {% for field in form %}
-    <div class="col-md-6">
+    <div class="mb-3">
         <label class="form-label">{{ field.label }}</label>
         {{ field }}
         {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
         {% if field.errors %}<div class="text-danger">{{ field.errors }}</div>{% endif %}
     </div>
     {% endfor %}
+    {% endif %}
+
     <div class="col-12">
         <button type="submit" class="btn btn-primary">
             {% if mode == "edit" %}{% translate "Save Changes" %}{% else %}{% translate "Create Payment" %}{% endif %}
@@ -20,4 +103,19 @@
         <a href="{% url 'payments:list' %}" class="btn btn-secondary">{% translate "Cancel" %}</a>
     </div>
 </form>
+
+<style>
+    .payment-form fieldset {
+        border-bottom: 1px solid #e9ecef;
+        padding-bottom: 1rem;
+    }
+    .payment-form fieldset:last-of-type {
+        border-bottom: none;
+    }
+    .payment-form > .col-12 {
+        margin-top: 2rem;
+        padding-top: 1rem;
+        border-top: 2px solid #e9ecef;
+    }
+</style>
 {% endblock %}
