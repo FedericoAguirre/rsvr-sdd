@@ -1,7 +1,7 @@
 from datetime import date
 
 from django.conf import settings
-from django.db import models
+from django.db import models, IntegrityError
 from django.utils.translation import gettext_lazy as _
 
 PAYMENT_TYPE_CHOICES = [
@@ -96,7 +96,14 @@ class Payment(models.Model):
     def save(self, *args, **kwargs):
         if not self.payment_identifier:
             self.payment_identifier = self._generate_identifier()
-        super().save(*args, **kwargs)
+        try:
+            super().save(*args, **kwargs)
+        except IntegrityError:
+            if not self.payment_identifier:
+                raise
+            self.payment_identifier = ""
+            self.payment_identifier = self._generate_identifier()
+            super().save(*args, **kwargs)
 
 
 class PaymentReservation(models.Model):
