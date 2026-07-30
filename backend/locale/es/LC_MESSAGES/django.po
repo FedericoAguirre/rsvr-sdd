@@ -861,6 +861,78 @@ msgstr "fechas"
 msgid "An error occurred"
 msgstr "Ocurrió un error"
 
+#: apps/payments/templates/payments/payment_detail.html
+msgid "Lun"
+msgstr "Lun"
+
+#: apps/payments/templates/payments/payment_detail.html
+msgid "Mar"
+msgstr "Mar"
+
+#: apps/payments/templates/payments/payment_detail.html
+msgid "Mié"
+msgstr "Mié"
+
+#: apps/payments/templates/payments/payment_detail.html
+msgid "Jue"
+msgstr "Jue"
+
+#: apps/payments/templates/payments/payment_detail.html
+msgid "Vie"
+msgstr "Vie"
+
+#: apps/payments/templates/payments/payment_detail.html
+msgid "Sáb"
+msgstr "Sáb"
+
+#: apps/payments/templates/payments/payment_detail.html
+msgid "Dom"
+msgstr "Dom"
+
+#: apps/payments/templates/payments/payment_detail.html
+msgid "Ene"
+msgstr "Ene"
+
+#: apps/payments/templates/payments/payment_detail.html
+msgid "Feb"
+msgstr "Feb"
+
+#: apps/payments/templates/payments/payment_detail.html
+msgid "Abr"
+msgstr "Abr"
+
+#: apps/payments/templates/payments/payment_detail.html
+msgid "May"
+msgstr "May"
+
+#: apps/payments/templates/payments/payment_detail.html
+msgid "Jun"
+msgstr "Jun"
+
+#: apps/payments/templates/payments/payment_detail.html
+msgid "Jul"
+msgstr "Jul"
+
+#: apps/payments/templates/payments/payment_detail.html
+msgid "Ago"
+msgstr "Ago"
+
+#: apps/payments/templates/payments/payment_detail.html
+msgid "Sep"
+msgstr "Sep"
+
+#: apps/payments/templates/payments/payment_detail.html
+msgid "Oct"
+msgstr "Oct"
+
+#: apps/payments/templates/payments/payment_detail.html
+msgid "Nov"
+msgstr "Nov"
+
+#: apps/payments/templates/payments/payment_detail.html
+msgid "Dic"
+msgstr "Dic"
+
 #: apps/payments/templates/payments/payment_form.html:3
 #: apps/payments/templates/payments/payment_form.html:5
 msgid "Edit Payment"
