@@ -2,120 +2,263 @@
 {% load i18n %}
 {% block title %}{% if mode == "edit" %}{% translate "Edit Payment" %}{% else %}{% translate "New Payment" %}{% endif %} | {{ block.super }}{% endblock %}
 {% block content %}
-<h2 class="mb-4">{% if mode == "edit" %}{% translate "Edit Payment" %}{% else %}{% translate "New Payment" %}{% endif %}</h2>
-<form method="post" enctype="multipart/form-data" class="payment-form">
-    {% csrf_token %}
+<div class="payment-form-container">
+    <h4 class="mb-2">{% if mode == "edit" %}{% translate "Edit Payment" %}{% else %}{% translate "New Payment" %}{% endif %}</h4>
 
-    {% if mode != "edit" %}
-    <fieldset class="mb-4">
-        <legend class="text-muted small">{% translate "Transaction Data" %}</legend>
+    <form method="post" enctype="multipart/form-data" class="payment-form">
+        {% csrf_token %}
 
-        <div class="mb-3">
-            <label class="form-label">{{ form.client.label }}</label>
-            {{ form.client }}
-            {% if form.client.help_text %}<div class="form-text">{{ form.client.help_text }}</div>{% endif %}
-            {% if form.client.errors %}<div class="text-danger">{{ form.client.errors }}</div>{% endif %}
-        </div>
+        {% if mode != "edit" %}
+        <fieldset class="mb-2">
+            <legend class="text-muted fs-6">{% translate "Transaction Data" %}</legend>
 
-        <div class="row">
-            <div class="col-md-6 mb-3">
-                <label class="form-label">{{ form.amount.label }}</label>
-                {{ form.amount }}
-                {% if form.amount.help_text %}<div class="form-text">{{ form.amount.help_text }}</div>{% endif %}
-                {% if form.amount.errors %}<div class="text-danger">{{ form.amount.errors }}</div>{% endif %}
+            <div class="mb-2">
+                <label class="form-label form-label-compact">{{ form.client.label }}</label>
+                {{ form.client }}
+                {% if form.client.help_text %}<div class="form-text form-help-collapsed" data-field="client">{{ form.client.help_text }}</div>{% endif %}
+                {% if form.client.errors %}<div class="text-danger small">{{ form.client.errors }}</div>{% endif %}
             </div>
 
-            <div class="col-md-6 mb-3">
-                <label class="form-label">{{ form.class_slot_count.label }}</label>
-                {{ form.class_slot_count }}
-                {% if form.class_slot_count.help_text %}<div class="form-text">{{ form.class_slot_count.help_text }}</div>{% endif %}
-                {% if form.class_slot_count.errors %}<div class="text-danger">{{ form.class_slot_count.errors }}</div>{% endif %}
-            </div>
-        </div>
+            <div class="row g-2">
+                <div class="col-md-6 mb-2">
+                    <label class="form-label form-label-compact">{{ form.amount.label }}</label>
+                    {{ form.amount }}
+                    {% if form.amount.help_text %}<div class="form-text form-help-collapsed" data-field="amount">{{ form.amount.help_text }}</div>{% endif %}
+                    {% if form.amount.errors %}<div class="text-danger small">{{ form.amount.errors }}</div>{% endif %}
+                </div>
 
-        <div class="mb-3">
-            <label class="form-label">{{ form.payment_type.label }}</label>
-            {{ form.payment_type }}
-            {% if form.payment_type.help_text %}<div class="form-text">{{ form.payment_type.help_text }}</div>{% endif %}
-            {% if form.payment_type.errors %}<div class="text-danger">{{ form.payment_type.errors }}</div>{% endif %}
-        </div>
-    </fieldset>
-
-    <fieldset class="mb-4">
-        <legend class="text-muted small">{% translate "Context" %}</legend>
-
-        <div class="mb-3">
-            <label class="form-label">{{ form.date.label }}</label>
-            {{ form.date }}
-            {% if form.date.help_text %}<div class="form-text">{{ form.date.help_text }}</div>{% endif %}
-            {% if form.date.errors %}<div class="text-danger">{{ form.date.errors }}</div>{% endif %}
-        </div>
-
-        <div class="mb-3">
-            <label class="form-label">{{ form.notes.label }}</label>
-            {{ form.notes }}
-            {% if form.notes.help_text %}<div class="form-text">{{ form.notes.help_text }}</div>{% endif %}
-            {% if form.notes.errors %}<div class="text-danger">{{ form.notes.errors }}</div>{% endif %}
-        </div>
-    </fieldset>
-
-    <fieldset class="mb-4">
-        <legend class="text-muted small">{% translate "Documentation and Reference" %}</legend>
-
-        <div class="row">
-            <div class="col-md-6 mb-3">
-                <label class="form-label">{{ form.payment_identifier.label }}</label>
-                {{ form.payment_identifier }}
-                {% if form.payment_identifier.help_text %}<div class="form-text">{{ form.payment_identifier.help_text }}</div>{% endif %}
-                {% if form.payment_identifier.errors %}<div class="text-danger">{{ form.payment_identifier.errors }}</div>{% endif %}
+                <div class="col-md-6 mb-2">
+                    <label class="form-label form-label-compact">{{ form.class_slot_count.label }}</label>
+                    {{ form.class_slot_count }}
+                    {% if form.class_slot_count.help_text %}<div class="form-text form-help-collapsed" data-field="class_slot_count">{{ form.class_slot_count.help_text }}</div>{% endif %}
+                    {% if form.class_slot_count.errors %}<div class="text-danger small">{{ form.class_slot_count.errors }}</div>{% endif %}
+                </div>
             </div>
 
-            <div class="col-md-6 mb-3">
-                <label class="form-label">{{ form.reference.label }}</label>
-                {{ form.reference }}
-                {% if form.reference.help_text %}<div class="form-text">{{ form.reference.help_text }}</div>{% endif %}
-                {% if form.reference.errors %}<div class="text-danger">{{ form.reference.errors }}</div>{% endif %}
+            <div class="mb-2">
+                <label class="form-label form-label-compact">{{ form.payment_type.label }}</label>
+                {{ form.payment_type }}
+                {% if form.payment_type.help_text %}<div class="form-text form-help-collapsed" data-field="payment_type">{{ form.payment_type.help_text }}</div>{% endif %}
+                {% if form.payment_type.errors %}<div class="text-danger small">{{ form.payment_type.errors }}</div>{% endif %}
+            </div>
+        </fieldset>
+
+        <fieldset class="mb-2">
+            <legend class="text-muted fs-6">{% translate "Context" %}</legend>
+
+            <div class="row g-2">
+                <div class="col-md-6 mb-2">
+                    <label class="form-label form-label-compact">{{ form.date.label }}</label>
+                    {{ form.date }}
+                    {% if form.date.help_text %}<div class="form-text form-help-collapsed" data-field="date">{{ form.date.help_text }}</div>{% endif %}
+                    {% if form.date.errors %}<div class="text-danger small">{{ form.date.errors }}</div>{% endif %}
+                </div>
+
+                <div class="col-md-6 mb-2">
+                    <label class="form-label form-label-compact">{{ form.notes.label }}</label>
+                    {{ form.notes }}
+                    {% if form.notes.help_text %}<div class="form-text form-help-collapsed" data-field="notes">{{ form.notes.help_text }}</div>{% endif %}
+                    {% if form.notes.errors %}<div class="text-danger small">{{ form.notes.errors }}</div>{% endif %}
+                </div>
+            </div>
+        </fieldset>
+
+        <fieldset class="mb-2">
+            <legend class="text-muted fs-6">{% translate "Documentation and Reference" %}</legend>
+
+            <div class="row g-2">
+                <div class="col-md-4 mb-2">
+                    <label class="form-label form-label-compact">{{ form.payment_identifier.label }}</label>
+                    {{ form.payment_identifier }}
+                    {% if form.payment_identifier.help_text %}<div class="form-text form-help-collapsed" data-field="payment_identifier">{{ form.payment_identifier.help_text }}</div>{% endif %}
+                    {% if form.payment_identifier.errors %}<div class="text-danger small">{{ form.payment_identifier.errors }}</div>{% endif %}
+                </div>
+
+                <div class="col-md-4 mb-2">
+                    <label class="form-label form-label-compact">{{ form.reference.label }}</label>
+                    {{ form.reference }}
+                    {% if form.reference.help_text %}<div class="form-text form-help-collapsed" data-field="reference">{{ form.reference.help_text }}</div>{% endif %}
+                    {% if form.reference.errors %}<div class="text-danger small">{{ form.reference.errors }}</div>{% endif %}
+                </div>
+
+                <div class="col-md-4 mb-2">
+                    <label class="form-label form-label-compact">{{ form.evidence.label }}</label>
+                    {{ form.evidence }}
+                    {% if form.evidence.help_text %}<div class="form-text form-help-collapsed" data-field="evidence">{{ form.evidence.help_text }}</div>{% endif %}
+                    {% if form.evidence.errors %}<div class="text-danger small">{{ form.evidence.errors }}</div>{% endif %}
+                </div>
+            </div>
+        </fieldset>
+        {% else %}
+        {% for field in form %}
+        <div class="mb-2">
+            <label class="form-label form-label-compact">{{ field.label }}</label>
+            {{ field }}
+            {% if field.help_text %}<div class="form-text form-help-collapsed" data-field="{{ field.name }}">{{ field.help_text }}</div>{% endif %}
+            {% if field.errors %}<div class="text-danger small">{{ field.errors }}</div>{% endif %}
+        </div>
+        {% endfor %}
+        {% endif %}
+
+        <div class="col-12">
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary btn-sm">
+                    {% if mode == "edit" %}{% translate "Save Changes" %}{% else %}{% translate "Create Payment" %}{% endif %}
+                </button>
+                <a href="{% url 'payments:list' %}" class="btn btn-secondary btn-sm">{% translate "Cancel" %}</a>
             </div>
         </div>
-
-        <div class="mb-3">
-            <label class="form-label">{{ form.evidence.label }}</label>
-            {{ form.evidence }}
-            {% if form.evidence.help_text %}<div class="form-text">{{ form.evidence.help_text }}</div>{% endif %}
-            {% if form.evidence.errors %}<div class="text-danger">{{ form.evidence.errors }}</div>{% endif %}
-        </div>
-    </fieldset>
-    {% else %}
-    {% for field in form %}
-    <div class="mb-3">
-        <label class="form-label">{{ field.label }}</label>
-        {{ field }}
-        {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
-        {% if field.errors %}<div class="text-danger">{{ field.errors }}</div>{% endif %}
-    </div>
-    {% endfor %}
-    {% endif %}
-
-    <div class="col-12">
-        <button type="submit" class="btn btn-primary">
-            {% if mode == "edit" %}{% translate "Save Changes" %}{% else %}{% translate "Create Payment" %}{% endif %}
-        </button>
-        <a href="{% url 'payments:list' %}" class="btn btn-secondary">{% translate "Cancel" %}</a>
-    </div>
-</form>
+    </form>
+</div>
 
 <style>
-    .payment-form fieldset {
-        border-bottom: 1px solid #e9ecef;
-        padding-bottom: 1rem;
+    .payment-form-container {
+        max-width: 900px;
+        margin: 0 auto;
     }
+
+    .payment-form-container h4 {
+        font-size: 1.25rem;
+        font-weight: 600;
+    }
+
+    .payment-form fieldset {
+        border: none;
+        border-bottom: 1px solid #e9ecef;
+        padding: 0.75rem 0;
+        margin-bottom: 0.5rem;
+    }
+
     .payment-form fieldset:last-of-type {
         border-bottom: none;
+        margin-bottom: 0;
     }
-    .payment-form > .col-12 {
-        margin-top: 2rem;
-        padding-top: 1rem;
-        border-top: 2px solid #e9ecef;
+
+    .payment-form fieldset legend {
+        font-size: 0.875rem;
+        font-weight: 600;
+        padding: 0;
+        margin-bottom: 0.5rem;
+        color: #6c757d;
+    }
+
+    .form-label-compact {
+        font-size: 0.9rem;
+        font-weight: 500;
+        margin-bottom: 0.25rem;
+    }
+
+    .payment-form .form-control,
+    .payment-form .form-select {
+        font-size: 0.9rem;
+        padding: 0.375rem 0.75rem;
+        height: auto;
+    }
+
+    .payment-form textarea.form-control {
+        min-height: 60px;
+        resize: vertical;
+    }
+
+    .form-help-collapsed {
+        display: none;
+        font-size: 0.8rem;
+        color: #6c757d;
+        margin-top: 0.25rem;
+        font-style: italic;
+    }
+
+    .form-control:focus ~ .form-help-collapsed,
+    .form-select:focus ~ .form-help-collapsed,
+    .form-help-collapsed:hover {
+        display: block;
+    }
+
+    .payment-form .text-danger {
+        font-size: 0.85rem;
+        margin-top: 0.25rem;
+        display: block;
+    }
+
+    .payment-form .row.g-2 {
+        margin-left: -0.5rem;
+        margin-right: -0.5rem;
+    }
+
+    .payment-form .row.g-2 > [class*='col-'] {
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 0.75rem;
+        margin-top: 1rem;
+        padding-top: 0.75rem;
+        border-top: 1px solid #e9ecef;
+    }
+
+    .form-actions .btn-sm {
+        padding: 0.375rem 1rem;
+        font-size: 0.875rem;
+    }
+
+    @media (max-width: 768px) {
+        .payment-form-container h4 {
+            font-size: 1.1rem;
+        }
+
+        .form-label-compact {
+            font-size: 0.85rem;
+        }
+
+        .payment-form .form-control,
+        .payment-form .form-select {
+            font-size: 0.85rem;
+            padding: 0.3rem 0.5rem;
+        }
+
+        .payment-form fieldset {
+            padding: 0.5rem 0;
+            margin-bottom: 0.25rem;
+        }
+
+        .form-actions {
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-actions .btn {
+            width: 100%;
+        }
+    }
+
+    @media (min-width: 769px) and (max-width: 1024px) {
+        .payment-form .row.g-2 {
+            row-gap: 0.75rem;
+        }
     }
 </style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var fields = document.querySelectorAll('.form-control, .form-select');
+
+        fields.forEach(function(field) {
+            field.addEventListener('focus', function() {
+                var helpText = this.nextElementSibling;
+                if (helpText && helpText.classList.contains('form-help-collapsed')) {
+                    helpText.style.display = 'block';
+                }
+            });
+
+            field.addEventListener('blur', function() {
+                var helpText = this.nextElementSibling;
+                if (helpText && helpText.classList.contains('form-help-collapsed') && !this.value) {
+                    helpText.style.display = 'none';
+                }
+            });
+        });
+    });
+</script>
 {% endblock %}
