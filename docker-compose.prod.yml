@@ -16,5 +16,16 @@ services:
       timeout: 5s
       retries: 5
 
+  web:
+    build:
+      context: ./backend
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgres://${POSTGRES_USER:-rsvr}:${POSTGRES_PASSWORD:-rsvr}@db:5432/${POSTGRES_DB:-rsvr}
+    depends_on:
+      db:
+        condition: service_healthy
+
 volumes:
   postgres_data:
