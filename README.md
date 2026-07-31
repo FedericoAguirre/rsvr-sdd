@@ -28,35 +28,69 @@ Reservas SDD is a web application for gym staff to reserve cardio equipment for 
 
 ## Prerequisites
 
-- [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/)
-- `uv` (optional — only for local development outside Docker)
+- Python 3.12+ (managed by `uv`)
+- [uv](https://github.com/astral-sh/uv) (Python package manager)
+- [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/) (database only)
 
 > **Windows 11 Home deployment**: See [docs/windows11_deployment.md](docs/windows11_deployment.md) for a container-free setup guide.
 
-## Setup
+## Quick Start (Local Development)
+
+Run the automated setup script to bootstrap your environment:
 
 ```bash
-# 1. Clone the repository
-git clone <repo-url> && cd rsvr-sdd
+bash setup.sh
+```
 
-# 2. Copy environment variables
-cp .env.example .env
-# Edit .env with your own values (at minimum, set a strong SECRET_KEY)
+This will:
+- Check that `uv`, `docker`, and `docker-compose` are installed
+- Create `.env` from `.env.example` (if not present)
+- Install Python dependencies with `uv sync`
+- Start PostgreSQL in Docker
+- Run database migrations
+- Optionally seed demo data and create an admin account
 
-# 3. Start services
-docker-compose up -d
+### Running the App
 
-# 4. Run database migrations
-docker-compose exec web uv run manage.py migrate
+```bash
+# Terminal 1: Start database (once)
+make db-up
 
-# 5. Seed demo data (class slots, equipment, sample clients)
-docker-compose exec web uv run manage.py seed_data
+# Terminal 2: Start Django dev server
+make serve
 
-# 6. Create an admin/operator account
-docker-compose exec web uv run manage.py createsuperuser
+# Open http://localhost:8000
+```
 
-# 7. Open in your browser
-open http://localhost:8000
+### Common Tasks
+
+| Task | Command |
+|------|---------|
+| Start database | `make db-up` |
+| Stop database | `make db-stop` |
+| View database logs | `make db-logs` |
+| Run migrations | `make migrate` |
+| Seed demo data | `make seed` |
+| Create admin user | `make createsuperuser` |
+| Run tests | `make test` |
+| Lint code | `make lint` |
+| Format code | `make format` |
+
+## Pre-Deployment Testing (Docker Full Stack)
+
+Before deploying to production, test the full Docker stack:
+
+```bash
+# Build web image
+make docker-build
+
+# Start full stack (db + web in containers)
+make docker-up
+
+# Run against http://localhost:8000
+
+# Stop stack
+make docker-down
 ```
 
 ## Usage
@@ -84,7 +118,11 @@ open http://localhost:8000
 ## Running Tests
 
 ```bash
-docker-compose exec web uv run pytest
+# Run tests locally
+make test
+
+# Or run the full Docker stack for pre-deployment validation
+make docker-build && make docker-up
 ```
 
 ## AI Development Data Export
@@ -110,7 +148,7 @@ For full details, see [`specs/052-ai-dev-data-collection/`](specs/052-ai-dev-dat
 ## Linting
 
 ```bash
-docker-compose exec web ruff check .
+make lint
 ```
 
 ## AI Agent Skills

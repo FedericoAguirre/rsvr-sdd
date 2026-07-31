@@ -54,6 +54,6 @@ on r.equipment_id = e.id;
 -- inner JOIN clients_client c2
 -- on p.client_id = c2.id;
 
-
+--delete from payments_paymentreservation;
 --delete from payments_payment;
 --delete from reservations_reservation;
