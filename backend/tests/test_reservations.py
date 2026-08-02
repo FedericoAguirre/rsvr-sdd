@@ -46,13 +46,21 @@ class TestAutoDate:
     def _slot_id(self, day, time_str):
         return ClassSlot.objects.get(day_of_week=day, time=time_str).pk
 
-    def test_same_day_goes_to_next_week(self, class_slots):
+    def test_same_day_goes_to_next_week(self, class_slots, monkeypatch):
         """T001: Slot day matches today → next week."""
-        slot_id = self._slot_id(date.today().weekday(), "17:30")
+
+        class MockDate(datetime.date):
+            @classmethod
+            def today(cls):
+                return datetime.date(2026, 7, 13)  # Monday
+
+        monkeypatch.setattr("apps.reservations.views.date", MockDate)
+        frozen_today = MockDate.today()
+        slot_id = self._slot_id(frozen_today.weekday(), "17:30")
         result = auto_date_for_slot(slot_id)
         assert result is not None
         result_date = date.fromisoformat(result)
-        diff = (result_date - date.today()).days
+        diff = (result_date - frozen_today).days
         assert diff == 7, f"Expected exactly 7 days ahead (next week), got {diff}"
 
     def test_future_day_goes_to_next_week(self, class_slots, monkeypatch):
@@ -77,15 +85,23 @@ class TestAutoDate:
             f"Expected weekday {future_day}, got {result_date.weekday()}"
         )
 
-    def test_past_day_goes_to_next_week(self, class_slots):
+    def test_past_day_goes_to_next_week(self, class_slots, monkeypatch):
         """T003: Slot day is a past day this week → next week."""
-        today = date.today().weekday()
-        past_day = (today - 1) % 5  # Yesterday (wrapping to Fri if today is Mon)
+
+        class MockDate(datetime.date):
+            @classmethod
+            def today(cls):
+                return datetime.date(2026, 7, 13)  # Monday
+
+        monkeypatch.setattr("apps.reservations.views.date", MockDate)
+        frozen_today = MockDate.today()
+        today_weekday = frozen_today.weekday()  # 0 = Monday
+        past_day = (today_weekday - 1) % 5  # Friday (4)
         slot_id = self._slot_id(past_day, "17:30")
         result = auto_date_for_slot(slot_id)
         assert result is not None
         result_date = date.fromisoformat(result)
-        diff = (result_date - date.today()).days
+        diff = (result_date - frozen_today).days
         # Must be in the future, and the day-of-week must match the slot
         assert diff >= 6, f"Expected at least 6 days ahead, got {diff}"
         assert result_date.weekday() == past_day, (
@@ -97,13 +113,21 @@ class TestAutoDate:
         result = auto_date_for_slot(99999)
         assert result is None
 
-    def test_same_day_always_goes_to_next_week(self, class_slots):
+    def test_same_day_always_goes_to_next_week(self, class_slots, monkeypatch):
         """T008: Same-day slot regardless of time → next week."""
-        slot_id = self._slot_id(date.today().weekday(), "18:30")
+
+        class MockDate(datetime.date):
+            @classmethod
+            def today(cls):
+                return datetime.date(2026, 7, 13)  # Monday
+
+        monkeypatch.setattr("apps.reservations.views.date", MockDate)
+        frozen_today = MockDate.today()
+        slot_id = self._slot_id(frozen_today.weekday(), "18:30")
         result = auto_date_for_slot(slot_id)
         assert result is not None
         result_date = date.fromisoformat(result)
-        assert (result_date - date.today()).days == 7, (
+        assert (result_date - frozen_today).days == 7, (
             "Same-day should always go to next week"
         )
 

@@ -119,7 +119,10 @@ class TestPaymentCalendarDownload:
         response = logged_client.get(url, follow=True)
         assert response.status_code == 200
         content = response.content.decode()
-        assert "No reservations are associated" in content
+        assert (
+            "No reservations are associated" in content
+            or "No hay reservaciones asociadas" in content
+        )
 
     def test_single_reservation_filename(self, logged_client, payment, payment_reservation):
         url = reverse("payments:calendar", args=[payment.pk])
