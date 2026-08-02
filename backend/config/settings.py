@@ -1,3 +1,4 @@
+import re
 import os
 from pathlib import Path
 
@@ -54,8 +55,8 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "config.wsgi.application"
 
-DATABASE_URL = os.environ.get("DATABASE_URL", "postgres://rsvr:rsvr@localhost:5432/rsvr")
-import re
+DATABASE_URL = os.environ.get(
+    "DATABASE_URL", "postgres://rsvr:rsvr@localhost:5432/rsvr")
 
 match = re.match(r"postgres://(.+):(.+)@(.+):(\d+)/(.+)", DATABASE_URL)
 if match:
@@ -99,7 +100,7 @@ STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
 LOGIN_URL = "/accounts/login/"
-LOGIN_REDIRECT_URL = "/reservations/"
+LOGIN_REDIRECT_URL = "/clients/search/"
 LOGOUT_REDIRECT_URL = "/accounts/login/"
 
 FILE_UPLOAD_MAX_MEMORY_SIZE = 5 * 1024 * 1024  # 5 MB
