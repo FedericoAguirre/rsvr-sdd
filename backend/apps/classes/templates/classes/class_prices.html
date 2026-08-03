@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load i18n %}
+{% load i18n payment_extras %}
 {% block title %}{% translate "Price Records" %}{% endblock %}
 {% block content %}
 <h2 class="mb-4">{% translate "Price Records" %}</h2>
@@ -14,7 +14,7 @@
 <div class="alert alert-success">
     <strong>{% translate "Current prices" %}:</strong>
     {% for price in current_prices %}
-    {{ price.price }}{% if not forloop.last %}, {% endif %}
+    {{ price.price|currency }}{% if not forloop.last %}, {% endif %}
     {% endfor %}
 </div>
 {% else %}
@@ -37,7 +37,7 @@
     <tbody>
         {% for price in price_history %}
         <tr>
-            <td>{{ price.price }}</td>
+            <td>{{ price.price|currency }}</td>
             <td>
                 {% if price.current %}
                 <span class="badge bg-success">{% translate "Current" %}</span>

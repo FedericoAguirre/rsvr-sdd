@@ -497,3 +497,68 @@ class TestQuickstartValidation:
         assert p1.changed_by == admin_user
         assert p2.current is True
         assert ClassPrice.objects.filter(current=True).count() == 1
+
+
+# ── Price Formatting ──────────────────────────────────────────────────────────
+
+
+@pytest.mark.django_db
+class TestClassPriceFormatting:
+    """TDD tests for $N,NNN.NN price display formatting (Feature 063)."""
+
+    def test_price_displays_dollar_sign(self, logged_client, admin_user):
+        """FR-001: Prices must show leading $."""
+        ClassPrice.objects.enter_price(new_price=100.00, changed_by=admin_user)
+        response = logged_client.get("/classes/prices/")
+        assert response.status_code == 200
+        html = response.content.decode()
+        assert "$100.00" in html
+
+    def test_price_displays_thousand_separators(self, logged_client, admin_user):
+        """FR-002: Prices use commas for thousand separators."""
+        ClassPrice.objects.enter_price(new_price=1500.00, changed_by=admin_user)
+        response = logged_client.get("/classes/prices/")
+        assert response.status_code == 200
+        html = response.content.decode()
+        assert "$1,500.00" in html
+
+    def test_price_displays_two_decimal_places(self, logged_client, admin_user):
+        """FR-003: Integer-like values always show two decimal places."""
+        ClassPrice.objects.enter_price(new_price=50, changed_by=admin_user)
+        response = logged_client.get("/classes/prices/")
+        assert response.status_code == 200
+        html = response.content.decode()
+        assert "$50.00" in html
+
+    def test_price_at_zero_displays_gracefully(self, logged_client, admin_user):
+        """FR-006 / edge case: $0.00 displays without error."""
+        from decimal import Decimal
+
+        ClassPrice.objects.create(
+            price=Decimal("0.00"),
+            current=True,
+            created_by=admin_user,
+        )
+        response = logged_client.get("/classes/prices/")
+        assert response.status_code == 200
+        html = response.content.decode()
+
+    def test_large_price_all_thousands_separated(self, logged_client, admin_user):
+        """FR-002: Very large prices separate every group of three digits."""
+        ClassPrice.objects.enter_price(new_price=99999999.99, changed_by=admin_user)
+        response = logged_client.get("/classes/prices/")
+        assert response.status_code == 200
+        html = response.content.decode()
+        assert "$99,999,999.99" in html
+
+    def test_add_price_then_show_formatted(self, logged_client, admin_user):
+        """FR-005 / US2: New price appears formatted after form submission."""
+        response = logged_client.post(
+            "/classes/prices/add/",
+            {"price": "1500.00"},
+            follow=True,
+        )
+        assert response.status_code == 200
+        html = response.content.decode()
+        assert "$1,500.00" in html
+        assert "1500.00" not in html.replace("$1,500.00", "")
