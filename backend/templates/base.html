@@ -25,7 +25,13 @@
                     <li class="nav-item"><a class="nav-link" href="{% url 'equipment:equipment-list' %}">{% translate "Equipment" %}</a></li>
                     {% endif %}
                     {% if perms.classes.view_classslot %}
-                    <li class="nav-item"><a class="nav-link" href="{% url 'classes:class-schedule' %}">{% translate "Schedule" %}</a></li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">{% translate "Schedule" %}</a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{% url 'classes:class-schedule' %}">{% translate "Class Schedule" %}</a></li>
+                            <li><a class="dropdown-item" href="{% url 'classes:price-list' %}">{% translate "Class prices" %}</a></li>
+                        </ul>
+                    </li>
                     {% endif %}
                     {% if user.is_superuser %}
                     <li class="nav-item dropdown">
