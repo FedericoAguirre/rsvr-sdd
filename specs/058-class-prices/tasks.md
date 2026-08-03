@@ -24,8 +24,8 @@ Python 3.13 / Django 5.0.14, PostgreSQL 16 (Docker), pytest, ruff, i18n via `get
 
 **Purpose**: Confirm a green baseline and ready environment before adding the feature.
 
-- [ ] T001 Verify green baseline (`ruff check .` + `pytest`) in `backend/` before changes
-- [ ] T002 Start PostgreSQL and apply migrations (`make db-up` + `cd backend && uv run manage.py migrate`)
+- [x] T001 Verify green baseline (`ruff check .` + `pytest`) in `backend/` before changes
+- [x] T002 Start PostgreSQL and apply migrations (`make db-up` + `cd backend && uv run manage.py migrate`)
 
 ---
 
@@ -35,11 +35,11 @@ Python 3.13 / Django 5.0.14, PostgreSQL 16 (Docker), pytest, ruff, i18n via `get
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete. Per Research Decision 1, `ClassPrice` references `ClassSlot` (the project's "class" entity — no separate `Class` model exists). Per Decision 2, the single-current constraint uses a Django filtered `UniqueConstraint`; per Decision 5, attribution uses `created_by`/`changed_by` FKs (cf. `Payment`).
 
-- [ ] T003 Write failing tests for `ClassPrice` model invariants (fields, single-current via filtered constraint, attribution) in `backend/tests/test_classes_classprice.py`
-- [ ] T004 Create `ClassPrice` model (class_slot FK, price, current, created_by, created_at, changed_at, changed_by, updated_at) + filtered `UniqueConstraint` in `backend/apps/classes/models.py` (depends T003)
-- [ ] T005 [P] Generate migration for `ClassPrice` in `backend/apps/classes/migrations/0003_classprice.py` (depends T004)
-- [ ] T006 [P] Register `ClassPrice` in Django admin in `backend/apps/classes/admin.py` (depends T004)
-- [ ] T007 [P] Add `ClassPrice` + audit i18n strings in `backend/locale/es/LC_MESSAGES/django.po` (depends T004)
+- [x] T003 Write failing tests for `ClassPrice` model invariants (fields, single-current via filtered constraint, attribution) in `backend/tests/test_classes_classprice.py`
+- [x] T004 Create `ClassPrice` model (class_slot FK, price, current, created_by, created_at, changed_at, changed_by, updated_at) + filtered `UniqueConstraint` in `backend/apps/classes/models.py` (depends T003)
+- [x] T005 [P] Generate migration for `ClassPrice` in `backend/apps/classes/migrations/0003_classprice.py` (depends T004)
+- [x] T006 [P] Register `ClassPrice` in Django admin in `backend/apps/classes/admin.py` (depends T004)
+- [x] T007 [P] Add `ClassPrice` + audit i18n strings in `backend/locale/es/LC_MESSAGES/django.po` (depends T004)
 
 **Checkpoint**: Foundation ready — `ClassPrice` model, migration, admin, and i18n in place.
 
@@ -51,13 +51,13 @@ Python 3.13 / Django 5.0.14, PostgreSQL 16 (Docker), pytest, ruff, i18n via `get
 
 **Independent Test**: Enter two prices for a class; verify the first is inactive with a changer recorded, the second is current, only one current exists, and a failure rolls back leaving the previous price current.
 
-- [ ] T008 [US1] Write failing tests for the atomic price-swap service in `backend/tests/test_classes_classprice.py`
-- [ ] T009 [US1] Implement atomic price-entry service (`transaction.atomic` + `select_for_update`) in `backend/apps/classes/models.py` (depends T004, T008)
-- [ ] T010 [US1] Create `ClassPriceForm` in `backend/apps/classes/forms.py` (depends T009)
-- [ ] T011 [US1] Implement `ClassPriceCreateView` (admin-only) in `backend/apps/classes/views.py` (depends T010)
-- [ ] T012 [P] [US1] Add POST route `classes/<int:pk>/prices/add/` in `backend/apps/classes/urls.py` (depends T011)
-- [ ] T013 [P] [US1] Add i18n strings for add-price UI in `backend/locale/es/LC_MESSAGES/django.po` (depends T011)
-- [ ] T014 [US1] Run quickstart Scenario 1–2 validation (enter price, atomic swap) (depends T011)
+- [x] T008 [US1] Write failing tests for the atomic price-swap service in `backend/tests/test_classes_classprice.py`
+- [x] T009 [US1] Implement atomic price-entry service (`transaction.atomic` + `select_for_update`) in `backend/apps/classes/models.py` (depends T004, T008)
+- [x] T010 [US1] Create `ClassPriceForm` in `backend/apps/classes/forms.py` (depends T009)
+- [x] T011 [US1] Implement `ClassPriceCreateView` (admin-only) in `backend/apps/classes/views.py` (depends T010)
+- [x] T012 [P] [US1] Add POST route `classes/<int:pk>/prices/add/` in `backend/apps/classes/urls.py` (depends T011)
+- [x] T013 [P] [US1] Add i18n strings for add-price UI in `backend/locale/es/LC_MESSAGES/django.po` (depends T011)
+- [x] T014 [US1] Run quickstart Scenario 1–2 validation (enter price, atomic swap) (depends T011)
 
 **Checkpoint**: User Story 1 complete — price entry works with full history preservation.
 
@@ -69,13 +69,13 @@ Python 3.13 / Django 5.0.14, PostgreSQL 16 (Docker), pytest, ruff, i18n via `get
 
 **Independent Test**: Re-price a class three times; open the prices page; verify descending order, the "Current" badge on the active record, and audit attribution (creator/changer) on every row, plus an empty state when no prices exist.
 
-- [ ] T015 [US2] Write failing tests for `ClassPricesView` (ordering, current flag, empty state) in `backend/tests/test_classes_classprice.py`
-- [ ] T016 [US2] Implement `ClassPricesView` (current price + history queryset, descending) in `backend/apps/classes/views.py` (depends T004, T015)
-- [ ] T017 [P] [US2] Create `class_prices.html` template in `backend/apps/classes/templates/classes/class_prices.html` (depends T016)
-- [ ] T018 [P] [US2] Add GET route `classes/<int:pk>/prices/` in `backend/apps/classes/urls.py` (depends T016)
-- [ ] T019 [P] [US2] Add "Prices" link to schedule per slot in `backend/apps/classes/templates/classes/schedule.html` (depends T016)
-- [ ] T020 [P] [US2] Add i18n strings for prices-view UI in `backend/locale/es/LC_MESSAGES/django.po` (depends T016)
-- [ ] T021 [US2] Run quickstart Scenario 4 validation (history ordering, current flag, empty state) (depends T016, T017, T018)
+- [x] T015 [US2] Write failing tests for `ClassPricesView` (ordering, current flag, empty state) in `backend/tests/test_classes_classprice.py`
+- [x] T016 [US2] Implement `ClassPricesView` (current price + history queryset, descending) in `backend/apps/classes/views.py` (depends T004, T015)
+- [x] T017 [P] [US2] Create `class_prices.html` template in `backend/apps/classes/templates/classes/class_prices.html` (depends T016)
+- [x] T018 [P] [US2] Add GET route `classes/<int:pk>/prices/` in `backend/apps/classes/urls.py` (depends T016)
+- [x] T019 [P] [US2] Add "Prices" link to schedule per slot in `backend/apps/classes/templates/classes/schedule.html` (depends T016)
+- [x] T020 [P] [US2] Add i18n strings for prices-view UI in `backend/locale/es/LC_MESSAGES/django.po` (depends T016)
+- [x] T021 [US2] Run quickstart Scenario 4 validation (history ordering, current flag, empty state) (depends T016, T017, T018)
 
 **Checkpoint**: User Stories 1 AND 2 both functional independently.
 
@@ -87,10 +87,10 @@ Python 3.13 / Django 5.0.14, PostgreSQL 16 (Docker), pytest, ruff, i18n via `get
 
 **Independent Test**: Attempt to delete a current and a historical price via instance `.delete()`, bulk `QuerySet.delete()`, and the admin delete action; verify every attempt is refused with a clear message and zero records are removed.
 
-- [ ] T022 [US3] Write failing tests for deletion prevention (instance + queryset + admin) in `backend/tests/test_classes_classprice.py`
-- [ ] T023 [US3] Override `ClassPrice.delete()` and queryset `delete()` to raise in `backend/apps/classes/models.py` (depends T004, T022)
-- [ ] T024 [US3] Disable delete in `ClassPriceAdmin.has_delete_permission` in `backend/apps/classes/admin.py` (depends T023)
-- [ ] T025 [US3] Run quickstart Scenario 4 (deletion prevention) validation (depends T022, T023, T024)
+- [x] T022 [US3] Write failing tests for deletion prevention (instance + queryset + admin) in `backend/tests/test_classes_classprice.py`
+- [x] T023 [US3] Override `ClassPrice.delete()` and queryset `delete()` to raise in `backend/apps/classes/models.py` (depends T004, T022)
+- [x] T024 [US3] Disable delete in `ClassPriceAdmin.has_delete_permission` in `backend/apps/classes/admin.py` (depends T023)
+- [x] T025 [US3] Run quickstart Scenario 4 (deletion prevention) validation (depends T022, T023, T024)
 
 **Checkpoint**: All user stories independently functional; price records are non-deletable.
 
@@ -100,11 +100,11 @@ Python 3.13 / Django 5.0.14, PostgreSQL 16 (Docker), pytest, ruff, i18n via `get
 
 **Purpose**: Internationalize, validate end-to-end, and confirm quality gates.
 
-- [ ] T026 [P] Compile Spanish translations in `backend/locale/` (`cd backend && uv run manage.py compilemessages`)
-- [ ] T027 Run quickstart Scenario 5 validation (admin-only restriction: non-admin denied) (depends T011)
-- [ ] T028 Run full suite + lint + format (`make test && make lint && make format`)
-- [ ] T029 [P] Generate Mermaid ER diagram (optional) via `/speckit.data-model-diagram.generate`
-- [ ] T030 Final i18n audit: confirm all new strings have Spanish translations in `backend/locale/es/LC_MESSAGES/django.po`
+- [x] T026 [P] Compile Spanish translations in `backend/locale/` (`cd backend && uv run manage.py compilemessages`)
+- [x] T027 Run quickstart Scenario 5 validation (admin-only restriction: non-admin denied) (depends T011)
+- [x] T028 Run full suite + lint + format (`make test && make lint && make format`)
+- [x] T029 [P] Generate Mermaid ER diagram (optional) via `/speckit.data-model-diagram.generate`
+- [x] T030 Final i18n audit: confirm all new strings have Spanish translations in `backend/locale/es/LC_MESSAGES/django.po`
 
 ---
 

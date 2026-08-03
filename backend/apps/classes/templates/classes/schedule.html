@@ -20,6 +20,11 @@
                 {% if slot.is_active %}{% translate "Deactivate" %}{% else %}{% translate "Activate" %}{% endif %}
             </a>
         </td>
+        <td>
+            <a href="{% url 'classes:class-prices' slot.pk %}" class="btn btn-sm btn-outline-info">
+                {% translate "Prices" %}
+            </a>
+        </td>
     </tr>
     {% endfor %}
     </tbody>
