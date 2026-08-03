@@ -133,11 +133,10 @@ class PaymentReservation(models.Model):
         related_name="payment_reservations",
         verbose_name=_("Payment"),
     )
-    reservation = models.ForeignKey(
+    reservation = models.OneToOneField(
         "reservations.Reservation",
         on_delete=models.CASCADE,
         related_name="payment_links",
-        unique=True,
         verbose_name=_("Reservation"),
     )
     created_at = models.DateTimeField(auto_now_add=True)
