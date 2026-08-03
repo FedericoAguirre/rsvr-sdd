@@ -36,7 +36,9 @@ def logged_client(http_client, staff_user):
 @pytest.fixture
 def client(db):
     return Client.objects.create(
-        first_name="John", last_name="Doe", mobile="+1234567890",
+        first_name="John",
+        last_name="Doe",
+        mobile="+1234567890",
     )
 
 
@@ -92,7 +94,10 @@ class TestPaymentIdentifier:
         Payment.objects.create(**payment_data)
         with pytest.raises(Exception):
             Payment.objects.create(
-                **{**payment_data, "payment_identifier": payment_data["payment_identifier"]},
+                **{
+                    **payment_data,
+                    "payment_identifier": payment_data["payment_identifier"],
+                },
             )
 
     def test_daily_counter_resets_per_type(self, payment_data, staff_user):
@@ -142,7 +147,9 @@ class TestPaymentOptionalFields:
         assert payment.notes is None
 
     def test_optional_fields_saved(self, payment_data):
-        img = SimpleUploadedFile("test.png", b"fake-image-data", content_type="image/png")
+        img = SimpleUploadedFile(
+            "test.png", b"fake-image-data", content_type="image/png"
+        )
         payment_data["reference"] = "REF-OPT"
         payment_data["notes"] = "Some notes"
         payment_data["evidence"] = img
@@ -198,14 +205,16 @@ class TestPaymentSoftDelete:
 @pytest.mark.django_db
 class TestPaymentForm:
     def test_valid_form(self, client, staff_user):
-        form = PaymentForm(data={
-            "client": client.id,
-            "amount": 50.00,
-            "payment_type": "CASH",
-            "date": datetime.date.today(),
-            "class_slot_count": 2,
-            "payment_identifier": "",
-        })
+        form = PaymentForm(
+            data={
+                "client": client.id,
+                "amount": 50.00,
+                "payment_type": "CASH",
+                "date": datetime.date.today(),
+                "class_slot_count": 2,
+                "payment_identifier": "",
+            }
+        )
         assert form.is_valid(), form.errors
 
     def test_missing_required_field_fails(self, client):
@@ -214,25 +223,29 @@ class TestPaymentForm:
         assert "amount" in form.errors
 
     def test_negative_amount_form_fails(self, client):
-        form = PaymentForm(data={
-            "client": client.id,
-            "amount": -10,
-            "payment_type": "CASH",
-            "date": datetime.date.today(),
-            "class_slot_count": 2,
-            "payment_identifier": "",
-        })
+        form = PaymentForm(
+            data={
+                "client": client.id,
+                "amount": -10,
+                "payment_type": "CASH",
+                "date": datetime.date.today(),
+                "class_slot_count": 2,
+                "payment_identifier": "",
+            }
+        )
         assert not form.is_valid()
 
     def test_zero_class_slot_count_form_fails(self, client):
-        form = PaymentForm(data={
-            "client": client.id,
-            "amount": 50,
-            "payment_type": "CASH",
-            "date": datetime.date.today(),
-            "class_slot_count": 0,
-            "payment_identifier": "",
-        })
+        form = PaymentForm(
+            data={
+                "client": client.id,
+                "amount": 50,
+                "payment_type": "CASH",
+                "date": datetime.date.today(),
+                "class_slot_count": 0,
+                "payment_identifier": "",
+            }
+        )
         assert not form.is_valid()
 
 
@@ -264,41 +277,58 @@ class TestPaymentHistory:
 @pytest.fixture
 def equipment(db):
     from apps.equipment.models import Equipment
+
     return Equipment.objects.create(name="Test Equipment", equipment_type="climber")
 
 
 @pytest.fixture
 def class_slot_early(db):
     from apps.classes.models import ClassSlot
+
     return ClassSlot.objects.create(day_of_week=0, time="17:30")
 
 
 @pytest.fixture
 def class_slot_late(db):
     from apps.classes.models import ClassSlot
+
     return ClassSlot.objects.create(day_of_week=0, time="18:30")
 
 
 @pytest.mark.django_db
 class TestPaymentReservation:
-    def test_payment_detail_shows_associated_reservations(self, logged_client, payment_data):
+    def test_payment_detail_shows_associated_reservations(
+        self, logged_client, payment_data
+    ):
         payment = Payment.objects.create(**payment_data)
         response = logged_client.get(f"/payments/{payment.pk}/")
         assert response.status_code == 200
 
-    def test_reservations_sorted_by_date_descending(self, logged_client, payment_data, client, equipment, class_slot_early, staff_user):
+    def test_reservations_sorted_by_date_descending(
+        self,
+        logged_client,
+        payment_data,
+        client,
+        equipment,
+        class_slot_early,
+        staff_user,
+    ):
         from apps.reservations.models import Reservation
         from apps.payments.models import PaymentReservation
+
         payment = Payment.objects.create(**payment_data)
         dates = [
             datetime.date(2026, 7, 10),  # 10/07/2026
             datetime.date(2026, 7, 12),  # 12/07/2026
-            datetime.date(2026, 7, 8),   # 08/07/2026
+            datetime.date(2026, 7, 8),  # 08/07/2026
         ]
         for d in dates:
             r = Reservation.objects.create(
-                client=client, equipment=equipment, class_slot=class_slot_early,
-                date=d, created_by=staff_user,
+                client=client,
+                equipment=equipment,
+                class_slot=class_slot_early,
+                date=d,
+                created_by=staff_user,
             )
             PaymentReservation.objects.create(payment=payment, reservation=r)
         response = logged_client.get(f"/payments/{payment.pk}/")
@@ -306,25 +336,44 @@ class TestPaymentReservation:
         html = response.content.decode()
         sorted_dates = sorted(dates, reverse=True)
         from django.template.defaultfilters import date as date_filter
+
         prev = -1
         for d in sorted_dates:
             formatted = date_filter(d, "SHORT_DATE_FORMAT")
             pos = html.find(formatted, prev + 1)
-            assert pos > prev, f"Expected {formatted} to appear after previous date, pos={pos}, prev={prev}"
+            assert pos > prev, (
+                f"Expected {formatted} to appear after previous date, pos={pos}, prev={prev}"
+            )
             prev = pos
 
-    def test_same_date_sorted_by_time_descending(self, logged_client, payment_data, client, equipment, class_slot_early, class_slot_late, staff_user):
+    def test_same_date_sorted_by_time_descending(
+        self,
+        logged_client,
+        payment_data,
+        client,
+        equipment,
+        class_slot_early,
+        class_slot_late,
+        staff_user,
+    ):
         from apps.reservations.models import Reservation
         from apps.payments.models import PaymentReservation
+
         payment = Payment.objects.create(**payment_data)
         common_date = datetime.date(2026, 7, 10)
         r1 = Reservation.objects.create(
-            client=client, equipment=equipment, class_slot=class_slot_early,
-            date=common_date, created_by=staff_user,
+            client=client,
+            equipment=equipment,
+            class_slot=class_slot_early,
+            date=common_date,
+            created_by=staff_user,
         )
         r2 = Reservation.objects.create(
-            client=client, equipment=equipment, class_slot=class_slot_late,
-            date=common_date, created_by=staff_user,
+            client=client,
+            equipment=equipment,
+            class_slot=class_slot_late,
+            date=common_date,
+            created_by=staff_user,
         )
         PaymentReservation.objects.create(payment=payment, reservation=r2)
         PaymentReservation.objects.create(payment=payment, reservation=r1)
@@ -333,7 +382,9 @@ class TestPaymentReservation:
         html = response.content.decode()
         pos_late = html.find("18:30")
         pos_early = html.find("17:30")
-        assert pos_late < pos_early, "Expected 18:30 (late) to appear before 17:30 (early)"
+        assert pos_late < pos_early, (
+            "Expected 18:30 (late) to appear before 17:30 (early)"
+        )
 
     def test_empty_reservation_list_renders(self, logged_client, payment_data):
         payment = Payment.objects.create(**payment_data)
@@ -352,9 +403,7 @@ class TestPaymentFormStyling:
     def test_all_widgets_have_form_control(self):
         """FR-003: Every widget in Meta.widgets must have form-control class."""
         for field_name, widget in PaymentForm.Meta.widgets.items():
-            assert "class" in widget.attrs, (
-                f"{field_name} widget missing 'class' attr"
-            )
+            assert "class" in widget.attrs, f"{field_name} widget missing 'class' attr"
             assert "form-control" in widget.attrs["class"], (
                 f"{field_name} widget missing 'form-control'"
             )
@@ -417,7 +466,9 @@ class TestReportsMenuNonSuperuser:
         assert response.status_code == 200
         assert "Reportes" not in response.content.decode()
 
-    def test_non_superuser_does_not_see_payments_dropdown(self, http_client, staff_user):
+    def test_non_superuser_does_not_see_payments_dropdown(
+        self, http_client, staff_user
+    ):
         http_client.force_login(staff_user)
         response = http_client.get("/reservations/")
         assert response.status_code == 200
@@ -487,23 +538,34 @@ class TestWeeklyChartRendering:
         admin = User.objects.create_superuser(username="wk1", password="pass")
         http_client.force_login(admin)
         Payment.objects.create(
-            client=client, amount=100.00, payment_type="CASH",
-            date=datetime.date(2026, 7, 6), class_slot_count=2,
-            reference="WEEK-1", created_by=staff_user,
+            client=client,
+            amount=100.00,
+            payment_type="CASH",
+            date=datetime.date(2026, 7, 6),
+            class_slot_count=2,
+            reference="WEEK-1",
+            created_by=staff_user,
         )
         Payment.objects.create(
-            client=client, amount=200.00, payment_type="CC",
-            date=datetime.date(2026, 7, 8), class_slot_count=2,
-            reference="WEEK-2", created_by=staff_user,
+            client=client,
+            amount=200.00,
+            payment_type="CC",
+            date=datetime.date(2026, 7, 8),
+            class_slot_count=2,
+            reference="WEEK-2",
+            created_by=staff_user,
         )
         response = http_client.get(
             "/payments/reports/?grouping=week&start=2026-07-06&end=2026-07-12",
         )
         assert response.status_code == 200
         import re
+
         html = response.content.decode()
         match = re.search(
-            r'<script id="report-data"[^>]*>(.*?)</script>', html, re.DOTALL,
+            r'<script id="report-data"[^>]*>(.*?)</script>',
+            html,
+            re.DOTALL,
         )
         assert match is not None
         report_data = json.loads(match.group(1))
@@ -524,7 +586,10 @@ class TestWeeklyChartRendering:
         )
         assert response.status_code == 200
         html = response.content.decode()
-        assert "No payment data for the selected period." in html or "No hay datos de pago" in html
+        assert (
+            "No payment data for the selected period." in html
+            or "No hay datos de pago" in html
+        )
 
 
 # ── T001-T007: 035 — Monthly Stacked Graph ──────────────────────────────────
@@ -588,18 +653,28 @@ class TestMonthlyDateSnapping:
 class TestMonthlyChartRendering:
     """Monthly chart returns correctly formatted YYYYMM labels."""
 
-    def test_monthly_grouping_returns_yyyymm_labels(self, http_client, client, staff_user):
+    def test_monthly_grouping_returns_yyyymm_labels(
+        self, http_client, client, staff_user
+    ):
         admin = User.objects.create_superuser(username="mchr1", password="pass")
         http_client.force_login(admin)
         Payment.objects.create(
-            client=client, amount=300.00, payment_type="CASH",
-            date=datetime.date(2026, 7, 15), class_slot_count=2,
-            reference="MONTH-1", created_by=staff_user,
+            client=client,
+            amount=300.00,
+            payment_type="CASH",
+            date=datetime.date(2026, 7, 15),
+            class_slot_count=2,
+            reference="MONTH-1",
+            created_by=staff_user,
         )
         Payment.objects.create(
-            client=client, amount=400.00, payment_type="CC",
-            date=datetime.date(2026, 8, 20), class_slot_count=2,
-            reference="MONTH-2", created_by=staff_user,
+            client=client,
+            amount=400.00,
+            payment_type="CC",
+            date=datetime.date(2026, 8, 20),
+            class_slot_count=2,
+            reference="MONTH-2",
+            created_by=staff_user,
         )
         response = http_client.get(
             "/payments/reports/?grouping=month&start=2026-07-01&end=2026-08-31",
@@ -607,13 +682,16 @@ class TestMonthlyChartRendering:
         assert response.status_code == 200
         html = response.content.decode()
         # Verify the formatLabel function produces YYYYMM (no hyphen separator)
-        assert "String(r.date__year) + String(r.date__month).padStart(2, '0')" in html, (
-            "Expected formatLabel to concatenate year+month without separator"
-        )
+        assert (
+            "String(r.date__year) + String(r.date__month).padStart(2, '0')" in html
+        ), "Expected formatLabel to concatenate year+month without separator"
         # Verify report_data JSON contains expected data
         import re
+
         match = re.search(
-            r'<script id="report-data"[^>]*>(.*?)</script>', html, re.DOTALL,
+            r'<script id="report-data"[^>]*>(.*?)</script>',
+            html,
+            re.DOTALL,
         )
         assert match is not None
         report_data = json.loads(match.group(1))
@@ -628,7 +706,10 @@ class TestMonthlyChartRendering:
         )
         assert response.status_code == 200
         html = response.content.decode()
-        assert "No payment data for the selected period." in html or "No hay datos de pago" in html
+        assert (
+            "No payment data for the selected period." in html
+            or "No hay datos de pago" in html
+        )
 
 
 # ── T005-T014: US1-US2 — Export Payments ─────────────────────────────────────
@@ -703,16 +784,24 @@ class TestPaymentReports:
         admin = User.objects.create_superuser(username="admin2", password="pass")
         http_client.force_login(admin)
         Payment.objects.create(**{**payment_data, "created_by": admin})
-        response = http_client.get("/payments/reports/?grouping=day&start=2026-01-01&end=2026-12-31")
+        response = http_client.get(
+            "/payments/reports/?grouping=day&start=2026-01-01&end=2026-12-31"
+        )
         assert response.status_code == 200
 
-    def test_reports_day_grouping_with_date_range(self, http_client, client, staff_user):
+    def test_reports_day_grouping_with_date_range(
+        self, http_client, client, staff_user
+    ):
         admin = User.objects.create_superuser(username="admin3", password="pass")
         http_client.force_login(admin)
         Payment.objects.create(
-            client=client, amount=150.00, payment_type="CASH",
-            date=datetime.date(2026, 6, 24), class_slot_count=2,
-            reference="REF-DAY", created_by=staff_user,
+            client=client,
+            amount=150.00,
+            payment_type="CASH",
+            date=datetime.date(2026, 6, 24),
+            class_slot_count=2,
+            reference="REF-DAY",
+            created_by=staff_user,
         )
         response = http_client.get(
             "/payments/reports/?grouping=day&start=2026-06-20&end=2026-06-30",
@@ -721,8 +810,11 @@ class TestPaymentReports:
         html = response.content.decode()
         assert "report-data" in html
         import re
+
         match = re.search(
-            r'<script id="report-data"[^>]*>(.*?)</script>', html, re.DOTALL,
+            r'<script id="report-data"[^>]*>(.*?)</script>',
+            html,
+            re.DOTALL,
         )
         assert match is not None, "report-data script tag not found"
         report_data = json.loads(match.group(1))
@@ -790,15 +882,21 @@ class TestPaymentReportDefaults:
 class TestPaymentAutoRender:
     """TDD tests for US2 — auto-render with current month data."""
 
-    def test_report_data_present_in_initial_context(self, http_client, client, staff_user):
+    def test_report_data_present_in_initial_context(
+        self, http_client, client, staff_user
+    ):
         """T005: Current month report data is in the initial page context."""
         admin = User.objects.create_superuser(username="aut1", password="pass")
         http_client.force_login(admin)
         today = datetime.date.today()
         Payment.objects.create(
-            client=client, amount=250.00, payment_type="CASH",
-            date=today, class_slot_count=2,
-            reference="AUTO-1", created_by=staff_user,
+            client=client,
+            amount=250.00,
+            payment_type="CASH",
+            date=today,
+            class_slot_count=2,
+            reference="AUTO-1",
+            created_by=staff_user,
         )
         response = http_client.get("/payments/reports/")
         assert response.status_code == 200
@@ -814,24 +912,33 @@ class TestPaymentAutoRender:
         assert response.status_code == 200
         html = response.content.decode()
         if not response.context["report_data"]:
-            assert any(msg in html for msg in (
-                "No payment data for the selected period.",
-                "No hay datos de pago",
-            ))
+            assert any(
+                msg in html
+                for msg in (
+                    "No payment data for the selected period.",
+                    "No hay datos de pago",
+                )
+            )
 
 
 @pytest.mark.django_db
 class TestPaymentManualOverride:
     """TDD tests for US3 — manual date override."""
 
-    def test_non_current_month_params_override_defaults(self, http_client, client, staff_user):
+    def test_non_current_month_params_override_defaults(
+        self, http_client, client, staff_user
+    ):
         """T008: Explicit non-current-month dates override defaults."""
         admin = User.objects.create_superuser(username="ovr1", password="pass")
         http_client.force_login(admin)
         Payment.objects.create(
-            client=client, amount=500.00, payment_type="CC",
-            date=datetime.date(2026, 5, 15), class_slot_count=2,
-            reference="OVR-1", created_by=staff_user,
+            client=client,
+            amount=500.00,
+            payment_type="CC",
+            date=datetime.date(2026, 5, 15),
+            class_slot_count=2,
+            reference="OVR-1",
+            created_by=staff_user,
         )
         response = http_client.get(
             "/payments/reports/?start=2026-05-01&end=2026-05-31",
@@ -863,7 +970,8 @@ class TestChartContainer:
         assert response.status_code == 200
         html = response.content.decode()
         match = re.search(
-            r'<canvas[^>]*id="totalsChart"[^>]*>', html,
+            r'<canvas[^>]*id="totalsChart"[^>]*>',
+            html,
         )
         assert match is not None, "totalsChart canvas not found"
         assert 'height="250"' in match.group(0), (

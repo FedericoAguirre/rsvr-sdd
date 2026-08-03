@@ -13,7 +13,9 @@ def snake_case_name(first_name, last_name):
     return re.sub(r"[^a-z0-9\s]", "", lowered).replace(" ", "_")
 
 
-def generate_ics(reservations, prodid="-//rsvr-sdd//Class Reservations//ES", extra_fields_fn=None):
+def generate_ics(
+    reservations, prodid="-//rsvr-sdd//Class Reservations//ES", extra_fields_fn=None
+):
     from icalendar import Calendar, Event, Timezone, TimezoneDaylight, TimezoneStandard
 
     cal = Calendar()
@@ -25,14 +27,18 @@ def generate_ics(reservations, prodid="-//rsvr-sdd//Class Reservations//ES", ext
     tz.add("x-lic-location", "America/Denver")
 
     std = TimezoneStandard()
-    std.add("dtstart", datetime.datetime(1970, 11, 1, 2, 0, 0, tzinfo=datetime.timezone.utc))
+    std.add(
+        "dtstart", datetime.datetime(1970, 11, 1, 2, 0, 0, tzinfo=datetime.timezone.utc)
+    )
     std.add("tzoffsetfrom", datetime.timedelta(hours=-6))
     std.add("tzoffsetto", datetime.timedelta(hours=-7))
     std.add("tzname", "MST")
     tz.add_component(std)
 
     dst = TimezoneDaylight()
-    dst.add("dtstart", datetime.datetime(1970, 3, 8, 2, 0, 0, tzinfo=datetime.timezone.utc))
+    dst.add(
+        "dtstart", datetime.datetime(1970, 3, 8, 2, 0, 0, tzinfo=datetime.timezone.utc)
+    )
     dst.add("tzoffsetfrom", datetime.timedelta(hours=-7))
     dst.add("tzoffsetto", datetime.timedelta(hours=-6))
     dst.add("tzname", "MDT")
@@ -48,7 +54,9 @@ def generate_ics(reservations, prodid="-//rsvr-sdd//Class Reservations//ES", ext
         event.add("dtstart", start)
         event.add("dtend", end)
         event.add("summary", str(r.class_slot))
-        description = _("Client: %(name)s\nClass: %(slot)s\nDate: %(date)s\nEquipment: %(equipment)s") % {
+        description = _(
+            "Client: %(name)s\nClass: %(slot)s\nDate: %(date)s\nEquipment: %(equipment)s"
+        ) % {
             "name": str(r.client),
             "slot": str(r.class_slot),
             "date": r.date.isoformat(),

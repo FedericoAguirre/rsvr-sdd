@@ -31,7 +31,9 @@ def logged_client(http_client, staff_user):
 @pytest.fixture
 def client(db):
     return Client.objects.create(
-        first_name="Jane", last_name="Smith", mobile="+9876543210",
+        first_name="Jane",
+        last_name="Smith",
+        mobile="+9876543210",
     )
 
 
@@ -72,9 +74,9 @@ class TestReservationHistoryColumnOrder:
         assert clase_idx != -1, "Clase column not found in <thead>"
         assert fecha_idx != -1, "Fecha column not found in <thead>"
         assert equipo_idx != -1, "Equipo column not found in <thead>"
-        assert (
-            clase_idx < fecha_idx < equipo_idx
-        ), f"Expected Clase < Fecha < Equipo in <thead>, got positions: Clase={clase_idx}, Fecha={fecha_idx}, Equipo={equipo_idx}"
+        assert clase_idx < fecha_idx < equipo_idx, (
+            f"Expected Clase < Fecha < Equipo in <thead>, got positions: Clase={clase_idx}, Fecha={fecha_idx}, Equipo={equipo_idx}"
+        )
 
     def test_empty_history_renders(self, logged_client, client):
         response = logged_client.get(f"/clients/{client.pk}/")

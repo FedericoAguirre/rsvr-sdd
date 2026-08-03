@@ -38,11 +38,15 @@ logger = logging.getLogger(__name__)
 def payment_calendar(request, pk):
     payment = get_object_or_404(Payment, pk=pk)
     qs = payment.payment_reservations.select_related(
-        "reservation__client", "reservation__equipment", "reservation__class_slot",
+        "reservation__client",
+        "reservation__equipment",
+        "reservation__class_slot",
     ).order_by("reservation__date", "reservation__class_slot__time")
 
     if not qs.exists():
-        messages.info(request, str(_("No reservations are associated with this payment.")))
+        messages.info(
+            request, str(_("No reservations are associated with this payment."))
+        )
         return redirect("payments:detail", pk=payment.pk)
 
     reservations = [pr.reservation for pr in qs]
@@ -51,7 +55,11 @@ def payment_calendar(request, pk):
     def extra_fields(_reservation):
         return {"Pago": payment.payment_identifier}
 
-    ics_content = generate_ics(reservations, prodid="-//rsvr-sdd//Payment Reservations//ES", extra_fields_fn=extra_fields)
+    ics_content = generate_ics(
+        reservations,
+        prodid="-//rsvr-sdd//Payment Reservations//ES",
+        extra_fields_fn=extra_fields,
+    )
     snake_name = _snake_case_name(client)
     dates = sorted(r.date for r in reservations)
     first_date = dates[0].strftime("%Y%m%d")
@@ -71,18 +79,23 @@ class PaymentListView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         qs = Payment.objects.filter(is_deleted=False).select_related(
-            "client", "created_by",
+            "client",
+            "created_by",
         )
         q = self.request.GET.get("q", "").strip()
         if q and len(q) >= 3:
-            matching_client_ids = Client.objects.filter(
-                is_active=True,
-            ).filter(
-                Q(first_name__icontains=q)
-                | Q(last_name__icontains=q)
-                | Q(email__icontains=q)
-                | Q(mobile__icontains=q),
-            ).values_list("id", flat=True)
+            matching_client_ids = (
+                Client.objects.filter(
+                    is_active=True,
+                )
+                .filter(
+                    Q(first_name__icontains=q)
+                    | Q(last_name__icontains=q)
+                    | Q(email__icontains=q)
+                    | Q(mobile__icontains=q),
+                )
+                .values_list("id", flat=True)
+            )
             qs = qs.filter(client_id__in=matching_client_ids)
         return qs.order_by("-date", "-created_at")
 
@@ -117,18 +130,28 @@ class ClientPaymentHistoryView(LoginRequiredMixin, ListView):
     paginate_by = 5
 
     def get_queryset(self):
-        return Payment.objects.filter(
-            client_id=self.kwargs["client_id"], is_deleted=False,
-        ).select_related("client", "created_by").order_by("-date", "-created_at")
+        return (
+            Payment.objects.filter(
+                client_id=self.kwargs["client_id"],
+                is_deleted=False,
+            )
+            .select_related("client", "created_by")
+            .order_by("-date", "-created_at")
+        )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["client_filter"] = str(self.kwargs["client_id"])
         from apps.reservations.models import Reservation
-        context["unassociated_reservations"] = Reservation.objects.filter(
-            client_id=self.kwargs["client_id"],
-            payment_links=None,
-        ).select_related("equipment", "class_slot").order_by("-date", "class_slot__time")
+
+        context["unassociated_reservations"] = (
+            Reservation.objects.filter(
+                client_id=self.kwargs["client_id"],
+                payment_links=None,
+            )
+            .select_related("equipment", "class_slot")
+            .order_by("-date", "class_slot__time")
+        )
         return context
 
 
@@ -155,8 +178,7 @@ class PaymentCreateView(LoginRequiredMixin, CreateView):
         form.instance.created_by = self.request.user
         self.object = form.save()
         return redirect(
-            reverse("payments:detail", kwargs={"pk": self.object.pk})
-            + "?batch_modal=1"
+            reverse("payments:detail", kwargs={"pk": self.object.pk}) + "?batch_modal=1"
         )
 
 
@@ -168,7 +190,9 @@ class PaymentDetailView(LoginRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["reservations"] = self.object.payment_reservations.select_related(
-            "reservation__client", "reservation__equipment", "reservation__class_slot",
+            "reservation__client",
+            "reservation__equipment",
+            "reservation__class_slot",
         ).order_by("-reservation__date", "-reservation__class_slot__time")
         context["remaining_slots"] = (
             self.object.class_slot_count - self.object.payment_reservations.count()
@@ -207,12 +231,18 @@ class PaymentAssociateView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         payment = get_object_or_404(Payment, pk=kwargs["pk"])
         from apps.reservations.models import Reservation
-        available_reservations = Reservation.objects.filter(
-            client=payment.client,
-            payment_links=None,
-        ).select_related(
-            "equipment", "class_slot",
-        ).order_by("-date", "class_slot__time")
+
+        available_reservations = (
+            Reservation.objects.filter(
+                client=payment.client,
+                payment_links=None,
+            )
+            .select_related(
+                "equipment",
+                "class_slot",
+            )
+            .order_by("-date", "class_slot__time")
+        )
         remaining_slots = (
             payment.class_slot_count - payment.payment_reservations.count()
         )
@@ -234,9 +264,12 @@ class PaymentAssociateView(LoginRequiredMixin, View):
             return redirect("payments:detail", pk=payment.pk)
         with transaction.atomic():
             from apps.reservations.models import Reservation
+
             for rid in reservation_ids[:max_new]:
                 reservation = get_object_or_404(
-                    Reservation, pk=rid, client=payment.client,
+                    Reservation,
+                    pk=rid,
+                    client=payment.client,
                 )
                 PaymentReservation.objects.get_or_create(
                     payment=payment,
@@ -252,9 +285,12 @@ class BatchDataView(LoginRequiredMixin, View):
         from apps.reservations.models import Reservation
         from django.db.models import Max
         from datetime import date, timedelta
+
         payment = get_object_or_404(Payment, pk=kwargs["pk"])
         raw_start = payment.date
-        latest = Reservation.objects.filter(client=payment.client).aggregate(Max("date"))
+        latest = Reservation.objects.filter(client=payment.client).aggregate(
+            Max("date")
+        )
         if latest["date__max"] is not None:
             raw_start = max(raw_start, latest["date__max"] + timedelta(days=1))
         next_monday = raw_start + timedelta(days=(7 - raw_start.weekday()) % 7 or 7)
@@ -264,11 +300,12 @@ class BatchDataView(LoginRequiredMixin, View):
                 client=payment.client,
                 date__gte=next_monday,
                 date__lte=end,
-            ).values_list("date", flat=True).distinct()
+            )
+            .values_list("date", flat=True)
+            .distinct()
         )
         equipment_list = list(
-            Equipment.objects.filter(status="in-service")
-            .values("id", "name")
+            Equipment.objects.filter(status="in-service").values("id", "name")
         )
         class_slots = list(
             ClassSlot.objects.filter(is_active=True)
@@ -283,17 +320,22 @@ class BatchDataView(LoginRequiredMixin, View):
                 seen_times[t] = s["id"]
                 s["label"] = str(s["time"])
                 deduped.append(s)
-        return JsonResponse({
-            "payment_id": payment.pk,
-            "block_class_count": payment.class_slot_count,
-            "date_range": {
-                "start": next_monday.isoformat(),
-                "end": end.isoformat(),
-            },
-            "equipment_list": equipment_list,
-            "class_slots": deduped,
-            "reserved_dates": [d.isoformat() if hasattr(d, "isoformat") else str(d) for d in reserved],
-        })
+        return JsonResponse(
+            {
+                "payment_id": payment.pk,
+                "block_class_count": payment.class_slot_count,
+                "date_range": {
+                    "start": next_monday.isoformat(),
+                    "end": end.isoformat(),
+                },
+                "equipment_list": equipment_list,
+                "class_slots": deduped,
+                "reserved_dates": [
+                    d.isoformat() if hasattr(d, "isoformat") else str(d)
+                    for d in reserved
+                ],
+            }
+        )
 
 
 class BatchCreateView(LoginRequiredMixin, View):
@@ -301,6 +343,7 @@ class BatchCreateView(LoginRequiredMixin, View):
         import json
         from django.db import transaction
         from apps.reservations.models import Reservation
+
         payment = get_object_or_404(Payment, pk=kwargs["pk"])
         try:
             data = json.loads(request.body)
@@ -317,6 +360,7 @@ class BatchCreateView(LoginRequiredMixin, View):
                 status=400,
             )
         from apps.classes.models import ClassSlot
+
         equipment = form.cleaned_data["equipment_id"]
         class_slot = form.cleaned_data["class_slot_id"]
         dates = form.cleaned_data["dates"]
@@ -325,10 +369,17 @@ class BatchCreateView(LoginRequiredMixin, View):
         for d in dates:
             try:
                 date_slot = ClassSlot.objects.get(
-                    day_of_week=d.weekday(), time=class_slot.time, is_active=True,
+                    day_of_week=d.weekday(),
+                    time=class_slot.time,
+                    is_active=True,
                 )
             except ClassSlot.DoesNotExist:
-                failed.append({"date": d.isoformat(), "reason": str(_("No class slot for this day at this time."))})
+                failed.append(
+                    {
+                        "date": d.isoformat(),
+                        "reason": str(_("No class slot for this day at this time.")),
+                    }
+                )
                 continue
             try:
                 with transaction.atomic():
@@ -346,32 +397,47 @@ class BatchCreateView(LoginRequiredMixin, View):
                     )
                     created_ids.append(reservation.pk)
             except Exception:
-                failed.append({"date": d.isoformat(), "reason": str(_("Already reserved or conflict"))})
+                failed.append(
+                    {
+                        "date": d.isoformat(),
+                        "reason": str(_("Already reserved or conflict")),
+                    }
+                )
         if not created_ids:
-            return JsonResponse({
-                "status": "error",
-                "errors": {"_": [str(_("Could not create any reservations."))]},
-            }, status=400)
+            return JsonResponse(
+                {
+                    "status": "error",
+                    "errors": {"_": [str(_("Could not create any reservations."))]},
+                },
+                status=400,
+            )
         if failed:
-            return JsonResponse({
-                "status": "partial",
+            return JsonResponse(
+                {
+                    "status": "partial",
+                    "created": len(created_ids),
+                    "reservations": created_ids,
+                    "failed": failed,
+                }
+            )
+        return JsonResponse(
+            {
+                "status": "ok",
                 "created": len(created_ids),
                 "reservations": created_ids,
-                "failed": failed,
-            })
-        return JsonResponse({
-            "status": "ok",
-            "created": len(created_ids),
-            "reservations": created_ids,
-            "failed": [],
-        })
+                "failed": [],
+            }
+        )
 
 
 class PaymentExportView(LoginRequiredMixin, UserPassesTestMixin, View):
     def test_func(self):
-        return self.request.user.is_superuser or self.request.user.groups.filter(
-            name="Administrators",
-        ).exists()
+        return (
+            self.request.user.is_superuser
+            or self.request.user.groups.filter(
+                name="Administrators",
+            ).exists()
+        )
 
     def get(self, request, *args, **kwargs):
         try:
@@ -395,9 +461,15 @@ class PaymentExportView(LoginRequiredMixin, UserPassesTestMixin, View):
                     {"error": str(_("Start date must be before end date."))},
                     status=400,
                 )
-            qs = Payment.objects.filter(
-                is_deleted=False, date__gte=start_dt, date__lte=end_dt,
-            ).select_related("client").order_by("date")
+            qs = (
+                Payment.objects.filter(
+                    is_deleted=False,
+                    date__gte=start_dt,
+                    date__lte=end_dt,
+                )
+                .select_related("client")
+                .order_by("date")
+            )
             if not qs.exists():
                 return JsonResponse(
                     {"error": str(_("No payments found for the selected date range."))},
@@ -407,14 +479,16 @@ class PaymentExportView(LoginRequiredMixin, UserPassesTestMixin, View):
             ws = wb.create_sheet()
             ws.append(["Identificador", "Cliente", "Monto", "Tipo", "Fecha", "Clases"])
             for p in qs:
-                ws.append([
-                    p.payment_identifier,
-                    str(p.client),
-                    float(p.amount),
-                    p.payment_type,
-                    p.date.isoformat(),
-                    p.class_slot_count,
-                ])
+                ws.append(
+                    [
+                        p.payment_identifier,
+                        str(p.client),
+                        float(p.amount),
+                        p.payment_type,
+                        p.date.isoformat(),
+                        p.class_slot_count,
+                    ]
+                )
             start_str = start_dt.strftime("%Y%m%d")
             end_str = end_dt.strftime("%Y%m%d")
             filename = f"pagos_{start_str}_{end_str}.xlsx"
@@ -425,7 +499,10 @@ class PaymentExportView(LoginRequiredMixin, UserPassesTestMixin, View):
             wb.save(response)
             logger.info(
                 "Export: user=%s start=%s end=%s count=%d",
-                request.user, start, end, qs.count(),
+                request.user,
+                start,
+                end,
+                qs.count(),
             )
             return response
         except Exception:
@@ -440,9 +517,12 @@ class PaymentReportView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
     template_name = "payments/payment_reports.html"
 
     def test_func(self):
-        return self.request.user.is_superuser or self.request.user.groups.filter(
-            name="Administrators",
-        ).exists()
+        return (
+            self.request.user.is_superuser
+            or self.request.user.groups.filter(
+                name="Administrators",
+            ).exists()
+        )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -484,19 +564,35 @@ class PaymentReportView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
         context["end_date"] = end
 
         if grouping == "day":
-            rows = qs.values("date", "payment_type").annotate(
-                total=Sum("amount"), count=Count("id"),
-            ).order_by("date", "payment_type")
+            rows = (
+                qs.values("date", "payment_type")
+                .annotate(
+                    total=Sum("amount"),
+                    count=Count("id"),
+                )
+                .order_by("date", "payment_type")
+            )
         elif grouping == "week":
-            rows = qs.extra(
-                select={"week": "date_trunc('week', date)::date"},
-            ).values("week", "payment_type").annotate(
-                total=Sum("amount"), count=Count("id"),
-            ).order_by("week", "payment_type")
+            rows = (
+                qs.extra(
+                    select={"week": "date_trunc('week', date)::date"},
+                )
+                .values("week", "payment_type")
+                .annotate(
+                    total=Sum("amount"),
+                    count=Count("id"),
+                )
+                .order_by("week", "payment_type")
+            )
         else:
-            rows = qs.values("date__year", "date__month", "payment_type").annotate(
-                total=Sum("amount"), count=Count("id"),
-            ).order_by("date__year", "date__month", "payment_type")
+            rows = (
+                qs.values("date__year", "date__month", "payment_type")
+                .annotate(
+                    total=Sum("amount"),
+                    count=Count("id"),
+                )
+                .order_by("date__year", "date__month", "payment_type")
+            )
 
         context["report_data"] = list(rows)
         return context

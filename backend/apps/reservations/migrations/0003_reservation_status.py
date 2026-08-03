@@ -4,15 +4,23 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('reservations', '0002_alter_reservation_options_and_more'),
+        ("reservations", "0002_alter_reservation_options_and_more"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='reservation',
-            name='status',
-            field=models.CharField(choices=[('reserved', 'Reserved'), ('used', 'Used'), ('unused', 'Unused')], default='reserved', max_length=20, verbose_name='Status'),
+            model_name="reservation",
+            name="status",
+            field=models.CharField(
+                choices=[
+                    ("reserved", "Reserved"),
+                    ("used", "Used"),
+                    ("unused", "Unused"),
+                ],
+                default="reserved",
+                max_length=20,
+                verbose_name="Status",
+            ),
         ),
     ]

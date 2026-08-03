@@ -7,7 +7,9 @@ from django.utils import timezone
 from utils.ical import generate_ics, snake_case_name
 
 
-def _make_mock_reservation(client_name="John Doe", slot_name="Morning", date=None, equipment="Harness"):
+def _make_mock_reservation(
+    client_name="John Doe", slot_name="Morning", date=None, equipment="Harness"
+):
     r = Mock()
     r.client = Mock()
     r.client.__str__ = Mock(return_value=client_name)
@@ -55,7 +57,9 @@ class TestGenerateIcs:
         assert b"END:VEVENT" in result
 
     def test_includes_reservation_fields(self):
-        r = _make_mock_reservation(client_name="Alice", slot_name="Evening", equipment="Rope")
+        r = _make_mock_reservation(
+            client_name="Alice", slot_name="Evening", equipment="Rope"
+        )
         result = _unfold(generate_ics([r]))
         assert b"Alice" in result
         assert b"Evening" in result
@@ -70,8 +74,10 @@ class TestGenerateIcs:
 
     def test_extra_fields_fn(self):
         r = _make_mock_reservation()
+
         def extra_fn(_res):
             return {"Pago": "PAY-001"}
+
         result = _unfold(generate_ics([r], extra_fields_fn=extra_fn))
         assert b"Pago: PAY-001" in result
 

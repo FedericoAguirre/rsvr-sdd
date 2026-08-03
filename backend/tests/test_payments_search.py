@@ -74,9 +74,11 @@ def payment_for_inactive(logged_client, inactive_client, staff_user):
 
 @pytest.mark.django_db
 class TestPaymentClientSearch:
-
     def test_search_by_client_name(
-        self, logged_client, payment_for_active, payment_for_inactive,
+        self,
+        logged_client,
+        payment_for_active,
+        payment_for_inactive,
     ):
         response = logged_client.get("/payments/", {"q": "John"})
         assert response.status_code == 200
@@ -84,24 +86,38 @@ class TestPaymentClientSearch:
         assert payment_for_inactive.payment_identifier not in response.content.decode()
 
     def test_search_by_client_email(
-        self, logged_client, payment_for_active, active_client,
+        self,
+        logged_client,
+        payment_for_active,
+        active_client,
     ):
         payment = Payment.objects.create(
-            client=active_client, amount=30.00, payment_type="DC",
-            date=datetime.date.today(), class_slot_count=1,
-            reference="PAY-EMAIL", created_by=User.objects.first(),
+            client=active_client,
+            amount=30.00,
+            payment_type="DC",
+            date=datetime.date.today(),
+            class_slot_count=1,
+            reference="PAY-EMAIL",
+            created_by=User.objects.first(),
         )
         response = logged_client.get("/payments/", {"q": "john@example.com"})
         assert response.status_code == 200
         assert payment.payment_identifier in response.content.decode()
 
     def test_search_by_client_mobile(
-        self, logged_client, payment_for_active, active_client,
+        self,
+        logged_client,
+        payment_for_active,
+        active_client,
     ):
         payment = Payment.objects.create(
-            client=active_client, amount=20.00, payment_type="CASH",
-            date=datetime.date.today(), class_slot_count=1,
-            reference="PAY-MOBILE", created_by=User.objects.first(),
+            client=active_client,
+            amount=20.00,
+            payment_type="CASH",
+            date=datetime.date.today(),
+            class_slot_count=1,
+            reference="PAY-MOBILE",
+            created_by=User.objects.first(),
         )
         response = logged_client.get("/payments/", {"q": "+1234567890"})
         assert response.status_code == 200
@@ -121,14 +137,19 @@ class TestPaymentClientSearch:
         assert payment_for_active.payment_identifier in response2.content.decode()
 
     def test_inactive_client_excluded(
-        self, logged_client, payment_for_active, payment_for_inactive,
+        self,
+        logged_client,
+        payment_for_active,
+        payment_for_inactive,
     ):
         response = logged_client.get("/payments/", {"q": "Jane"})
         assert response.status_code == 200
         assert payment_for_inactive.payment_identifier not in response.content.decode()
 
     def test_no_results_shows_not_found_message(
-        self, logged_client, payment_for_active,
+        self,
+        logged_client,
+        payment_for_active,
     ):
         response = logged_client.get("/payments/", {"q": "ZZZZZZ"})
         assert response.status_code == 200
@@ -136,7 +157,8 @@ class TestPaymentClientSearch:
         assert "No se encontraron pagos que coincidan con su búsqueda" in content
 
     def test_page_renders_updated_labels_and_classes(
-        self, logged_client,
+        self,
+        logged_client,
     ):
         response = logged_client.get("/payments/")
         content = response.content.decode()
@@ -146,11 +168,17 @@ class TestPaymentClientSearch:
         assert 'class="btn btn-success"' in content
 
     def test_clear_search_shows_all_payments(
-        self, logged_client, payment_for_active, inactive_client,
+        self,
+        logged_client,
+        payment_for_active,
+        inactive_client,
     ):
         Payment.objects.create(
-            client=inactive_client, amount=60.00, payment_type="DC",
-            date=datetime.date.today(), class_slot_count=1,
+            client=inactive_client,
+            amount=60.00,
+            payment_type="DC",
+            date=datetime.date.today(),
+            class_slot_count=1,
             created_by=User.objects.first(),
         )
         response = logged_client.get("/payments/", {"q": ""})

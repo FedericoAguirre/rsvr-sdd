@@ -3,18 +3,14 @@
 {% block title %}{% translate "Enter a new price" %}{% endblock %}
 {% block content %}
 <h2 class="mb-4">{% translate "Enter a new price" %}</h2>
-<p class="text-muted">
-    {% blocktranslate with slot=class_slot %}{{ slot }}{% endblocktranslate %}
-</p>
-{% if not current_price %}
-<div class="alert alert-info">
-    {% translate "This class has no current price." %}
+{% if current_prices %}
+<div class="alert alert-warning">
+    {% translate "A current price already exists. Adding a new price creates a separate record." %}
 </div>
 {% else %}
-<div class="alert alert-warning">
-    {% translate "A current price already exists. Updating it will archive the previous price." %}
+<div class="alert alert-info">
+    {% translate "This is the first price record." %}
 </div>
-<p><strong>{% translate "Current price" %}:</strong> {{ current_price.price }}</p>
 {% endif %}
 <form method="post" class="needs-validation" novalidate>
     {% csrf_token %}
@@ -28,6 +24,6 @@
         {% endif %}
     </div>
     <button type="submit" class="btn btn-primary">{% translate "Save" %}</button>
-    <a href="{% url 'classes:class-prices' class_slot.pk %}" class="btn btn-link">{% translate "Cancel" %}</a>
+    <a href="{% url 'classes:price-list' %}" class="btn btn-link">{% translate "Cancel" %}</a>
 </form>
 {% endblock %}

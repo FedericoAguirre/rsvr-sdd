@@ -24,22 +24,27 @@ def logged_client(http_client, staff_user):
 @pytest.fixture
 def sample_clients(db):
     Client.objects.create(
-        first_name="John", last_name="Doe",
-        email="john@test.com", mobile="+1 (555) 123-4567",
+        first_name="John",
+        last_name="Doe",
+        email="john@test.com",
+        mobile="+1 (555) 123-4567",
     )
     Client.objects.create(
-        first_name="Jane", last_name="Smith",
-        email="jane@example.com", mobile="+1 (555) 987-6543",
+        first_name="Jane",
+        last_name="Smith",
+        email="jane@example.com",
+        mobile="+1 (555) 987-6543",
     )
     Client.objects.create(
-        first_name="Mark", last_name="Johnson",
-        email="mark@test.co", mobile="+54 11 5555-1212",
+        first_name="Mark",
+        last_name="Johnson",
+        email="mark@test.co",
+        mobile="+54 11 5555-1212",
     )
 
 
 @pytest.mark.django_db
 class TestEmailHighlighting:
-
     def test_email_partial_match_highlighted(self, logged_client, sample_clients):
         response = logged_client.get("/clients/search/?q=john")
         content = response.content.decode()
@@ -55,7 +60,9 @@ class TestEmailHighlighting:
         content = response.content.decode()
         assert "<mark>test</mark>" in content
 
-    def test_email_highlight_not_applied_for_name_below_3_chars(self, logged_client, sample_clients):
+    def test_email_highlight_not_applied_for_name_below_3_chars(
+        self, logged_client, sample_clients
+    ):
         response = logged_client.get("/clients/search/?q=zz")
         content = response.content.decode()
         assert "<mark>" not in content
@@ -63,7 +70,6 @@ class TestEmailHighlighting:
 
 @pytest.mark.django_db
 class TestMobileHighlighting:
-
     def test_mobile_digit_match_highlighted(self, logged_client, sample_clients):
         response = logged_client.get("/clients/search/?q=555")
         content = response.content.decode()
@@ -79,9 +85,9 @@ class TestMobileHighlighting:
         content = response.content.decode()
         assert "<mark>987</mark>" in content
 
-
-
-    def test_mobile_highlight_not_applied_for_name_below_3_chars(self, logged_client, sample_clients):
+    def test_mobile_highlight_not_applied_for_name_below_3_chars(
+        self, logged_client, sample_clients
+    ):
         response = logged_client.get("/clients/search/?q=zz")
         content = response.content.decode()
         assert "<mark>" not in content
@@ -94,7 +100,6 @@ class TestMobileHighlighting:
 
 @pytest.mark.django_db
 class TestHighlightConsistency:
-
     def test_same_mark_tag_used_across_fields(self, logged_client, sample_clients):
         response = logged_client.get("/clients/search/?q=ar")
         content = response.content.decode()
@@ -109,7 +114,6 @@ class TestHighlightConsistency:
 
 @pytest.mark.django_db
 class TestSearchRegression:
-
     def test_name_search_still_returns_results(self, logged_client, sample_clients):
         response = logged_client.get("/clients/search/?q=Doe")
         content = response.content.decode()

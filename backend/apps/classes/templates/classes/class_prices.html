@@ -1,26 +1,25 @@
 {% extends "base.html" %}
 {% load i18n %}
-{% block title %}{% translate "Class Prices" %}{% endblock %}
+{% block title %}{% translate "Price Records" %}{% endblock %}
 {% block content %}
-<h2 class="mb-4">{% translate "Class Prices" %}</h2>
-<p class="text-muted">
-    {% blocktranslate with slot=class_slot %}{{ slot }}{% endblocktranslate %}
-</p>
+<h2 class="mb-4">{% translate "Price Records" %}</h2>
 {% if user_can_add %}
 <p>
-    <a href="{% url 'classes:class-price-add' class_slot.pk %}" class="btn btn-sm btn-outline-primary">
+    <a href="{% url 'classes:price-add' %}" class="btn btn-sm btn-outline-primary">
         {% translate "Add price" %}
     </a>
 </p>
 {% endif %}
-{% if current_price %}
+{% if current_prices %}
 <div class="alert alert-success">
-    <strong>{% translate "Current price" %}:</strong> {{ current_price.price }}
-    <span class="badge bg-success">{% translate "Current" %}</span>
+    <strong>{% translate "Current prices" %}:</strong>
+    {% for price in current_prices %}
+    {{ price.price }}{% if not forloop.last %}, {% endif %}
+    {% endfor %}
 </div>
 {% else %}
 {% if not price_history %}
-<div class="alert alert-info">{% translate "This class has no price history." %}</div>
+<div class="alert alert-info">{% translate "No price history exists yet." %}</div>
 {% endif %}
 {% endif %}
 {% if price_history %}

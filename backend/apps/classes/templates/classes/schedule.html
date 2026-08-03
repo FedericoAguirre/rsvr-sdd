@@ -4,7 +4,7 @@
 {% block content %}
 <h2 class="mb-4">{% translate "Class Schedule" %}</h2>
 <table class="table table-striped">
-    <thead><tr><th>{% translate "Day" %}</th><th>{% translate "Time" %}</th><th>{% translate "Status" %}</th><th></th></tr></thead>
+    <thead><tr><th>{% translate "Day" %}</th><th>{% translate "Time" %}</th><th>{% translate "Status" %}</th></tr></thead>
     <tbody>
     {% for slot in slots %}
     <tr>
@@ -14,16 +14,6 @@
             <span class="badge {% if slot.is_active %}bg-success{% else %}bg-secondary{% endif %}">
                 {% if slot.is_active %}{% translate "Active" %}{% else %}{% translate "Inactive" %}{% endif %}
             </span>
-        </td>
-        <td>
-            <a href="{% url 'classes:class-toggle' slot.pk %}" class="btn btn-sm btn-outline-warning">
-                {% if slot.is_active %}{% translate "Deactivate" %}{% else %}{% translate "Activate" %}{% endif %}
-            </a>
-        </td>
-        <td>
-            <a href="{% url 'classes:class-prices' slot.pk %}" class="btn btn-sm btn-outline-info">
-                {% translate "Prices" %}
-            </a>
         </td>
     </tr>
     {% endfor %}

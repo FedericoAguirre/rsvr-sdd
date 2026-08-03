@@ -80,7 +80,9 @@ class TestAutoDate:
         assert result is not None
         result_date = date.fromisoformat(result)
         diff = (result_date - frozen_today).days
-        assert diff == expected_diff, f"Expected diff {expected_diff} (next week), got {diff}"
+        assert diff == expected_diff, (
+            f"Expected diff {expected_diff} (next week), got {diff}"
+        )
         assert result_date.weekday() == future_day, (
             f"Expected weekday {future_day}, got {result_date.weekday()}"
         )

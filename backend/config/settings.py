@@ -56,7 +56,8 @@ TEMPLATES = [
 WSGI_APPLICATION = "config.wsgi.application"
 
 DATABASE_URL = os.environ.get(
-    "DATABASE_URL", "postgres://rsvr:rsvr@localhost:5432/rsvr")
+    "DATABASE_URL", "postgres://rsvr:rsvr@localhost:5432/rsvr"
+)
 
 match = re.match(r"postgres://(.+):(.+)@(.+):(\d+)/(.+)", DATABASE_URL)
 if match:

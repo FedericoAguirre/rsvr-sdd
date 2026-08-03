@@ -26,8 +26,15 @@ class PaymentForm(forms.ModelForm):
     class Meta:
         model = Payment
         fields = [
-            "client", "amount", "class_slot_count", "payment_type",
-            "date", "notes", "payment_identifier", "reference", "evidence",
+            "client",
+            "amount",
+            "class_slot_count",
+            "payment_type",
+            "date",
+            "notes",
+            "payment_identifier",
+            "reference",
+            "evidence",
         ]
         widgets = {
             "client": forms.Select(attrs={"class": "form-control"}),
@@ -35,7 +42,8 @@ class PaymentForm(forms.ModelForm):
             "payment_type": forms.Select(attrs={"class": "form-control"}),
             "payment_identifier": forms.TextInput(attrs={"class": "form-control"}),
             "date": forms.DateInput(
-                attrs={"class": "form-control", "type": "date"}, format="%Y-%m-%d",
+                attrs={"class": "form-control", "type": "date"},
+                format="%Y-%m-%d",
             ),
             "class_slot_count": forms.NumberInput(attrs={"class": "form-control"}),
             "reference": forms.TextInput(attrs={"class": "form-control"}),
@@ -54,12 +62,20 @@ class PaymentForm(forms.ModelForm):
         instance = kwargs.get("instance")
         if instance and instance.pk:
             # Only allow editing reference, notes, evidence
-            for field in ["client", "amount", "payment_type",
-                          "payment_identifier", "date", "class_slot_count"]:
+            for field in [
+                "client",
+                "amount",
+                "payment_type",
+                "payment_identifier",
+                "date",
+                "class_slot_count",
+            ]:
                 self.fields[field].disabled = True
             formatted = f"${float(instance.amount):,.2f}"
             self.fields["amount"] = forms.CharField(
-                initial=formatted, disabled=True, required=False,
+                initial=formatted,
+                disabled=True,
+                required=False,
                 label=self.fields["amount"].label,
             )
             self.fields["evidence"].required = False
@@ -96,6 +112,7 @@ class BatchReservationForm(forms.Form):
 
     def clean_equipment_id(self):
         from apps.equipment.models import Equipment
+
         eid = self.cleaned_data["equipment_id"]
         try:
             equipment = Equipment.objects.get(pk=eid, status="in-service")
@@ -105,6 +122,7 @@ class BatchReservationForm(forms.Form):
 
     def clean_class_slot_id(self):
         from apps.classes.models import ClassSlot
+
         sid = self.cleaned_data["class_slot_id"]
         try:
             slot = ClassSlot.objects.get(pk=sid, is_active=True)
@@ -118,6 +136,7 @@ class BatchReservationForm(forms.Form):
         from apps.reservations.models import Reservation
         from django.db.models import Max
         from datetime import date, timedelta
+
         raw = self.cleaned_data["dates"]
         pid = self.cleaned_data.get("payment_id")
         payment = Payment.objects.filter(pk=pid).first()
@@ -139,7 +158,9 @@ class BatchReservationForm(forms.Form):
         if len(set(parsed)) != len(parsed):
             raise ValidationError(_("Duplicate dates are not allowed."))
         raw_start = payment.date
-        latest = Reservation.objects.filter(client=payment.client).aggregate(Max("date"))
+        latest = Reservation.objects.filter(client=payment.client).aggregate(
+            Max("date")
+        )
         if latest["date__max"] is not None:
             raw_start = max(raw_start, latest["date__max"] + timedelta(days=1))
         next_monday = raw_start + timedelta(days=(7 - raw_start.weekday()) % 7 or 7)
@@ -153,7 +174,9 @@ class BatchReservationForm(forms.Form):
         if isinstance(slot, ClassSlot):
             for d in parsed:
                 if not ClassSlot.objects.filter(
-                    day_of_week=d.weekday(), time=slot.time, is_active=True,
+                    day_of_week=d.weekday(),
+                    time=slot.time,
+                    is_active=True,
                 ).exists():
                     raise ValidationError(
                         _("No class slot at {} for date {}.").format(slot.time, d),

@@ -28,19 +28,25 @@ def logged_client(http_client, staff_user):
 @pytest.fixture
 def client(db):
     return Client.objects.create(
-        first_name="John", last_name="Doe", mobile="+1234567890",
+        first_name="John",
+        last_name="Doe",
+        mobile="+1234567890",
     )
 
 
 @pytest.fixture
 def equipment(db):
     from apps.equipment.models import Equipment
-    return Equipment.objects.create(name="Cinta 1", equipment_type="treadmill", status="in-service")
+
+    return Equipment.objects.create(
+        name="Cinta 1", equipment_type="treadmill", status="in-service"
+    )
 
 
 @pytest.fixture
 def class_slot(db):
     from apps.classes.models import ClassSlot
+
     return ClassSlot.objects.create(day_of_week=0, time="19:15", is_active=True)
 
 
@@ -67,14 +73,18 @@ class TestBatchModalAppears:
     """T009: Batch modal appears after payment creation."""
 
     def test_modal_shown_on_payment_create(self, logged_client, client):
-        response = logged_client.post("/payments/create/", {
-            "client": client.id,
-            "amount": 100,
-            "payment_type": "CASH",
-            "date": datetime.date.today(),
-            "class_slot_count": 3,
-            "payment_identifier": "",
-        }, follow=True)
+        response = logged_client.post(
+            "/payments/create/",
+            {
+                "client": client.id,
+                "amount": 100,
+                "payment_type": "CASH",
+                "date": datetime.date.today(),
+                "class_slot_count": 3,
+                "payment_identifier": "",
+            },
+            follow=True,
+        )
         assert response.status_code == 200
         content = response.content.decode()
         assert "batchModal" in content
@@ -84,7 +94,9 @@ class TestBatchModalAppears:
 class TestBatchModalContextData:
     """T010: Batch modal context data returns correct equipment/class_slot/date range."""
 
-    def test_batch_data_returns_context(self, logged_client, payment, equipment, class_slot):
+    def test_batch_data_returns_context(
+        self, logged_client, payment, equipment, class_slot
+    ):
         response = logged_client.get(f"/payments/{payment.pk}/batch-data/")
         assert response.status_code == 200
         data = response.json()
@@ -101,7 +113,9 @@ class TestBatchModalContextData:
 class TestBatchCreation:
     """T011: Batch creation creates N reservations linked to payment."""
 
-    def test_batch_creates_n_reservations(self, logged_client, payment, equipment, class_slot):
+    def test_batch_creates_n_reservations(
+        self, logged_client, payment, equipment, class_slot
+    ):
         start = payment.date
         next_monday = start + datetime.timedelta(days=(7 - start.weekday()) % 7 or 7)
         dates = [
@@ -110,26 +124,33 @@ class TestBatchCreation:
         ]
         response = logged_client.post(
             f"/payments/{payment.pk}/batch-create/",
-            json.dumps({
-                "payment_id": payment.pk,
-                "equipment_id": equipment.id,
-                "class_slot_id": class_slot.id,
-                "dates": dates,
-            }),
+            json.dumps(
+                {
+                    "payment_id": payment.pk,
+                    "equipment_id": equipment.id,
+                    "class_slot_id": class_slot.id,
+                    "dates": dates,
+                }
+            ),
             content_type="application/json",
         )
         assert response.status_code == 200
         data = response.json()
         assert data["status"] == "ok"
         assert data["created"] == payment.class_slot_count
-        assert PaymentReservation.objects.filter(payment=payment).count() == payment.class_slot_count
+        assert (
+            PaymentReservation.objects.filter(payment=payment).count()
+            == payment.class_slot_count
+        )
 
 
 @pytest.mark.django_db
 class TestBatchRedirectToDetail:
     """T012: After batch creation, page redirects to payment detail."""
 
-    def test_batch_redirects_on_success(self, logged_client, payment, equipment, class_slot):
+    def test_batch_redirects_on_success(
+        self, logged_client, payment, equipment, class_slot
+    ):
         start = payment.date
         next_monday = start + datetime.timedelta(days=(7 - start.weekday()) % 7 or 7)
         dates = [
@@ -138,12 +159,14 @@ class TestBatchRedirectToDetail:
         ]
         response = logged_client.post(
             f"/payments/{payment.pk}/batch-create/",
-            json.dumps({
-                "payment_id": payment.pk,
-                "equipment_id": equipment.id,
-                "class_slot_id": class_slot.id,
-                "dates": dates,
-            }),
+            json.dumps(
+                {
+                    "payment_id": payment.pk,
+                    "equipment_id": equipment.id,
+                    "class_slot_id": class_slot.id,
+                    "dates": dates,
+                }
+            ),
             content_type="application/json",
         )
         assert response.status_code == 200
@@ -156,6 +179,7 @@ class TestBatchRedirectToDetail:
         detail_html = detail.content.decode()
         for r in PaymentReservation.objects.filter(payment=payment):
             from django.template.defaultfilters import date as date_filter
+
             formatted = date_filter(r.reservation.date, "SHORT_DATE_FORMAT")
             assert formatted in detail_html
 
@@ -165,14 +189,17 @@ class TestBatchZeroClassCount:
     """T013: Batch with zero class_slot_count does not show modal."""
 
     def test_zero_class_count_no_modal(self, logged_client, client):
-        response = logged_client.post("/payments/create/", {
-            "client": client.id,
-            "amount": 50,
-            "payment_type": "CASH",
-            "date": datetime.date.today(),
-            "class_slot_count": 0,
-            "payment_identifier": "",
-        })
+        response = logged_client.post(
+            "/payments/create/",
+            {
+                "client": client.id,
+                "amount": 50,
+                "payment_type": "CASH",
+                "date": datetime.date.today(),
+                "class_slot_count": 0,
+                "payment_identifier": "",
+            },
+        )
         assert response.status_code == 200
         content = response.content.decode()
         assert "batchModal" not in content
@@ -182,11 +209,16 @@ class TestBatchZeroClassCount:
 class TestBatchPartialFailure:
     """T014: Partial failure on unique constraint conflicts."""
 
-    def test_partial_failure_on_conflict(self, logged_client, payment, equipment, class_slot, staff_user, db):
+    def test_partial_failure_on_conflict(
+        self, logged_client, payment, equipment, class_slot, staff_user, db
+    ):
         from apps.reservations.models import Reservation
+
         # Use a different client so the pre-created reservation doesn't shift the date range
         other_client = Client.objects.create(
-            first_name="Other", last_name="Client", mobile="+9999999999",
+            first_name="Other",
+            last_name="Client",
+            mobile="+9999999999",
         )
         start = payment.date
         next_monday = start + datetime.timedelta(days=(7 - start.weekday()) % 7 or 7)
@@ -207,12 +239,14 @@ class TestBatchPartialFailure:
         )
         response = logged_client.post(
             f"/payments/{payment.pk}/batch-create/",
-            json.dumps({
-                "payment_id": payment.pk,
-                "equipment_id": equipment.id,
-                "class_slot_id": class_slot.id,
-                "dates": dates,
-            }),
+            json.dumps(
+                {
+                    "payment_id": payment.pk,
+                    "equipment_id": equipment.id,
+                    "class_slot_id": class_slot.id,
+                    "dates": dates,
+                }
+            ),
             content_type="application/json",
         )
         assert response.status_code == 200
@@ -226,26 +260,33 @@ class TestBatchPartialFailure:
 class TestBatchMax20:
     """T021: Exceeding 20 reservations shows warning."""
 
-    def test_exceed_20_fails(self, logged_client, client, staff_user, equipment, class_slot):
+    def test_exceed_20_fails(
+        self, logged_client, client, staff_user, equipment, class_slot
+    ):
         payment = Payment.objects.create(
-            client=client, amount=200, payment_type="CASH",
-            date=datetime.date.today(), class_slot_count=25,
-            reference="MAX-20", created_by=staff_user,
+            client=client,
+            amount=200,
+            payment_type="CASH",
+            date=datetime.date.today(),
+            class_slot_count=25,
+            reference="MAX-20",
+            created_by=staff_user,
         )
         start = payment.date
         next_monday = start + datetime.timedelta(days=(7 - start.weekday()) % 7 or 7)
         dates = [
-            (next_monday + datetime.timedelta(weeks=i)).isoformat()
-            for i in range(25)
+            (next_monday + datetime.timedelta(weeks=i)).isoformat() for i in range(25)
         ]
         response = logged_client.post(
             f"/payments/{payment.pk}/batch-create/",
-            json.dumps({
-                "payment_id": payment.pk,
-                "equipment_id": equipment.id,
-                "class_slot_id": class_slot.id,
-                "dates": dates,
-            }),
+            json.dumps(
+                {
+                    "payment_id": payment.pk,
+                    "equipment_id": equipment.id,
+                    "class_slot_id": class_slot.id,
+                    "dates": dates,
+                }
+            ),
             content_type="application/json",
         )
         assert response.status_code == 400
@@ -270,12 +311,14 @@ class TestBatchDateRange:
         ]
         response = logged_client.post(
             f"/payments/{payment.pk}/batch-create/",
-            json.dumps({
-                "payment_id": payment.pk,
-                "equipment_id": equipment.id,
-                "class_slot_id": class_slot.id,
-                "dates": dates,
-            }),
+            json.dumps(
+                {
+                    "payment_id": payment.pk,
+                    "equipment_id": equipment.id,
+                    "class_slot_id": class_slot.id,
+                    "dates": dates,
+                }
+            ),
             content_type="application/json",
         )
         assert response.status_code == 400
@@ -294,12 +337,14 @@ class TestBatchExactCount:
         dates = [next_monday.isoformat()]
         response = logged_client.post(
             f"/payments/{payment.pk}/batch-create/",
-            json.dumps({
-                "payment_id": payment.pk,
-                "equipment_id": equipment.id,
-                "class_slot_id": class_slot.id,
-                "dates": dates,
-            }),
+            json.dumps(
+                {
+                    "payment_id": payment.pk,
+                    "equipment_id": equipment.id,
+                    "class_slot_id": class_slot.id,
+                    "dates": dates,
+                }
+            ),
             content_type="application/json",
         )
         assert response.status_code == 400
@@ -323,12 +368,14 @@ class TestBatchDOWMismatch:
         dates = [tuesday.isoformat()]
         response = logged_client.post(
             f"/payments/{payment.pk}/batch-create/",
-            json.dumps({
-                "payment_id": payment.pk,
-                "equipment_id": equipment.id,
-                "class_slot_id": class_slot.id,
-                "dates": dates,
-            }),
+            json.dumps(
+                {
+                    "payment_id": payment.pk,
+                    "equipment_id": equipment.id,
+                    "class_slot_id": class_slot.id,
+                    "dates": dates,
+                }
+            ),
             content_type="application/json",
         )
         assert response.status_code == 400
@@ -341,11 +388,16 @@ class TestBatchDOWMismatch:
 class TestBatchConflictDisplay:
     """T025: Partial conflict display on payment detail page."""
 
-    def test_partial_reservations_shown_on_detail(self, logged_client, payment, equipment, class_slot, staff_user, db):
+    def test_partial_reservations_shown_on_detail(
+        self, logged_client, payment, equipment, class_slot, staff_user, db
+    ):
         from apps.reservations.models import Reservation
+
         # Use a different client so the pre-created reservation doesn't shift the date range
         other_client = Client.objects.create(
-            first_name="Other", last_name="Client", mobile="+8888888888",
+            first_name="Other",
+            last_name="Client",
+            mobile="+8888888888",
         )
         payment.class_slot_count = 2
         payment.save()
@@ -365,12 +417,14 @@ class TestBatchConflictDisplay:
         )
         response = logged_client.post(
             f"/payments/{payment.pk}/batch-create/",
-            json.dumps({
-                "payment_id": payment.pk,
-                "equipment_id": equipment.id,
-                "class_slot_id": class_slot.id,
-                "dates": dates,
-            }),
+            json.dumps(
+                {
+                    "payment_id": payment.pk,
+                    "equipment_id": equipment.id,
+                    "class_slot_id": class_slot.id,
+                    "dates": dates,
+                }
+            ),
             content_type="application/json",
         )
         assert response.status_code == 200
@@ -383,4 +437,5 @@ class TestBatchConflictDisplay:
         assert detail.status_code == 200
         detail_html = detail.content.decode()
         from django.template.defaultfilters import date as date_filter
+
         assert date_filter(success_date, "SHORT_DATE_FORMAT") in detail_html

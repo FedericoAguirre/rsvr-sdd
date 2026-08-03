@@ -8,9 +8,7 @@ DOCS_PATH = Path(__file__).resolve().parents[2] / "docs" / "windows11_deployment
 
 
 def _extract_powershell_code_blocks(md_text: str) -> list[str]:
-    blocks = re.findall(
-        r"```powershell\n(.*?)```", md_text, re.DOTALL
-    )
+    blocks = re.findall(r"```powershell\n(.*?)```", md_text, re.DOTALL)
     return blocks
 
 
@@ -26,9 +24,7 @@ class TestDocContainsPowerShellEnvLoader:
     ):
         md = DOCS_PATH.read_text(encoding="utf-8")
         blocks = _extract_powershell_code_blocks(md)
-        assert any(
-            "SetEnvironmentVariable" in block for block in blocks
-        ), (
+        assert any("SetEnvironmentVariable" in block for block in blocks), (
             "No PowerShell code block in docs/windows11_deployment.md "
             "contains the .env loader (SetEnvironmentVariable). "
             "Expected after updating Option 1/2/3."
@@ -39,9 +35,7 @@ class TestDocContainsPowerShellEnvLoader:
     ):
         md = DOCS_PATH.read_text(encoding="utf-8")
         blocks = _extract_powershell_code_blocks(md)
-        assert any(
-            "uv run" in block and "manage.py" in block for block in blocks
-        ), (
+        assert any("uv run" in block and "manage.py" in block for block in blocks), (
             "No PowerShell code block in docs/windows11_deployment.md "
             "contains 'uv run .\\manage.py runserver'. "
             "Expected after updating Option 1/2/3."
@@ -105,6 +99,4 @@ class TestDocValidationNoExecution:
     def test_project_root_contains_manage_py(self):
         project_root = Path(__file__).resolve().parents[2]
         manage_py = project_root / "backend" / "manage.py"
-        assert manage_py.exists(), (
-            f"Expected {manage_py} to exist for path validation"
-        )
+        assert manage_py.exists(), f"Expected {manage_py} to exist for path validation"

@@ -17,8 +17,15 @@ class Equipment(models.Model):
     ]
 
     name = models.CharField(max_length=100, verbose_name=_("Name"))
-    equipment_type = models.CharField(max_length=50, choices=EQUIPMENT_TYPES, verbose_name=_("Equipment type"))
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="in-service", verbose_name=_("Status"))
+    equipment_type = models.CharField(
+        max_length=50, choices=EQUIPMENT_TYPES, verbose_name=_("Equipment type")
+    )
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default="in-service",
+        verbose_name=_("Status"),
+    )
     notes = models.TextField(blank=True, verbose_name=_("Notes"))
     created_at = models.DateTimeField(auto_now_add=True, verbose_name=_("Created at"))
     updated_at = models.DateTimeField(auto_now=True)

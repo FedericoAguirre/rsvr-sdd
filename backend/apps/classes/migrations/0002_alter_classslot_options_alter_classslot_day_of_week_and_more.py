@@ -4,29 +4,41 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('classes', '0001_initial'),
+        ("classes", "0001_initial"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='classslot',
-            options={'ordering': ['day_of_week', 'time'], 'verbose_name': 'Class slot', 'verbose_name_plural': 'Class slots'},
+            name="classslot",
+            options={
+                "ordering": ["day_of_week", "time"],
+                "verbose_name": "Class slot",
+                "verbose_name_plural": "Class slots",
+            },
         ),
         migrations.AlterField(
-            model_name='classslot',
-            name='day_of_week',
-            field=models.IntegerField(choices=[(0, 'Monday'), (1, 'Tuesday'), (2, 'Wednesday'), (3, 'Thursday'), (4, 'Friday')], verbose_name='Day of week'),
+            model_name="classslot",
+            name="day_of_week",
+            field=models.IntegerField(
+                choices=[
+                    (0, "Monday"),
+                    (1, "Tuesday"),
+                    (2, "Wednesday"),
+                    (3, "Thursday"),
+                    (4, "Friday"),
+                ],
+                verbose_name="Day of week",
+            ),
         ),
         migrations.AlterField(
-            model_name='classslot',
-            name='is_active',
-            field=models.BooleanField(default=True, verbose_name='Is active'),
+            model_name="classslot",
+            name="is_active",
+            field=models.BooleanField(default=True, verbose_name="Is active"),
         ),
         migrations.AlterField(
-            model_name='classslot',
-            name='time',
-            field=models.TimeField(verbose_name='Time'),
+            model_name="classslot",
+            name="time",
+            field=models.TimeField(verbose_name="Time"),
         ),
     ]

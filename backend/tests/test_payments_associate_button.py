@@ -33,7 +33,9 @@ def logged_client(http_client, staff_user):
 @pytest.fixture
 def client(db):
     return Client.objects.create(
-        first_name="Jane", last_name="Smith", mobile="+9876543210",
+        first_name="Jane",
+        last_name="Smith",
+        mobile="+9876543210",
     )
 
 
@@ -83,9 +85,7 @@ class TestAssociateButtonPresence:
         response = logged_client.get(f"/payments/{payment.pk}/")
         html = response.content.decode()
         associate_url = f"/payments/{payment.pk}/associate/"
-        assert associate_url in html, (
-            f"Expected {associate_url} in payment detail page"
-        )
+        assert associate_url in html, f"Expected {associate_url} in payment detail page"
 
 
 class TestAssociateGetView:

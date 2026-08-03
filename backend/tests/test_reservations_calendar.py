@@ -129,7 +129,7 @@ class TestReservationsCalendarDownload:
         )
         disposition = response["Content-Disposition"]
         assert disposition.startswith("attachment;")
-        assert disposition.endswith(".ics\"")
+        assert disposition.endswith('.ics"')
 
     def test_empty_range_shows_message(self, logged_client):
         response = self._get_calendar(
@@ -143,7 +143,9 @@ class TestReservationsCalendarDownload:
         response = self._get_calendar(logged_client)
         assert response.status_code in (302, 400)
 
-    def test_unassociated_reservations(self, logged_client, client_obj, class_slot, equipment):
+    def test_unassociated_reservations(
+        self, logged_client, client_obj, class_slot, equipment
+    ):
         today = datetime.date.today()
         Reservation.objects.create(
             client=client_obj,
@@ -160,7 +162,16 @@ class TestReservationsCalendarDownload:
         content = response.content.replace(b"\r\n ", b"")
         assert b"Reservaci" in content
 
-    def test_multiple_payments_in_range(self, logged_client, client_obj, class_slot, equipment, staff_user, reservations, payment):
+    def test_multiple_payments_in_range(
+        self,
+        logged_client,
+        client_obj,
+        class_slot,
+        equipment,
+        staff_user,
+        reservations,
+        payment,
+    ):
         today = datetime.date.today()
         payment2 = Payment.objects.create(
             client=client_obj,

@@ -24,26 +24,33 @@ def logged_client(http_client, staff_user):
 @pytest.fixture
 def sample_clients(db):
     Client.objects.create(
-        first_name="John", last_name="Doe",
-        email="john@test.com", mobile="+541111111111",
+        first_name="John",
+        last_name="Doe",
+        email="john@test.com",
+        mobile="+541111111111",
     )
     Client.objects.create(
-        first_name="Jane", last_name="Smith",
-        email="jane@test.com", mobile="+541111111112",
+        first_name="Jane",
+        last_name="Smith",
+        email="jane@test.com",
+        mobile="+541111111112",
     )
     Client.objects.create(
-        first_name="Mark", last_name="Johnson",
-        email="mark@test.com", mobile="+541111111113",
+        first_name="Mark",
+        last_name="Johnson",
+        email="mark@test.com",
+        mobile="+541111111113",
     )
     Client.objects.create(
-        first_name="Maria", last_name="Garcia",
-        email="maria@test.com", mobile="+541111111114",
+        first_name="Maria",
+        last_name="Garcia",
+        email="maria@test.com",
+        mobile="+541111111114",
     )
 
 
 @pytest.mark.django_db
 class TestClientSearchByName:
-
     def test_search_by_first_name_partial(self, logged_client, sample_clients):
         response = logged_client.get("/clients/search/?q=Joh")
         content = response.content.decode()
@@ -62,7 +69,9 @@ class TestClientSearchByName:
         assert "<mark>Mar</mark>" in content
         assert "NO ENCONTRADO" not in content
 
-    def test_min_3_chars_does_not_trigger_name_search(self, logged_client, sample_clients):
+    def test_min_3_chars_does_not_trigger_name_search(
+        self, logged_client, sample_clients
+    ):
         response = logged_client.get("/clients/search/?q=zz")
         content = response.content.decode()
         assert "NO ENCONTRADO" in content
@@ -75,7 +84,6 @@ class TestClientSearchByName:
 
 @pytest.mark.django_db
 class TestClientSearchHighlight:
-
     def test_matched_term_wrapped_in_mark_tags(self, logged_client, sample_clients):
         response = logged_client.get("/clients/search/?q=Joh")
         content = response.content.decode()
@@ -94,13 +102,16 @@ class TestClientSearchHighlight:
 
 @pytest.mark.django_db
 class TestClientSearchNotFound:
-
-    def test_not_found_message_appears_when_no_match(self, logged_client, sample_clients):
+    def test_not_found_message_appears_when_no_match(
+        self, logged_client, sample_clients
+    ):
         response = logged_client.get("/clients/search/?q=Zzzz")
         content = response.content.decode()
         assert "NO ENCONTRADO" in content
 
-    def test_not_found_disappears_when_search_modified(self, logged_client, sample_clients):
+    def test_not_found_disappears_when_search_modified(
+        self, logged_client, sample_clients
+    ):
         response = logged_client.get("/clients/search/?q=Zzzz")
         content = response.content.decode()
         assert "NO ENCONTRADO" in content
@@ -111,7 +122,6 @@ class TestClientSearchNotFound:
 
 @pytest.mark.django_db
 class TestClientSearchRegression:
-
     def test_search_by_existing_email(self, logged_client, sample_clients):
         response = logged_client.get("/clients/search/?q=john@test.com")
         content = response.content.decode()

@@ -9,7 +9,13 @@ class ClientSearchForm(forms.Form):
         label=_("Search by email or mobile"),
         max_length=100,
         required=False,
-        widget=forms.TextInput(attrs={"class": "form-control", "placeholder": _("Name, mobile, or email"), "id": "id_q"}),
+        widget=forms.TextInput(
+            attrs={
+                "class": "form-control",
+                "placeholder": _("Name, mobile, or email"),
+                "id": "id_q",
+            }
+        ),
     )
 
 
@@ -28,7 +34,9 @@ class ClientForm(forms.ModelForm):
 class ClientCsvUploadForm(forms.Form):
     csv_file = forms.FileField(
         label=_("CSV file"),
-        help_text=_("Upload a CSV file with columns: first_name, last_name, email, mobile."),
+        help_text=_(
+            "Upload a CSV file with columns: first_name, last_name, email, mobile."
+        ),
         widget=forms.FileInput(attrs={"class": "form-control", "accept": ".csv"}),
     )
 

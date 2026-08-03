@@ -93,8 +93,14 @@ class TestCollectAiDevData:
             rows = list(reader)
         assert len(rows) >= 2
         assert rows[0] == [
-            "feature", "complexity", "minutes", "model",
-            "start_timestamp", "end_timestamp", "specs_quality", "iterations",
+            "feature",
+            "complexity",
+            "minutes",
+            "model",
+            "start_timestamp",
+            "end_timestamp",
+            "specs_quality",
+            "iterations",
         ]
 
     def test_all_features_have_rows(self, repo_with_data):
@@ -131,8 +137,14 @@ class TestCollectAiDevData:
             rows = list(reader)
         assert len(rows) == 1
         assert rows[0] == [
-            "feature", "complexity", "minutes", "model",
-            "start_timestamp", "end_timestamp", "specs_quality", "iterations",
+            "feature",
+            "complexity",
+            "minutes",
+            "model",
+            "start_timestamp",
+            "end_timestamp",
+            "specs_quality",
+            "iterations",
         ]
 
     def test_malformed_session_graceful(self, tmp_path):

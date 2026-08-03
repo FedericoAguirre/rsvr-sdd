@@ -56,89 +56,133 @@ def reservation(db, client_obj, class_slot, equipment, staff_user):
 
 @pytest.mark.django_db
 class TestClientCalendarDownload:
-
-    def test_download_returns_ics_content_type(self, logged_client, client_obj, reservation):
+    def test_download_returns_ics_content_type(
+        self, logged_client, client_obj, reservation
+    ):
         url = reverse("clients:client-calendar", args=[client_obj.pk])
-        response = logged_client.get(url, {"start_date": "2026-06-01", "end_date": "2026-06-30"})
+        response = logged_client.get(
+            url, {"start_date": "2026-06-01", "end_date": "2026-06-30"}
+        )
         assert response.status_code == 200
         assert response["Content-Type"] == "text/calendar; charset=utf-8"
 
     def test_download_filename_format(self, logged_client, client_obj, reservation):
         url = reverse("clients:client-calendar", args=[client_obj.pk])
-        response = logged_client.get(url, {"start_date": "2026-06-01", "end_date": "2026-06-30"})
+        response = logged_client.get(
+            url, {"start_date": "2026-06-01", "end_date": "2026-06-30"}
+        )
         disposition = response["Content-Disposition"]
         assert disposition.startswith("attachment;")
         assert "cal_john_doe_20260601_20260630.ics" in disposition
 
     def test_download_ics_contains_vevent(self, logged_client, client_obj, reservation):
         url = reverse("clients:client-calendar", args=[client_obj.pk])
-        response = logged_client.get(url, {"start_date": "2026-06-01", "end_date": "2026-06-30"})
+        response = logged_client.get(
+            url, {"start_date": "2026-06-01", "end_date": "2026-06-30"}
+        )
         content = response.content.decode()
         assert "VEVENT" in content
         assert "John" in content
         assert "Doe" in content
         assert "Treadmill" in content
 
-    def test_unauthenticated_redirects_to_login(self, http_client, client_obj, reservation):
+    def test_unauthenticated_redirects_to_login(
+        self, http_client, client_obj, reservation
+    ):
         url = reverse("clients:client-calendar", args=[client_obj.pk])
-        response = http_client.get(url, {"start_date": "2026-06-01", "end_date": "2026-06-30"})
+        response = http_client.get(
+            url, {"start_date": "2026-06-01", "end_date": "2026-06-30"}
+        )
         assert response.status_code == 302
 
     def test_nonexistent_client_returns_404(self, logged_client):
         url = reverse("clients:client-calendar", args=[9999])
-        response = logged_client.get(url, {"start_date": "2026-06-01", "end_date": "2026-06-30"})
+        response = logged_client.get(
+            url, {"start_date": "2026-06-01", "end_date": "2026-06-30"}
+        )
         assert response.status_code == 404
 
     def test_empty_range_shows_message(self, logged_client, client_obj):
         url = reverse("clients:client-calendar", args=[client_obj.pk])
-        response = logged_client.get(url, {"start_date": "2026-01-01", "end_date": "2026-01-31"})
+        response = logged_client.get(
+            url, {"start_date": "2026-01-01", "end_date": "2026-01-31"}
+        )
         assert response.status_code == 302
         follow_response = logged_client.get(response.url)
         content = follow_response.content.decode()
         assert "Sin reservas" in content
 
-    def test_invalid_date_order_shows_error(self, logged_client, client_obj, reservation):
+    def test_invalid_date_order_shows_error(
+        self, logged_client, client_obj, reservation
+    ):
         url = reverse("clients:client-calendar", args=[client_obj.pk])
-        response = logged_client.get(url, {"start_date": "2026-06-30", "end_date": "2026-06-01"})
+        response = logged_client.get(
+            url, {"start_date": "2026-06-30", "end_date": "2026-06-01"}
+        )
         assert response.status_code == 302
         follow_response = logged_client.get(response.url)
         content = follow_response.content.decode()
         assert "anterior a la fecha de fin" in content
 
-    def test_download_with_payment_identifier(self, logged_client, client_obj, class_slot, equipment, staff_user):
+    def test_download_with_payment_identifier(
+        self, logged_client, client_obj, class_slot, equipment, staff_user
+    ):
         reservation = Reservation.objects.create(
-            client=client_obj, equipment=equipment, class_slot=class_slot,
-            date="2026-06-15", created_by=staff_user,
+            client=client_obj,
+            equipment=equipment,
+            class_slot=class_slot,
+            date="2026-06-15",
+            created_by=staff_user,
         )
         payment = Payment.objects.create(
-            client=client_obj, payment_identifier="PAY-001", amount=100.00,
-            date="2026-06-15", payment_type="cash", class_slot_count=1,
+            client=client_obj,
+            payment_identifier="PAY-001",
+            amount=100.00,
+            date="2026-06-15",
+            payment_type="cash",
+            class_slot_count=1,
             created_by=staff_user,
         )
         PaymentReservation.objects.create(payment=payment, reservation=reservation)
         url = reverse("clients:client-calendar", args=[client_obj.pk])
-        response = logged_client.get(url, {"start_date": "2026-06-01", "end_date": "2026-06-30"})
+        response = logged_client.get(
+            url, {"start_date": "2026-06-01", "end_date": "2026-06-30"}
+        )
         content = response.content.replace(b"\r\n ", b"")
         assert b"PAY-001" in content
 
-    def test_download_without_payment_shows_unassociated(self, logged_client, client_obj, class_slot, equipment, staff_user):
+    def test_download_without_payment_shows_unassociated(
+        self, logged_client, client_obj, class_slot, equipment, staff_user
+    ):
         Reservation.objects.create(
-            client=client_obj, equipment=equipment, class_slot=class_slot,
-            date="2026-06-15", created_by=staff_user,
+            client=client_obj,
+            equipment=equipment,
+            class_slot=class_slot,
+            date="2026-06-15",
+            created_by=staff_user,
         )
         url = reverse("clients:client-calendar", args=[client_obj.pk])
-        response = logged_client.get(url, {"start_date": "2026-06-01", "end_date": "2026-06-30"})
+        response = logged_client.get(
+            url, {"start_date": "2026-06-01", "end_date": "2026-06-30"}
+        )
         content = response.content.replace(b"\r\n ", b"")
         assert b"Reservaci" in content
 
-    def test_special_chars_in_client_name_handled(self, logged_client, class_slot, equipment, staff_user):
+    def test_special_chars_in_client_name_handled(
+        self, logged_client, class_slot, equipment, staff_user
+    ):
         client = Client.objects.create(first_name="María José", last_name="González")
         Reservation.objects.create(
-            client=client, equipment=equipment, class_slot=class_slot,
-            date="2026-06-15", created_by=staff_user,
+            client=client,
+            equipment=equipment,
+            class_slot=class_slot,
+            date="2026-06-15",
+            created_by=staff_user,
         )
         url = reverse("clients:client-calendar", args=[client.pk])
-        response = logged_client.get(url, {"start_date": "2026-06-01", "end_date": "2026-06-30"})
+        response = logged_client.get(
+            url, {"start_date": "2026-06-01", "end_date": "2026-06-30"}
+        )
         assert response.status_code == 200
         disposition = response["Content-Disposition"]
         assert "maria_jose_gonzalez" in disposition.lower()

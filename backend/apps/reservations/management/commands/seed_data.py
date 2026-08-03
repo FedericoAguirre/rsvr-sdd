@@ -26,7 +26,9 @@ class Command(BaseCommand):
                 ClassSlot.objects.create(
                     day_of_week=day, time=time(hour, minute), is_active=True
                 )
-        self.stdout.write(_("  Created %(count)s class slots.") % {"count": ClassSlot.objects.count()})
+        self.stdout.write(
+            _("  Created %(count)s class slots.") % {"count": ClassSlot.objects.count()}
+        )
 
     def _create_equipment(self):
         if Equipment.objects.exists():
@@ -41,7 +43,10 @@ class Command(BaseCommand):
         ]
         for name, etype in items:
             Equipment.objects.create(name=name, equipment_type=etype)
-        self.stdout.write(_("  Created %(count)s equipment items.") % {"count": Equipment.objects.count()})
+        self.stdout.write(
+            _("  Created %(count)s equipment items.")
+            % {"count": Equipment.objects.count()}
+        )
 
     def _create_clients(self):
         if Client.objects.exists():
@@ -57,4 +62,6 @@ class Command(BaseCommand):
             Client.objects.create(
                 first_name=first, last_name=last, email=email, mobile=mobile
             )
-        self.stdout.write(_("  Created %(count)s clients.") % {"count": Client.objects.count()})
+        self.stdout.write(
+            _("  Created %(count)s clients.") % {"count": Client.objects.count()}
+        )

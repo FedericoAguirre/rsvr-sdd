@@ -13,7 +13,6 @@ class ClassSlotAdmin(admin.ModelAdmin):
 @admin.register(ClassPrice)
 class ClassPriceAdmin(admin.ModelAdmin):
     list_display = [
-        "class_slot",
         "price",
         "current",
         "created_by",
@@ -22,10 +21,9 @@ class ClassPriceAdmin(admin.ModelAdmin):
         "changed_by",
     ]
     list_filter = ["current", "created_at", "changed_at"]
-    search_fields = ["class_slot__day_of_week", "class_slot__time"]
+    search_fields = ["price"]
     readonly_fields = [
         "price",
-        "class_slot",
         "current",
         "created_by",
         "created_at",
