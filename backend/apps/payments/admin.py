@@ -7,8 +7,13 @@ from .models import Payment
 @admin.register(Payment)
 class PaymentAdmin(admin.ModelAdmin):
     list_display = [
-        "payment_identifier", "client", "amount", "payment_type",
-        "date", "class_slot_count", "is_deleted",
+        "payment_identifier",
+        "client",
+        "amount",
+        "payment_type",
+        "date",
+        "class_slot_count",
+        "is_deleted",
     ]
     list_filter = ["payment_type", "date", "is_deleted"]
     search_fields = ["payment_identifier", "client__first_name", "client__last_name"]
@@ -18,8 +23,12 @@ class PaymentAdmin(admin.ModelAdmin):
             None,
             {
                 "fields": [
-                    "client", "amount", "payment_type", "payment_identifier",
-                    "date", "class_slot_count",
+                    "client",
+                    "amount",
+                    "payment_type",
+                    "payment_identifier",
+                    "date",
+                    "class_slot_count",
                 ],
             },
         ),

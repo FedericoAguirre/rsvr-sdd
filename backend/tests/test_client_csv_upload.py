@@ -14,6 +14,7 @@ pytestmark = pytest.mark.django_db
 # Fixtures
 # ---------------------------------------------------------------------------
 
+
 @pytest.fixture
 def http_client():
     return HttpClient()
@@ -33,12 +34,16 @@ def logged_client(http_client, staff_user):
 @pytest.fixture
 def existing_clients(db):
     Client.objects.create(
-        first_name="John", last_name="Doe",
-        email="john@test.com", mobile="+541111111111",
+        first_name="John",
+        last_name="Doe",
+        email="john@test.com",
+        mobile="+541111111111",
     )
     Client.objects.create(
-        first_name="Jane", last_name="Smith",
-        email="jane@test.com", mobile="+541111111112",
+        first_name="Jane",
+        last_name="Smith",
+        email="jane@test.com",
+        mobile="+541111111112",
     )
 
 
@@ -46,17 +51,24 @@ def existing_clients(db):
 # T002 – parse_csv_file
 # ---------------------------------------------------------------------------
 
-class TestParseCsvFile:
 
+class TestParseCsvFile:
     def test_parses_valid_csv(self):
         from apps.clients.csv_import import parse_csv_file
+
         content = "first_name,last_name,email,mobile\nAna,López,ana@test.com,+54911\n"
         result = parse_csv_file(io.StringIO(content))
         assert len(result) == 1
-        assert result[0] == {"first_name": "Ana", "last_name": "López", "email": "ana@test.com", "mobile": "+54911"}
+        assert result[0] == {
+            "first_name": "Ana",
+            "last_name": "López",
+            "email": "ana@test.com",
+            "mobile": "+54911",
+        }
 
     def test_trims_whitespace(self):
         from apps.clients.csv_import import parse_csv_file
+
         content = "first_name,last_name,email,mobile\n  Ana  ,  López  ,ana@test.com,  +54911  \n"
         result = parse_csv_file(io.StringIO(content))
         assert result[0]["first_name"] == "Ana"
@@ -65,6 +77,7 @@ class TestParseCsvFile:
 
     def test_normalizes_empty_to_none(self):
         from apps.clients.csv_import import parse_csv_file
+
         content = "first_name,last_name,email,mobile\nAna,López,,\n"
         result = parse_csv_file(io.StringIO(content))
         assert result[0]["email"] is None
@@ -72,12 +85,14 @@ class TestParseCsvFile:
 
     def test_rejects_missing_required_column(self):
         from apps.clients.csv_import import parse_csv_file
+
         content = "first_name,email,mobile\nAna,ana@test.com,+54911\n"
         with pytest.raises(ValueError, match="last_name"):
             parse_csv_file(io.StringIO(content))
 
     def test_ignores_extra_columns(self):
         from apps.clients.csv_import import parse_csv_file
+
         content = "first_name,last_name,email,mobile,extra\nAna,López,ana@test.com,+54911,ignored\n"
         result = parse_csv_file(io.StringIO(content))
         assert len(result) == 1
@@ -85,12 +100,16 @@ class TestParseCsvFile:
 
     def test_handles_bom(self):
         from apps.clients.csv_import import parse_csv_file
-        content = "\ufefffirst_name,last_name,email,mobile\nAna,López,ana@test.com,+54911\n"
+
+        content = (
+            "\ufefffirst_name,last_name,email,mobile\nAna,López,ana@test.com,+54911\n"
+        )
         result = parse_csv_file(io.StringIO(content))
         assert len(result) == 1
 
     def test_handles_empty_file(self):
         from apps.clients.csv_import import parse_csv_file
+
         content = "first_name,last_name,email,mobile\n"
         result = parse_csv_file(io.StringIO(content))
         assert result == []
@@ -100,10 +119,11 @@ class TestParseCsvFile:
 # T003 – match_client
 # ---------------------------------------------------------------------------
 
-class TestMatchClient:
 
+class TestMatchClient:
     def test_matches_by_first_and_last_name(self, existing_clients):
         from apps.clients.csv_import import match_client
+
         row = {"first_name": "John", "last_name": "Doe", "email": "", "mobile": ""}
         client = match_client(row, Client.objects.all())
         assert client is not None
@@ -111,45 +131,82 @@ class TestMatchClient:
 
     def test_match_by_name_is_case_insensitive(self, existing_clients):
         from apps.clients.csv_import import match_client
+
         row = {"first_name": "JOHN", "last_name": "DOE", "email": "", "mobile": ""}
         client = match_client(row, Client.objects.all())
         assert client is not None
 
     def test_matches_by_email_when_name_fails(self, existing_clients):
         from apps.clients.csv_import import match_client
-        row = {"first_name": "Jonathan", "last_name": "Doe", "email": "jane@test.com", "mobile": ""}
+
+        row = {
+            "first_name": "Jonathan",
+            "last_name": "Doe",
+            "email": "jane@test.com",
+            "mobile": "",
+        }
         client = match_client(row, Client.objects.all())
         assert client is not None
         assert client.first_name == "Jane"
 
     def test_match_by_email_is_case_insensitive(self, existing_clients):
         from apps.clients.csv_import import match_client
-        row = {"first_name": "X", "last_name": "Y", "email": "JANE@TEST.COM", "mobile": ""}
+
+        row = {
+            "first_name": "X",
+            "last_name": "Y",
+            "email": "JANE@TEST.COM",
+            "mobile": "",
+        }
         client = match_client(row, Client.objects.all())
         assert client is not None
 
     def test_matches_by_mobile_when_name_and_email_fail(self, existing_clients):
         from apps.clients.csv_import import match_client
-        row = {"first_name": "X", "last_name": "Y", "email": "no@match.com", "mobile": "+541111111112"}
+
+        row = {
+            "first_name": "X",
+            "last_name": "Y",
+            "email": "no@match.com",
+            "mobile": "+541111111112",
+        }
         client = match_client(row, Client.objects.all())
         assert client is not None
         assert client.first_name == "Jane"
 
     def test_returns_none_when_no_match(self, existing_clients):
         from apps.clients.csv_import import match_client
-        row = {"first_name": "Nobody", "last_name": "Nowhere", "email": "nonexist@test.com", "mobile": "+99999999"}
+
+        row = {
+            "first_name": "Nobody",
+            "last_name": "Nowhere",
+            "email": "nonexist@test.com",
+            "mobile": "+99999999",
+        }
         client = match_client(row, Client.objects.all())
         assert client is None
 
     def test_email_match_skipped_when_email_is_none(self, existing_clients):
         from apps.clients.csv_import import match_client
-        row = {"first_name": "X", "last_name": "Y", "email": None, "mobile": "+541111111112"}
+
+        row = {
+            "first_name": "X",
+            "last_name": "Y",
+            "email": None,
+            "mobile": "+541111111112",
+        }
         client = match_client(row, Client.objects.all())
         assert client is not None
 
     def test_mobile_match_skipped_when_mobile_is_none(self, existing_clients):
         from apps.clients.csv_import import match_client
-        row = {"first_name": "X", "last_name": "Y", "email": "jane@test.com", "mobile": None}
+
+        row = {
+            "first_name": "X",
+            "last_name": "Y",
+            "email": "jane@test.com",
+            "mobile": None,
+        }
         client = match_client(row, Client.objects.all())
         assert client is not None
 
@@ -158,11 +215,19 @@ class TestMatchClient:
 # T004 – process_csv_rows
 # ---------------------------------------------------------------------------
 
-class TestProcessCsvRows:
 
+class TestProcessCsvRows:
     def test_creates_new_client_when_no_match(self, existing_clients):
         from apps.clients.csv_import import process_csv_rows
-        rows = [{"first_name": "New", "last_name": "Client", "email": "new@test.com", "mobile": "+54000000001"}]
+
+        rows = [
+            {
+                "first_name": "New",
+                "last_name": "Client",
+                "email": "new@test.com",
+                "mobile": "+54000000001",
+            }
+        ]
         result = process_csv_rows(rows)
         assert result.created == 1
         assert result.updated == 0
@@ -171,15 +236,31 @@ class TestProcessCsvRows:
 
     def test_updates_existing_client_on_name_match(self, existing_clients):
         from apps.clients.csv_import import process_csv_rows
-        rows = [{"first_name": "John", "last_name": "Doe", "email": "johnny@test.com", "mobile": "+541111111111"}]
+
+        rows = [
+            {
+                "first_name": "John",
+                "last_name": "Doe",
+                "email": "johnny@test.com",
+                "mobile": "+541111111111",
+            }
+        ]
         result = process_csv_rows(rows)
         assert result.updated == 1
-        Client.objects.get(first_name="John", last_name="Doe").email == "johnny@test.com"
+        Client.objects.get(
+            first_name="John", last_name="Doe"
+        ).email == "johnny@test.com"
 
     def test_reports_errors_for_invalid_rows(self, existing_clients):
         from apps.clients.csv_import import process_csv_rows
+
         rows = [
-            {"first_name": "Valid", "last_name": "User", "email": "valid@test.com", "mobile": "+54000000001"},
+            {
+                "first_name": "Valid",
+                "last_name": "User",
+                "email": "valid@test.com",
+                "mobile": "+54000000001",
+            },
             {"first_name": "", "last_name": "", "email": "", "mobile": ""},
         ]
         result = process_csv_rows(rows)
@@ -188,15 +269,27 @@ class TestProcessCsvRows:
 
     def test_total_rows_count(self, existing_clients):
         from apps.clients.csv_import import process_csv_rows
+
         rows = [
-            {"first_name": "A", "last_name": "B", "email": "a@test.com", "mobile": "+54000000001"},
-            {"first_name": "C", "last_name": "D", "email": "c@test.com", "mobile": "+54000000002"},
+            {
+                "first_name": "A",
+                "last_name": "B",
+                "email": "a@test.com",
+                "mobile": "+54000000001",
+            },
+            {
+                "first_name": "C",
+                "last_name": "D",
+                "email": "c@test.com",
+                "mobile": "+54000000002",
+            },
         ]
         result = process_csv_rows(rows)
         assert result.total_rows == 2
 
     def test_error_details_contain_row_info(self, existing_clients):
         from apps.clients.csv_import import process_csv_rows
+
         rows = [
             {"first_name": "", "last_name": "", "email": "", "mobile": ""},
         ]
@@ -206,10 +299,21 @@ class TestProcessCsvRows:
 
     def test_partial_errors_dont_block_valid_rows(self, existing_clients):
         from apps.clients.csv_import import process_csv_rows
+
         rows = [
-            {"first_name": "Good", "last_name": "One", "email": "good@test.com", "mobile": "+54000000001"},
+            {
+                "first_name": "Good",
+                "last_name": "One",
+                "email": "good@test.com",
+                "mobile": "+54000000001",
+            },
             {"first_name": "", "last_name": "", "email": "", "mobile": ""},
-            {"first_name": "Good", "last_name": "Two", "email": "good2@test.com", "mobile": "+54000000002"},
+            {
+                "first_name": "Good",
+                "last_name": "Two",
+                "email": "good2@test.com",
+                "mobile": "+54000000002",
+            },
         ]
         result = process_csv_rows(rows)
         assert result.created == 2
@@ -217,7 +321,15 @@ class TestProcessCsvRows:
 
     def test_created_client_is_active(self, existing_clients):
         from apps.clients.csv_import import process_csv_rows
-        rows = [{"first_name": "Active", "last_name": "Test", "email": "active@test.com", "mobile": "+54000000003"}]
+
+        rows = [
+            {
+                "first_name": "Active",
+                "last_name": "Test",
+                "email": "active@test.com",
+                "mobile": "+54000000003",
+            }
+        ]
         process_csv_rows(rows)
         client = Client.objects.get(email="active@test.com")
         assert client.is_active is True
@@ -227,6 +339,7 @@ class TestProcessCsvRows:
 # Helper to build a CSV upload file
 # ---------------------------------------------------------------------------
 
+
 def _csv_file(content: str, name: str = "test.csv") -> SimpleUploadedFile:
     return SimpleUploadedFile(name, content.encode("utf-8"), content_type="text/csv")
 
@@ -235,8 +348,8 @@ def _csv_file(content: str, name: str = "test.csv") -> SimpleUploadedFile:
 # T009 – GET /clients/upload/
 # ---------------------------------------------------------------------------
 
-class TestCsvUploadViewGet:
 
+class TestCsvUploadViewGet:
     def test_returns_200_and_contains_form(self, logged_client):
         response = logged_client.get("/clients/upload/")
         assert response.status_code == 200
@@ -249,10 +362,12 @@ class TestCsvUploadViewGet:
 # T010 – POST valid CSV
 # ---------------------------------------------------------------------------
 
-class TestCsvUploadValidPost:
 
+class TestCsvUploadValidPost:
     def test_returns_results_with_correct_counts(self, logged_client, existing_clients):
-        csv_data = "first_name,last_name,email,mobile\nNew,Client,new@test.com,+5400000001\n"
+        csv_data = (
+            "first_name,last_name,email,mobile\nNew,Client,new@test.com,+5400000001\n"
+        )
         response = logged_client.post(
             "/clients/upload/",
             {"csv_file": _csv_file(csv_data)},
@@ -266,8 +381,8 @@ class TestCsvUploadValidPost:
 # T011 – POST with missing header
 # ---------------------------------------------------------------------------
 
-class TestCsvUploadMissingHeader:
 
+class TestCsvUploadMissingHeader:
     def test_shows_error_no_rows_processed(self, logged_client):
         csv_data = "first_name,email,mobile\nAna,ana@test.com,+54911\n"
         response = logged_client.post(
@@ -283,8 +398,8 @@ class TestCsvUploadMissingHeader:
 # T012 – rows missing email AND mobile
 # ---------------------------------------------------------------------------
 
-class TestCsvUploadMissingContact:
 
+class TestCsvUploadMissingContact:
     def test_skips_row_reports_error(self, logged_client, existing_clients):
         csv_data = "first_name,last_name,email,mobile\nJohn,Doe,,\n"
         response = logged_client.post(
@@ -299,8 +414,8 @@ class TestCsvUploadMissingContact:
 # T013 – empty file
 # ---------------------------------------------------------------------------
 
-class TestCsvUploadEmptyFile:
 
+class TestCsvUploadEmptyFile:
     def test_rejects_empty_file(self, logged_client):
         csv_data = "first_name,last_name,email,mobile\n"
         response = logged_client.post(
@@ -316,8 +431,8 @@ class TestCsvUploadEmptyFile:
 # T014 – all-new CSV
 # ---------------------------------------------------------------------------
 
-class TestCsvUploadAllNew:
 
+class TestCsvUploadAllNew:
     def test_all_created(self, logged_client):
         csv_data = (
             "first_name,last_name,email,mobile\n"
@@ -338,8 +453,8 @@ class TestCsvUploadAllNew:
 # T024 – GET /clients/template/
 # ---------------------------------------------------------------------------
 
-class TestCsvTemplateDownload:
 
+class TestCsvTemplateDownload:
     def test_returns_csv_content_type_and_filename(self, logged_client):
         response = logged_client.get("/clients/template/")
         assert response.status_code == 200

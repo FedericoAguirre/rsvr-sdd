@@ -27,7 +27,9 @@ def logged_client(http_client, staff_user):
 @pytest.fixture
 def client(db):
     return Client.objects.create(
-        first_name="Jane", last_name="Smith", mobile="+9876543210",
+        first_name="Jane",
+        last_name="Smith",
+        mobile="+9876543210",
     )
 
 
@@ -66,9 +68,7 @@ class TestNewPaymentButtonPresence:
         response = logged_client.get(f"/clients/{client.pk}/")
         html = response.content.decode()
         expected_url = f"/payments/create/?client={client.pk}"
-        assert expected_url in html, (
-            f"Expected {expected_url} in client detail page"
-        )
+        assert expected_url in html, f"Expected {expected_url} in client detail page"
 
 
 class TestClientPreselection:

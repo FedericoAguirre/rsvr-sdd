@@ -57,7 +57,9 @@ def existing_reservation(db, class_slot, equipment_item, client_item, staff_user
 
 @pytest.mark.django_db
 class TestReservationFormDuplicateDetection:
-    def test_clean_raises_error_for_duplicate(self, existing_reservation, class_slot, equipment_item, client_item):
+    def test_clean_raises_error_for_duplicate(
+        self, existing_reservation, class_slot, equipment_item, client_item
+    ):
         form = ReservationForm(
             data={
                 "client": client_item.pk,
@@ -71,9 +73,13 @@ class TestReservationFormDuplicateDetection:
         error_text = str(form.errors)
         has_en = "UNAVAILABLE" in error_text
         has_es = "NO DISPONIBLE" in error_text
-        assert has_en or has_es, f"Expected UNAVAILABLE or NO DISPONIBLE in {error_text}"
+        assert has_en or has_es, (
+            f"Expected UNAVAILABLE or NO DISPONIBLE in {error_text}"
+        )
 
-    def test_clean_passes_for_unique_combination(self, existing_reservation, class_slot, equipment_item, client_item):
+    def test_clean_passes_for_unique_combination(
+        self, existing_reservation, class_slot, equipment_item, client_item
+    ):
         form = ReservationForm(
             data={
                 "client": client_item.pk,
@@ -85,7 +91,9 @@ class TestReservationFormDuplicateDetection:
         )
         assert form.is_valid()
 
-    def test_clean_does_not_add_custom_error_for_non_reserved_status(self, existing_reservation, class_slot, equipment_item, client_item, staff_user):
+    def test_clean_does_not_add_custom_error_for_non_reserved_status(
+        self, existing_reservation, class_slot, equipment_item, client_item, staff_user
+    ):
         existing_reservation.status = "used"
         existing_reservation.save()
         form = ReservationForm(
@@ -101,7 +109,9 @@ class TestReservationFormDuplicateDetection:
         non_field = str(form.non_field_errors())
         assert "UNAVAILABLE" not in non_field
 
-    def test_alert_includes_equipment_date_and_class_slot(self, existing_reservation, class_slot, equipment_item, client_item):
+    def test_alert_includes_equipment_date_and_class_slot(
+        self, existing_reservation, class_slot, equipment_item, client_item
+    ):
         form = ReservationForm(
             data={
                 "client": client_item.pk,
@@ -117,7 +127,9 @@ class TestReservationFormDuplicateDetection:
         assert "2026-07-01" in error_text
         assert str(class_slot) in error_text
 
-    def test_alert_contains_aria_role(self, existing_reservation, class_slot, equipment_item, client_item):
+    def test_alert_contains_aria_role(
+        self, existing_reservation, class_slot, equipment_item, client_item
+    ):
         form = ReservationForm(
             data={
                 "client": client_item.pk,
@@ -129,6 +141,7 @@ class TestReservationFormDuplicateDetection:
         )
         form.is_valid()
         from django.template import Template, Context
+
         template = Template(
             "{% if form.non_field_errors %}"
             '<div class="alert alert-warning alert-dismissible fade show" role="alert" aria-live="assertive">'
@@ -142,7 +155,9 @@ class TestReservationFormDuplicateDetection:
         rendered = template.render(Context({"form": form}))
         assert 'role="alert"' in rendered
 
-    def test_multi_equipment_validation(self, class_slot, equipment_item, client_item, staff_user):
+    def test_multi_equipment_validation(
+        self, class_slot, equipment_item, client_item, staff_user
+    ):
         bike = Equipment.objects.create(name="Bike", equipment_type="bike")
         Reservation.objects.create(
             client=client_item,
@@ -166,7 +181,14 @@ class TestReservationFormDuplicateDetection:
 
 @pytest.mark.django_db
 class TestReservationAlertIntegration:
-    def test_duplicate_alert_shown_on_form_submit(self, logged_client, existing_reservation, class_slot, equipment_item, client_item):
+    def test_duplicate_alert_shown_on_form_submit(
+        self,
+        logged_client,
+        existing_reservation,
+        class_slot,
+        equipment_item,
+        client_item,
+    ):
         response = logged_client.post(
             "/reservations/create/",
             {
@@ -181,7 +203,9 @@ class TestReservationAlertIntegration:
         content = response.content.decode()
         assert "NO DISPONIBLE" in content or "UNAVAILABLE" in content
 
-    def test_unique_reservation_submits_successfully(self, logged_client, class_slot, equipment_item, client_item):
+    def test_unique_reservation_submits_successfully(
+        self, logged_client, class_slot, equipment_item, client_item
+    ):
         response = logged_client.post(
             "/reservations/create/",
             {
@@ -194,7 +218,14 @@ class TestReservationAlertIntegration:
         )
         assert response.status_code == 302
 
-    def test_alert_has_warning_css_class(self, logged_client, existing_reservation, class_slot, equipment_item, client_item):
+    def test_alert_has_warning_css_class(
+        self,
+        logged_client,
+        existing_reservation,
+        class_slot,
+        equipment_item,
+        client_item,
+    ):
         response = logged_client.post(
             "/reservations/create/",
             {
@@ -208,7 +239,15 @@ class TestReservationAlertIntegration:
         content = response.content.decode()
         assert 'class="alert alert-warning alert-dismissible fade show"' in content
 
-    def test_spanish_locale_shows_spanish_alert(self, http_client, staff_user, existing_reservation, class_slot, equipment_item, client_item):
+    def test_spanish_locale_shows_spanish_alert(
+        self,
+        http_client,
+        staff_user,
+        existing_reservation,
+        class_slot,
+        equipment_item,
+        client_item,
+    ):
         http_client.force_login(staff_user)
         response = http_client.post(
             "/reservations/create/",

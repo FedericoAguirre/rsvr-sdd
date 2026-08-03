@@ -32,10 +32,14 @@ def _get_slot_reservations(class_slot_pk, date_str):
     reservations = Reservation.objects.none()
     class_slot = None
     if class_slot_pk and date_str:
-        reservations = Reservation.objects.filter(
-            class_slot_id=class_slot_pk,
-            date=date_str,
-        ).select_related("client", "equipment", "class_slot").order_by("equipment__name")
+        reservations = (
+            Reservation.objects.filter(
+                class_slot_id=class_slot_pk,
+                date=date_str,
+            )
+            .select_related("client", "equipment", "class_slot")
+            .order_by("equipment__name")
+        )
         class_slot = get_object_or_404(ClassSlot, pk=class_slot_pk)
     return reservations, class_slot
 
@@ -49,9 +53,12 @@ def reservation_list_pdf(request):
     try:
         buffer = io.BytesIO()
         doc = SimpleDocTemplate(
-            buffer, pagesize=A4,
-            topMargin=2 * cm, bottomMargin=2 * cm,
-            leftMargin=2 * cm, rightMargin=2 * cm,
+            buffer,
+            pagesize=A4,
+            topMargin=2 * cm,
+            bottomMargin=2 * cm,
+            leftMargin=2 * cm,
+            rightMargin=2 * cm,
         )
         styles = getSampleStyleSheet()
         elements = []
@@ -63,34 +70,51 @@ def reservation_list_pdf(request):
         elements.append(Spacer(1, 0.5 * cm))
 
         if reservations:
-            data = [[
-                Paragraph(_("Equipment"), styles["Normal"]),
-                Paragraph(_("Client"), styles["Normal"]),
-                Paragraph(_("Status"), styles["Normal"]),
-            ]]
+            data = [
+                [
+                    Paragraph(_("Equipment"), styles["Normal"]),
+                    Paragraph(_("Client"), styles["Normal"]),
+                    Paragraph(_("Status"), styles["Normal"]),
+                ]
+            ]
             for r in reservations:
-                data.append([
-                    Paragraph(r.equipment.name, styles["Normal"]),
-                    Paragraph(" ".join(p for p in [r.client.first_name, r.client.last_name] if p), styles["Normal"]),
-                    Paragraph(r.get_status_display(), styles["Normal"]),
-                ])
+                data.append(
+                    [
+                        Paragraph(r.equipment.name, styles["Normal"]),
+                        Paragraph(
+                            " ".join(
+                                p
+                                for p in [r.client.first_name, r.client.last_name]
+                                if p
+                            ),
+                            styles["Normal"],
+                        ),
+                        Paragraph(r.get_status_display(), styles["Normal"]),
+                    ]
+                )
             col_widths = [doc.width * 0.35, doc.width * 0.40, doc.width * 0.25]
             table = Table(data, colWidths=col_widths, repeatRows=1)
-            table.setStyle(TableStyle([
-                ("GRID", (0, 0), (-1, -1), 0.5, colors.grey),
-                ("BACKGROUND", (0, 0), (-1, 0), colors.Color(0.9, 0.9, 0.9)),
-                ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
-                ("VALIGN", (0, 0), (-1, -1), "TOP"),
-                ("TOPPADDING", (0, 0), (-1, -1), 4),
-                ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
-                ("LEFTPADDING", (0, 0), (-1, -1), 6),
-            ]))
+            table.setStyle(
+                TableStyle(
+                    [
+                        ("GRID", (0, 0), (-1, -1), 0.5, colors.grey),
+                        ("BACKGROUND", (0, 0), (-1, 0), colors.Color(0.9, 0.9, 0.9)),
+                        ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+                        ("VALIGN", (0, 0), (-1, -1), "TOP"),
+                        ("TOPPADDING", (0, 0), (-1, -1), 4),
+                        ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
+                        ("LEFTPADDING", (0, 0), (-1, -1), 6),
+                    ]
+                )
+            )
             elements.append(table)
         else:
-            elements.append(Paragraph(
-                _("No reservations found for this class and date."),
-                styles["Normal"],
-            ))
+            elements.append(
+                Paragraph(
+                    _("No reservations found for this class and date."),
+                    styles["Normal"],
+                )
+            )
 
         doc.build(elements)
         pdf = buffer.getvalue()
@@ -98,9 +122,11 @@ def reservation_list_pdf(request):
 
         response = HttpResponse(pdf, content_type="application/pdf")
         safe_name = (
-            str(class_slot).replace(" ", "_").translate(
-                str.maketrans("", "", "/" + chr(0) + '<>:"|?*')
-            ) if class_slot else "unknown"
+            str(class_slot)
+            .replace(" ", "_")
+            .translate(str.maketrans("", "", "/" + chr(0) + '<>:"|?*'))
+            if class_slot
+            else "unknown"
         )
         date_compact = date_str.replace("-", "") if date_str else "no_date"
         filename = f"reservations_{safe_name}_{date_compact}.pdf"
@@ -109,7 +135,9 @@ def reservation_list_pdf(request):
     except Exception as exc:
         logger.exception("PDF generation failed: %s", exc)
         messages.error(request, _("Could not generate the PDF. Please try again."))
-        return redirect(request.META.get("HTTP_REFERER", "reservations:reservation-list"))
+        return redirect(
+            request.META.get("HTTP_REFERER", "reservations:reservation-list")
+        )
 
 
 @login_required
@@ -120,7 +148,9 @@ def reservation_list(request):
     if class_slot_pk and date_str:
         reservations, class_slot = _get_slot_reservations(class_slot_pk, date_str)
     else:
-        reservations = Reservation.objects.select_related("client", "equipment", "class_slot").all()
+        reservations = Reservation.objects.select_related(
+            "client", "equipment", "class_slot"
+        ).all()
         if date_str:
             reservations = reservations.filter(date=date_str)
         class_slot = None
@@ -129,15 +159,19 @@ def reservation_list(request):
     class_slots = ClassSlot.objects.all()
     today = timezone.localdate()
     date_display = date_str.replace("-", "/") if date_str else ""
-    return render(request, "reservations/reservation_list.html", {
-        "reservations": reservations,
-        "today": today,
-        "class_slots": class_slots,
-        "class_slot": class_slot,
-        "date_str": date_str,
-        "date_display": date_display,
-        "status_filter": status_filter,
-    })
+    return render(
+        request,
+        "reservations/reservation_list.html",
+        {
+            "reservations": reservations,
+            "today": today,
+            "class_slots": class_slots,
+            "class_slot": class_slot,
+            "date_str": date_str,
+            "date_display": date_display,
+            "status_filter": status_filter,
+        },
+    )
 
 
 @login_required
@@ -162,11 +196,17 @@ def reservation_calendar(request):
         messages.error(request, _("The start date must be before the end date."))
         return redirect("reservations:reservation-list")
 
-    reservations = Reservation.objects.filter(
-        date__gte=start_date, date__lte=end_date,
-    ).select_related("client", "equipment", "class_slot").order_by("date", "class_slot__time")
+    reservations = (
+        Reservation.objects.filter(
+            date__gte=start_date,
+            date__lte=end_date,
+        )
+        .select_related("client", "equipment", "class_slot")
+        .order_by("date", "class_slot__time")
+    )
 
     from apps.payments.models import PaymentReservation
+
     prs = PaymentReservation.objects.filter(
         reservation__in=reservations,
     ).select_related("payment", "reservation")
@@ -187,10 +227,14 @@ def reservation_calendar(request):
 @login_required
 def reservation_detail(request, pk):
     reservation = get_object_or_404(
-        Reservation.objects.select_related("client", "equipment", "class_slot", "created_by"),
+        Reservation.objects.select_related(
+            "client", "equipment", "class_slot", "created_by"
+        ),
         pk=pk,
     )
-    return render(request, "reservations/reservation_detail.html", {"reservation": reservation})
+    return render(
+        request, "reservations/reservation_detail.html", {"reservation": reservation}
+    )
 
 
 @login_required
@@ -211,9 +255,13 @@ def reservation_change_status(request, pk):
     reservation.status = new_status
     reservation.save()
     if request.headers.get("HX-Request"):
-        response = render(request, "reservations/partials/reservation_row.html", {
-            "reservation": reservation,
-        })
+        response = render(
+            request,
+            "reservations/partials/reservation_row.html",
+            {
+                "reservation": reservation,
+            },
+        )
         response["HX-Trigger"] = "statusChanged"
         return response
     messages.success(request, _("Reservation status updated."))
@@ -251,13 +299,22 @@ def reservation_create(request):
             return redirect("reservations:reservation-detail", pk=reservation.pk)
     else:
         form = ReservationForm(initial=initial)
-    slots_qs = ClassSlot.objects.filter(is_active=True).values("id", "day_of_week", "time")
-    slots_data = [{
-        "id": s["id"],
-        "day_of_week": s["day_of_week"],
-        "time": s["time"].strftime("%H:%M"),
-    } for s in slots_qs]
-    return render(request, "reservations/reservation_form.html", {
-        "form": form,
-        "slots_data": slots_data,
-    })
+    slots_qs = ClassSlot.objects.filter(is_active=True).values(
+        "id", "day_of_week", "time"
+    )
+    slots_data = [
+        {
+            "id": s["id"],
+            "day_of_week": s["day_of_week"],
+            "time": s["time"].strftime("%H:%M"),
+        }
+        for s in slots_qs
+    ]
+    return render(
+        request,
+        "reservations/reservation_form.html",
+        {
+            "form": form,
+            "slots_data": slots_data,
+        },
+    )

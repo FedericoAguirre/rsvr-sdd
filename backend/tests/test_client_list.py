@@ -37,7 +37,6 @@ def many_clients(db):
 
 @pytest.mark.django_db
 class TestClientList:
-
     def test_all_clients_rendered_when_no_search(self, logged_client):
         Client.objects.all().delete()
         for i in range(15):
@@ -49,8 +48,10 @@ class TestClientList:
 
     def test_all_client_attributes_displayed(self, logged_client):
         Client.objects.create(
-            first_name="Alice", last_name="Smith",
-            email="alice@test.com", mobile="+541112223344",
+            first_name="Alice",
+            last_name="Smith",
+            email="alice@test.com",
+            mobile="+541112223344",
             is_active=True,
         )
         response = logged_client.get("/clients/search/")
@@ -82,8 +83,9 @@ class TestClientList:
             Client.objects.create(first_name=f"User{i}", last_name="Test")
         response = logged_client.get("/clients/search/")
         content = response.content.decode()
-        assert "page-link" in content or "page-item" in content, \
+        assert "page-link" in content or "page-item" in content, (
             "Pagination controls should appear with 11 clients"
+        )
 
     def test_empty_state_when_no_clients(self, logged_client):
         Client.objects.all().delete()
@@ -93,12 +95,16 @@ class TestClientList:
 
     def test_search_still_works_alongside_list(self, logged_client):
         Client.objects.create(
-            first_name="John", last_name="Doe",
-            email="john@test.com", mobile="+541111111111",
+            first_name="John",
+            last_name="Doe",
+            email="john@test.com",
+            mobile="+541111111111",
         )
         Client.objects.create(
-            first_name="Jane", last_name="Doe",
-            email="jane@test.com", mobile="+541111111112",
+            first_name="Jane",
+            last_name="Doe",
+            email="jane@test.com",
+            mobile="+541111111112",
         )
         response = logged_client.get("/clients/search/?q=john")
         content = response.content.decode()
@@ -107,8 +113,10 @@ class TestClientList:
 
     def test_each_row_has_edit_link(self, logged_client):
         Client.objects.create(
-            first_name="Bob", last_name="Brown",
-            email="bob@test.com", mobile="+541111111113",
+            first_name="Bob",
+            last_name="Brown",
+            email="bob@test.com",
+            mobile="+541111111113",
         )
         response = logged_client.get("/clients/search/")
         content = response.content.decode()
@@ -118,12 +126,16 @@ class TestClientList:
 
     def test_edit_link_points_to_correct_client(self, logged_client):
         c1 = Client.objects.create(
-            first_name="Alice", last_name="A",
-            email="alice@t.com", mobile="+541111111114",
+            first_name="Alice",
+            last_name="A",
+            email="alice@t.com",
+            mobile="+541111111114",
         )
         c2 = Client.objects.create(
-            first_name="Bob", last_name="B",
-            email="bob@t.com", mobile="+541111111115",
+            first_name="Bob",
+            last_name="B",
+            email="bob@t.com",
+            mobile="+541111111115",
         )
         response = logged_client.get("/clients/search/")
         content = response.content.decode()

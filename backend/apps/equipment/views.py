@@ -29,7 +29,11 @@ def equipment_create(request):
             return redirect("equipment:equipment-list")
     else:
         form = EquipmentForm()
-    return render(request, "equipment/equipment_form.html", {"form": form, "title": _("Add Equipment")})
+    return render(
+        request,
+        "equipment/equipment_form.html",
+        {"form": form, "title": _("Add Equipment")},
+    )
 
 
 @login_required
@@ -43,4 +47,8 @@ def equipment_edit(request, pk):
             return redirect("equipment:equipment-list")
     else:
         form = EquipmentForm(instance=equipment)
-    return render(request, "equipment/equipment_form.html", {"form": form, "title": _("Edit Equipment")})
+    return render(
+        request,
+        "equipment/equipment_form.html",
+        {"form": form, "title": _("Edit Equipment")},
+    )

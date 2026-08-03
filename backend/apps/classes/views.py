@@ -10,7 +10,7 @@ from django.utils.translation import gettext as _
 from django.views.generic import CreateView, TemplateView
 
 from .forms import ClassPriceForm
-from .models import ClassPrice, ClassSlot
+from .models import ClassPrice
 
 
 def is_admin(user):
@@ -21,12 +21,16 @@ def is_admin(user):
 
 @login_required
 def class_schedule(request):
+    from .models import ClassSlot
+
     slots = ClassSlot.objects.all().order_by("day_of_week", "time")
     return render(request, "classes/schedule.html", {"slots": slots})
 
 
 @login_required
 def class_toggle(request, pk):
+    from .models import ClassSlot
+
     slot = get_object_or_404(ClassSlot, pk=pk)
     slot.is_active = not slot.is_active
     slot.save()
@@ -47,23 +51,18 @@ class ClassPriceCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["class_slot"] = get_object_or_404(
-            ClassSlot,
-            pk=self.kwargs["pk"],
-        )
+        context["current_prices"] = ClassPrice.objects.filter(
+            current=True,
+        ).order_by("-created_at")
         return context
 
     def form_valid(self, form):
-        slot = get_object_or_404(ClassSlot, pk=self.kwargs["pk"])
         ClassPrice.objects.enter_price(
-            class_slot=slot,
             new_price=form.cleaned_data["price"],
             changed_by=self.request.user,
         )
         messages.success(self.request, _("Price updated successfully."))
-        return redirect(
-            reverse("classes:class-prices", kwargs={"pk": slot.pk}),
-        )
+        return redirect(reverse("classes:price-list"))
 
 
 class ClassPricesView(LoginRequiredMixin, TemplateView):
@@ -71,14 +70,12 @@ class ClassPricesView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        slot = get_object_or_404(ClassSlot, pk=self.kwargs["pk"])
-        price_history = ClassPrice.objects.filter(class_slot=slot).select_related(
+        price_history = ClassPrice.objects.all().select_related(
             "created_by",
             "changed_by",
         )
-        current_price = price_history.filter(current=True).first()
-        context["class_slot"] = slot
-        context["current_price"] = current_price
+        current_prices = price_history.filter(current=True)
+        context["current_prices"] = current_prices
         context["price_history"] = price_history
         context["user_can_add"] = is_admin(self.request.user)
         return context

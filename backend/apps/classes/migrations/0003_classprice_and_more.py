@@ -6,34 +6,90 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('classes', '0002_alter_classslot_options_alter_classslot_day_of_week_and_more'),
+        (
+            "classes",
+            "0002_alter_classslot_options_alter_classslot_day_of_week_and_more",
+        ),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='ClassPrice',
+            name="ClassPrice",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('price', models.DecimalField(decimal_places=2, max_digits=10, verbose_name='Price')),
-                ('current', models.BooleanField(default=True, verbose_name='Current')),
-                ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='Created at')),
-                ('changed_at', models.DateTimeField(blank=True, null=True, verbose_name='Changed at')),
-                ('updated_at', models.DateTimeField(auto_now=True, verbose_name='Updated at')),
-                ('changed_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='changed_class_prices', to=settings.AUTH_USER_MODEL, verbose_name='Changed by')),
-                ('class_slot', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='prices', to='classes.classslot', verbose_name='Class slot')),
-                ('created_by', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='created_class_prices', to=settings.AUTH_USER_MODEL, verbose_name='Created by')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "price",
+                    models.DecimalField(
+                        decimal_places=2, max_digits=10, verbose_name="Price"
+                    ),
+                ),
+                ("current", models.BooleanField(default=True, verbose_name="Current")),
+                (
+                    "created_at",
+                    models.DateTimeField(auto_now_add=True, verbose_name="Created at"),
+                ),
+                (
+                    "changed_at",
+                    models.DateTimeField(
+                        blank=True, null=True, verbose_name="Changed at"
+                    ),
+                ),
+                (
+                    "updated_at",
+                    models.DateTimeField(auto_now=True, verbose_name="Updated at"),
+                ),
+                (
+                    "changed_by",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name="changed_class_prices",
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="Changed by",
+                    ),
+                ),
+                (
+                    "class_slot",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name="prices",
+                        to="classes.classslot",
+                        verbose_name="Class slot",
+                    ),
+                ),
+                (
+                    "created_by",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name="created_class_prices",
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="Created by",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Class price',
-                'verbose_name_plural': 'Class prices',
-                'ordering': ['-created_at'],
+                "verbose_name": "Class price",
+                "verbose_name_plural": "Class prices",
+                "ordering": ["-created_at"],
             },
         ),
         migrations.AddConstraint(
-            model_name='classprice',
-            constraint=models.UniqueConstraint(condition=models.Q(('current', True)), fields=('class_slot',), name='unique_current_classprice_per_slot'),
+            model_name="classprice",
+            constraint=models.UniqueConstraint(
+                condition=models.Q(("current", True)),
+                fields=("class_slot",),
+                name="unique_current_classprice_per_slot",
+            ),
         ),
     ]

@@ -32,7 +32,9 @@ def logged_client(http_client, staff_user):
 @pytest.fixture
 def client(db):
     return Client.objects.create(
-        first_name="Jane", last_name="Smith", mobile="+9876543210",
+        first_name="Jane",
+        last_name="Smith",
+        mobile="+9876543210",
     )
 
 
@@ -72,9 +74,7 @@ def payment(client, staff_user):
 
 @pytest.fixture
 def payment_reservation(payment, reservation):
-    return PaymentReservation.objects.create(
-        payment=payment, reservation=reservation
-    )
+    return PaymentReservation.objects.create(payment=payment, reservation=reservation)
 
 
 class TestReservationsGridColumnOrder:
@@ -94,9 +94,9 @@ class TestReservationsGridColumnOrder:
         assert fecha_idx != -1, "Fecha column not found in <thead>"
         assert equipo_idx != -1, "Equipo column not found in <thead>"
         assert estado_idx != -1, "Estado column not found in <thead>"
-        assert (
-            clase_idx < fecha_idx < equipo_idx < estado_idx
-        ), f"Expected Bloque de clase < Fecha < Equipo < Estado in <thead>, got positions: Bloque de clase={clase_idx}, Fecha={fecha_idx}, Equipo={equipo_idx}, Estado={estado_idx}"
+        assert clase_idx < fecha_idx < equipo_idx < estado_idx, (
+            f"Expected Bloque de clase < Fecha < Equipo < Estado in <thead>, got positions: Bloque de clase={clase_idx}, Fecha={fecha_idx}, Equipo={equipo_idx}, Estado={estado_idx}"
+        )
 
     def test_table_has_striped_class(self, logged_client, client, payment_reservation):
         response = logged_client.get(f"/payments/{payment_reservation.payment.pk}/")

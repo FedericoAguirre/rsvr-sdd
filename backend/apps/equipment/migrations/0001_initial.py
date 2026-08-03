@@ -4,27 +4,55 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Equipment',
+            name="Equipment",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=100)),
-                ('equipment_type', models.CharField(choices=[('treadmill', 'Treadmill'), ('bike', 'Stationary Bike'), ('elliptical', 'Elliptical'), ('rower', 'Rowing Machine'), ('other', 'Other')], max_length=50)),
-                ('status', models.CharField(choices=[('in-service', 'In Service'), ('out-of-service', 'Out of Service')], default='in-service', max_length=20)),
-                ('notes', models.TextField(blank=True)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=100)),
+                (
+                    "equipment_type",
+                    models.CharField(
+                        choices=[
+                            ("treadmill", "Treadmill"),
+                            ("bike", "Stationary Bike"),
+                            ("elliptical", "Elliptical"),
+                            ("rower", "Rowing Machine"),
+                            ("other", "Other"),
+                        ],
+                        max_length=50,
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("in-service", "In Service"),
+                            ("out-of-service", "Out of Service"),
+                        ],
+                        default="in-service",
+                        max_length=20,
+                    ),
+                ),
+                ("notes", models.TextField(blank=True)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
             ],
             options={
-                'verbose_name_plural': 'equipment',
-                'ordering': ['name'],
+                "verbose_name_plural": "equipment",
+                "ordering": ["name"],
             },
         ),
     ]

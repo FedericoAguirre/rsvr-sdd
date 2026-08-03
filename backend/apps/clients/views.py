@@ -53,7 +53,11 @@ def client_search(request):
 def client_detail(request, pk):
     client = get_object_or_404(Client, pk=pk)
     reservations = client.reservations.select_related("equipment", "class_slot").all()
-    return render(request, "clients/client_detail.html", {"client": client, "reservations": reservations})
+    return render(
+        request,
+        "clients/client_detail.html",
+        {"client": client, "reservations": reservations},
+    )
 
 
 def _snake_case_name(client):
@@ -134,21 +138,35 @@ def client_csv_upload(request):
                     decoded = csv_file.read().decode("utf-8")
                     rows = csv_import.parse_csv_file(io.StringIO(decoded))
                     if not rows:
-                        form.add_error("csv_file", _("The CSV file contains no data rows."))
+                        form.add_error(
+                            "csv_file", _("The CSV file contains no data rows.")
+                        )
                     else:
                         result = csv_import.process_csv_rows(rows)
                         messages.success(
                             request,
-                            _("Processed %(total)s rows: %(created)s created, %(updated)s updated, %(errors)s errors.")
-                            % {"total": result.total_rows, "created": result.created, "updated": result.updated, "errors": result.errors},
+                            _(
+                                "Processed %(total)s rows: %(created)s created, %(updated)s updated, %(errors)s errors."
+                            )
+                            % {
+                                "total": result.total_rows,
+                                "created": result.created,
+                                "updated": result.updated,
+                                "errors": result.errors,
+                            },
                         )
                 except UnicodeDecodeError:
-                    form.add_error("csv_file", _("Could not decode the file. Please use UTF-8 encoding."))
+                    form.add_error(
+                        "csv_file",
+                        _("Could not decode the file. Please use UTF-8 encoding."),
+                    )
                 except ValueError as e:
                     form.add_error("csv_file", str(e))
     else:
         form = ClientCsvUploadForm()
-    return render(request, "clients/client_csv_upload.html", {"form": form, "result": result})
+    return render(
+        request, "clients/client_csv_upload.html", {"form": form, "result": result}
+    )
 
 
 @login_required

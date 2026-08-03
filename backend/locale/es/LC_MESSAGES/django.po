@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: rsvr-sdd\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-02 18:17-0600\n"
+"POT-Creation-Date: 2026-08-02 19:03-0600\n"
 "PO-Revision-Date: 2026-06-11 10:30-0600\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -20,8 +20,8 @@ msgstr ""
 msgid "Classes"
 msgstr "Clases"
 
-#: apps/classes/forms.py:20 apps/classes/models.py:76
-#: apps/classes/templates/classes/class_prices.html:30
+#: apps/classes/forms.py:20 apps/classes/models.py:74
+#: apps/classes/templates/classes/class_prices.html:29
 msgid "Price"
 msgstr "Precio"
 
@@ -29,154 +29,138 @@ msgstr "Precio"
 msgid "Enter a positive amount."
 msgstr "Ingrese una cantidad positiva."
 
-#: apps/classes/models.py:17 apps/classes/models.py:57
-#: apps/classes/models.py:147 apps/classes/models.py:184
+#: apps/classes/models.py:10 apps/classes/models.py:60
+#: apps/classes/models.py:138
 msgid "Class price records cannot be deleted."
 msgstr "Los registros de precios de clase no se pueden eliminar."
 
-#: apps/classes/models.py:23
+#: apps/classes/models.py:16
 msgid "Monday"
 msgstr "Lunes"
 
-#: apps/classes/models.py:24
+#: apps/classes/models.py:17
 msgid "Tuesday"
 msgstr "Martes"
 
-#: apps/classes/models.py:25
+#: apps/classes/models.py:18
 msgid "Wednesday"
 msgstr "Miércoles"
 
-#: apps/classes/models.py:26
+#: apps/classes/models.py:19
 msgid "Thursday"
 msgstr "Jueves"
 
-#: apps/classes/models.py:27
+#: apps/classes/models.py:20
 msgid "Friday"
 msgstr "Viernes"
 
-#: apps/classes/models.py:30
+#: apps/classes/models.py:23
 msgid "17:30"
 msgstr "17:30"
 
-#: apps/classes/models.py:31
+#: apps/classes/models.py:24
 msgid "18:30"
 msgstr "18:30"
 
-#: apps/classes/models.py:34
+#: apps/classes/models.py:29
 msgid "Day of week"
 msgstr "Día de la semana"
 
-#: apps/classes/models.py:35 apps/classes/templates/classes/schedule.html:7
+#: apps/classes/models.py:31 apps/classes/templates/classes/schedule.html:7
 msgid "Time"
 msgstr "Hora"
 
-#: apps/classes/models.py:36 apps/clients/models.py:10
+#: apps/classes/models.py:34 apps/clients/models.py:10
 msgid "Is active"
 msgstr "Activo"
 
-#: apps/classes/models.py:41 apps/classes/models.py:71
+#: apps/classes/models.py:40
 #: apps/payments/templates/payments/payment_list.html:49
 #: apps/reservations/forms.py:18 apps/reservations/models.py:29
 msgid "Class slot"
 msgstr "Bloque de clase"
 
-#: apps/classes/models.py:42
+#: apps/classes/models.py:41
 msgid "Class slots"
 msgstr "Bloques de clase"
 
-#: apps/classes/models.py:47
+#: apps/classes/models.py:46
 msgid " (inactive)"
 msgstr " (inactivo)"
 
-#: apps/classes/models.py:48
+#: apps/classes/models.py:47
 #, python-format
 msgid "%(day)s %(time)s%(status)s"
 msgstr "%(day)s %(time)s%(status)s"
 
-#: apps/classes/models.py:80
-#: apps/classes/templates/classes/class_prices.html:19
-#: apps/classes/templates/classes/class_prices.html:31
-#: apps/classes/templates/classes/class_prices.html:44
+#: apps/classes/models.py:78
+#: apps/classes/templates/classes/class_prices.html:30
+#: apps/classes/templates/classes/class_prices.html:43
 msgid "Current"
 msgstr "Actual"
 
-#: apps/classes/models.py:86
-#: apps/classes/templates/classes/class_prices.html:34
+#: apps/classes/models.py:84
+#: apps/classes/templates/classes/class_prices.html:33
 #: apps/payments/models.py:52 apps/reservations/models.py:38
 #: apps/reservations/templates/reservations/reservation_detail.html:15
 msgid "Created by"
 msgstr "Creado por"
 
-#: apps/classes/models.py:90 apps/equipment/models.py:23
+#: apps/classes/models.py:88 apps/equipment/models.py:23
 msgid "Created at"
 msgstr "Creado en"
 
-#: apps/classes/models.py:95
+#: apps/classes/models.py:93
 msgid "Changed at"
 msgstr "Modificado en"
 
-#: apps/classes/models.py:103
-#: apps/classes/templates/classes/class_prices.html:35
+#: apps/classes/models.py:101
+#: apps/classes/templates/classes/class_prices.html:34
 msgid "Changed by"
 msgstr "Modificado por"
 
-#: apps/classes/models.py:107
+#: apps/classes/models.py:105
 msgid "Updated at"
 msgstr "Actualizado en"
 
-#: apps/classes/models.py:114
+#: apps/classes/models.py:112
 msgid "Class price"
 msgstr "Precio de clase"
 
-#: apps/classes/models.py:115
+#: apps/classes/models.py:113
 msgid "Class prices"
 msgstr "Precios de clase"
 
-#: apps/classes/models.py:125
-#, python-format
-msgid "%(price)s — %(slot)s"
-msgstr "%(price)s — %(slot)s"
+#: apps/classes/models.py:116
+#: apps/classes/models.py:128
+msgid "%(price)s"
+msgstr "%(price)s"
 
-#: apps/classes/models.py:137
+#: apps/classes/models.py:128
 msgid "The price amount cannot be modified."
 msgstr "El monto del precio no se puede modificar."
-
-#: apps/classes/models.py:162
-msgid "Multiple current prices exist for this class slot."
-msgstr "Existen múltiples precios actuales para este bloque de clase."
 
 #: apps/classes/templates/classes/class_price_form.html:3
 #: apps/classes/templates/classes/class_price_form.html:5
 msgid "Enter a new price"
 msgstr "Ingresar un nuevo precio"
 
-#: apps/classes/templates/classes/class_price_form.html:7
-#: apps/classes/templates/classes/class_prices.html:7
-#, python-format
-msgid "%(slot)s"
-msgstr "%(slot)s"
-
-#: apps/classes/templates/classes/class_price_form.html:11
-msgid "This class has no current price."
-msgstr "Esta clase no tiene un precio actual."
-
-#: apps/classes/templates/classes/class_price_form.html:15
+#: apps/classes/templates/classes/class_price_form.html:8
 msgid ""
-"A current price already exists. Updating it will archive the previous price."
-msgstr "Ya existe un precio actual. Actualizarlo archivará el precio anterior."
+"A current price already exists. Adding a new price creates a separate record."
+msgstr "Ya existe un precio actual. Agregar un nuevo precio crea un registro separado."
 
-#: apps/classes/templates/classes/class_price_form.html:17
-#: apps/classes/templates/classes/class_prices.html:18
-msgid "Current price"
-msgstr "Precio actual"
+#: apps/classes/templates/classes/class_price_form.html:12
+msgid "This is the first price record."
+msgstr "Este es el primer registro de precio."
 
-#: apps/classes/templates/classes/class_price_form.html:30
+#: apps/classes/templates/classes/class_price_form.html:26
 #: apps/clients/templates/clients/client_form.html:16
 #: apps/equipment/templates/equipment/equipment_form.html:16
 msgid "Save"
 msgstr "Guardar"
 
-#: apps/classes/templates/classes/class_price_form.html:31
+#: apps/classes/templates/classes/class_price_form.html:27
 #: apps/clients/templates/clients/client_csv_upload.html:17
 #: apps/clients/templates/clients/client_form.html:17
 #: apps/equipment/templates/equipment/equipment_form.html:17
@@ -187,26 +171,32 @@ msgstr "Guardar"
 msgid "Cancel"
 msgstr "Cancelar"
 
-msgid "Class Prices"
-msgstr "Precios de Clase"
+#: apps/classes/templates/classes/class_prices.html:3
+#: apps/classes/templates/classes/class_prices.html:5
+msgid "Price Records"
+msgstr "Registros de precios"
 
-#: apps/classes/templates/classes/class_prices.html:12
+#: apps/classes/templates/classes/class_prices.html:9
 msgid "Add price"
 msgstr "Agregar precio"
 
-#: apps/classes/templates/classes/class_prices.html:23
-msgid "This class has no price history."
-msgstr "Esta clase no tiene historial de precios."
+#: apps/classes/templates/classes/class_prices.html:15
+msgid "Current prices"
+msgstr "Precios actuales"
 
-#: apps/classes/templates/classes/class_prices.html:32
+#: apps/classes/templates/classes/class_prices.html:22
+msgid "No price history exists yet."
+msgstr "Aún no existe historial de precios."
+
+#: apps/classes/templates/classes/class_prices.html:31
 msgid "Effective"
 msgstr "Vigente"
 
-#: apps/classes/templates/classes/class_prices.html:33
+#: apps/classes/templates/classes/class_prices.html:32
 msgid "Superseded"
 msgstr "Sustituido"
 
-#: apps/classes/templates/classes/class_prices.html:46
+#: apps/classes/templates/classes/class_prices.html:45
 #: apps/classes/templates/classes/schedule.html:15
 msgid "Inactive"
 msgstr "Inactivo"
@@ -241,29 +231,17 @@ msgstr "Estado"
 msgid "Active"
 msgstr "Activo"
 
-#: apps/classes/templates/classes/schedule.html:20
-msgid "Deactivate"
-msgstr "Desactivar"
-
-#: apps/classes/templates/classes/schedule.html:20
-msgid "Activate"
-msgstr "Activar"
-
-#: apps/classes/templates/classes/schedule.html:25
-msgid "Prices"
-msgstr "Precios"
-
-#: apps/classes/views.py:35
+#: apps/classes/views.py:38
 #, python-format
 msgid "Class slot %s activated."
 msgstr "Bloque de clase %s activado."
 
-#: apps/classes/views.py:37
+#: apps/classes/views.py:40
 #, python-format
 msgid "Class slot %s deactivated."
 msgstr "Bloque de clase %s desactivado."
 
-#: apps/classes/views.py:63
+#: apps/classes/views.py:64
 msgid "Price updated successfully."
 msgstr "Precio actualizado exitosamente."
 
@@ -1363,3 +1341,26 @@ msgstr ""
 "Clase: %(slot)s\n"
 "Fecha: %(date)s\n"
 "Equipo: %(equipment)s"
+
+#, python-format
+#~ msgid "%(price)s — %(slot)s"
+#~ msgstr "%(price)s — %(slot)s"
+
+#~ msgid "Multiple current prices exist for this class slot."
+#~ msgstr "Existen múltiples precios actuales para este bloque de clase."
+
+#, python-format
+#~ msgid "%(slot)s"
+#~ msgstr "%(slot)s"
+
+#~ msgid "This class has no current price."
+#~ msgstr "Esta clase no tiene un precio actual."
+
+#~ msgid "Class Prices"
+#~ msgstr "Precios de Clase"
+
+#~ msgid "Deactivate"
+#~ msgstr "Desactivar"
+
+#~ msgid "Activate"
+#~ msgstr "Activar"

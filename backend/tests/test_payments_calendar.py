@@ -76,14 +76,17 @@ def payment_reservation(db, payment, reservation):
 
 @pytest.mark.django_db
 class TestPaymentCalendarDownload:
-
-    def test_download_returns_ics_content_type(self, logged_client, payment, payment_reservation):
+    def test_download_returns_ics_content_type(
+        self, logged_client, payment, payment_reservation
+    ):
         url = reverse("payments:calendar", args=[payment.pk])
         response = logged_client.get(url)
         assert response.status_code == 200
         assert response["Content-Type"] == "text/calendar; charset=utf-8"
 
-    def test_download_filename_format(self, logged_client, payment, payment_reservation):
+    def test_download_filename_format(
+        self, logged_client, payment, payment_reservation
+    ):
         url = reverse("payments:calendar", args=[payment.pk])
         response = logged_client.get(url)
         disposition = response["Content-Disposition"]
@@ -91,9 +94,11 @@ class TestPaymentCalendarDownload:
         assert "john_doe" in disposition
         assert payment.payment_identifier in disposition
         assert "20260721" in disposition
-        assert disposition.endswith(".ics\"")
+        assert disposition.endswith('.ics"')
 
-    def test_download_contains_vevent(self, logged_client, payment, payment_reservation):
+    def test_download_contains_vevent(
+        self, logged_client, payment, payment_reservation
+    ):
         url = reverse("payments:calendar", args=[payment.pk])
         response = logged_client.get(url)
         content = response.content.decode()
@@ -104,7 +109,9 @@ class TestPaymentCalendarDownload:
         assert payment.payment_identifier in content
         assert "Pago" in content
 
-    def test_unauthenticated_redirects_to_login(self, http_client, payment, payment_reservation):
+    def test_unauthenticated_redirects_to_login(
+        self, http_client, payment, payment_reservation
+    ):
         url = reverse("payments:calendar", args=[payment.pk])
         response = http_client.get(url)
         assert response.status_code == 302
@@ -124,11 +131,13 @@ class TestPaymentCalendarDownload:
             or "No hay reservaciones asociadas" in content
         )
 
-    def test_single_reservation_filename(self, logged_client, payment, payment_reservation):
+    def test_single_reservation_filename(
+        self, logged_client, payment, payment_reservation
+    ):
         url = reverse("payments:calendar", args=[payment.pk])
         response = logged_client.get(url)
         disposition = response["Content-Disposition"]
         parts = disposition.split("_")
         first_date = parts[-2]
-        last_date = parts[-1].replace(".ics\"", "")
+        last_date = parts[-1].replace('.ics"', "")
         assert first_date == last_date

@@ -5,25 +5,56 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('payments', '0001_initial'),
-        ('reservations', '0004_reservation_updated_by'),
+        ("payments", "0001_initial"),
+        ("reservations", "0004_reservation_updated_by"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='PaymentReservation',
+            name="PaymentReservation",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('payment', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='payment_reservations', to='payments.payment', verbose_name='Payment')),
-                ('reservation', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='payment_links', to='reservations.reservation', unique=True, verbose_name='Reservation')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                (
+                    "payment",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="payment_reservations",
+                        to="payments.payment",
+                        verbose_name="Payment",
+                    ),
+                ),
+                (
+                    "reservation",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="payment_links",
+                        to="reservations.reservation",
+                        unique=True,
+                        verbose_name="Reservation",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Payment Reservation',
-                'verbose_name_plural': 'Payment Reservations',
-                'indexes': [models.Index(fields=['payment'], name='payments_pa_payment_0eb14f_idx'), models.Index(fields=['reservation'], name='payments_pa_reserva_ff34e0_idx')],
+                "verbose_name": "Payment Reservation",
+                "verbose_name_plural": "Payment Reservations",
+                "indexes": [
+                    models.Index(
+                        fields=["payment"], name="payments_pa_payment_0eb14f_idx"
+                    ),
+                    models.Index(
+                        fields=["reservation"], name="payments_pa_reserva_ff34e0_idx"
+                    ),
+                ],
             },
         ),
     ]

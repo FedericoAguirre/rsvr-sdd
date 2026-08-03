@@ -69,15 +69,18 @@ def reservations_for_slot(db, class_slot, equipment_list, client_list, staff_use
 
 @pytest.mark.django_db
 class TestReservationsListPDF:
-
     def _expected_filename(self, class_slot, date_str):
-        safe = str(class_slot).replace(" ", "_").translate(
-            str.maketrans("", "", "/" + chr(0) + '<>:"|?*')
+        safe = (
+            str(class_slot)
+            .replace(" ", "_")
+            .translate(str.maketrans("", "", "/" + chr(0) + '<>:"|?*'))
         )
         date_compact = date_str.replace("-", "")
         return f"reservations_{safe}_{date_compact}.pdf"
 
-    def test_pdf_download_content_type(self, logged_client, class_slot, reservations_for_slot):
+    def test_pdf_download_content_type(
+        self, logged_client, class_slot, reservations_for_slot
+    ):
         response = logged_client.get(
             f"/reservations/pdf/?class_slot={class_slot.pk}&date=2026-06-15"
         )
@@ -95,7 +98,9 @@ class TestReservationsListPDF:
         expected = self._expected_filename(class_slot, "2026-06-15")
         assert response["Content-Disposition"] == f'attachment; filename="{expected}"'
 
-    def test_filename_with_missing_date_uses_no_date_fallback(self, logged_client, class_slot):
+    def test_filename_with_missing_date_uses_no_date_fallback(
+        self, logged_client, class_slot
+    ):
         response = logged_client.get(
             f"/reservations/pdf/?class_slot={class_slot.pk}&date="
         )
@@ -103,21 +108,23 @@ class TestReservationsListPDF:
         assert "no_date" in response["Content-Disposition"]
 
     def test_pdf_filename_with_missing_class_slot_fallback(self, logged_client):
-        response = logged_client.get(
-            "/reservations/pdf/?date=2026-06-15"
-        )
+        response = logged_client.get("/reservations/pdf/?date=2026-06-15")
         assert response.status_code == 200
         safe = "unknown"
         assert safe in response["Content-Disposition"]
 
-    def test_export_button_visible_on_main_page(self, logged_client, class_slot, reservations_for_slot):
+    def test_export_button_visible_on_main_page(
+        self, logged_client, class_slot, reservations_for_slot
+    ):
         response = logged_client.get(
             f"/reservations/?class_slot={class_slot.pk}&date=2026-06-15"
         )
         content = response.content.decode()
         assert "/reservations/pdf/" in content
 
-    def test_pdf_content_contains_reservation_data(self, logged_client, class_slot, reservations_for_slot):
+    def test_pdf_content_contains_reservation_data(
+        self, logged_client, class_slot, reservations_for_slot
+    ):
         response = logged_client.get(
             f"/reservations/pdf/?class_slot={class_slot.pk}&date=2026-06-15"
         )
@@ -127,7 +134,9 @@ class TestReservationsListPDF:
         assert "Alice" in text
         assert str(class_slot) in text
 
-    def test_pdf_empty_state_shows_no_reservations_message(self, logged_client, class_slot):
+    def test_pdf_empty_state_shows_no_reservations_message(
+        self, logged_client, class_slot
+    ):
         response = logged_client.get(
             f"/reservations/pdf/?class_slot={class_slot.pk}&date=2026-06-15"
         )
@@ -138,7 +147,6 @@ class TestReservationsListPDF:
 
 @pytest.mark.django_db
 class TestMainPageWithSlotFilter:
-
     def test_class_slot_and_date_filter_shows_equipment_client_pairs(
         self, logged_client, class_slot, reservations_for_slot
     ):
@@ -160,9 +168,7 @@ class TestMainPageWithSlotFilter:
         content = response.content.decode()
         assert "/reservations/create/" in content
 
-    def test_main_page_shows_class_slot_dropdown(
-        self, logged_client, class_slot
-    ):
+    def test_main_page_shows_class_slot_dropdown(self, logged_client, class_slot):
         response = logged_client.get("/reservations/")
         content = response.content.decode()
         assert "class_slot" in content
@@ -180,7 +186,6 @@ class TestMainPageWithSlotFilter:
 
 @pytest.mark.django_db
 class TestReservationStatusChange:
-
     def test_change_status_to_used(self, logged_client, reservations_for_slot):
         reservation = Reservation.objects.first()
         response = logged_client.post(
@@ -241,8 +246,9 @@ class TestReservationStatusChange:
 
 @pytest.mark.django_db
 class TestHTMXStatusChange:
-
-    def test_htmx_request_returns_row_partial(self, logged_client, reservations_for_slot):
+    def test_htmx_request_returns_row_partial(
+        self, logged_client, reservations_for_slot
+    ):
         reservation = Reservation.objects.first()
         response = logged_client.post(
             f"/reservations/{reservation.pk}/status/",
@@ -254,7 +260,9 @@ class TestHTMXStatusChange:
         assert f'id="row-{reservation.pk}"' in content
         assert "bg-primary" in content
 
-    def test_non_htmx_request_still_redirects(self, logged_client, reservations_for_slot):
+    def test_non_htmx_request_still_redirects(
+        self, logged_client, reservations_for_slot
+    ):
         reservation = Reservation.objects.first()
         response = logged_client.post(
             f"/reservations/{reservation.pk}/status/", {"status": "used"}
@@ -262,7 +270,9 @@ class TestHTMXStatusChange:
         assert response.status_code == 302
         assert f"/reservations/{reservation.pk}/" in response.url
 
-    def test_htmx_invalid_status_returns_400(self, logged_client, reservations_for_slot):
+    def test_htmx_invalid_status_returns_400(
+        self, logged_client, reservations_for_slot
+    ):
         reservation = Reservation.objects.first()
         response = logged_client.post(
             f"/reservations/{reservation.pk}/status/",
@@ -281,7 +291,9 @@ class TestHTMXStatusChange:
         assert response.status_code == 302
         assert "/accounts/login/" in response.url
 
-    def test_htmx_reserved_to_used_updates_badge(self, logged_client, reservations_for_slot):
+    def test_htmx_reserved_to_used_updates_badge(
+        self, logged_client, reservations_for_slot
+    ):
         reservation = Reservation.objects.first()
         assert reservation.status == "reserved"
         response = logged_client.post(
@@ -295,7 +307,9 @@ class TestHTMXStatusChange:
         reservation.refresh_from_db()
         assert reservation.status == "used"
 
-    def test_htmx_used_to_unused_updates_badge(self, logged_client, reservations_for_slot):
+    def test_htmx_used_to_unused_updates_badge(
+        self, logged_client, reservations_for_slot
+    ):
         reservation = Reservation.objects.first()
         reservation.status = "used"
         reservation.save()
@@ -310,7 +324,9 @@ class TestHTMXStatusChange:
         reservation.refresh_from_db()
         assert reservation.status == "unused"
 
-    def test_htmx_response_has_status_changed_trigger(self, logged_client, reservations_for_slot):
+    def test_htmx_response_has_status_changed_trigger(
+        self, logged_client, reservations_for_slot
+    ):
         reservation = Reservation.objects.first()
         response = logged_client.post(
             f"/reservations/{reservation.pk}/status/",
@@ -350,8 +366,9 @@ class TestHTMXStatusChange:
 
 @pytest.mark.django_db
 class TestReservationStatusFilter:
-
-    def test_filter_by_status_shows_only_matching(self, logged_client, class_slot, reservations_for_slot):
+    def test_filter_by_status_shows_only_matching(
+        self, logged_client, class_slot, reservations_for_slot
+    ):
         reservation = Reservation.objects.first()
         reservation.status = "used"
         reservation.save()
@@ -364,8 +381,9 @@ class TestReservationStatusFilter:
 
 @pytest.mark.django_db
 class TestReservationStatusInPDF:
-
-    def test_status_in_pdf_export(self, logged_client, class_slot, reservations_for_slot):
+    def test_status_in_pdf_export(
+        self, logged_client, class_slot, reservations_for_slot
+    ):
         reservation = Reservation.objects.first()
         reservation.status = "used"
         reservation.save()
@@ -379,14 +397,16 @@ class TestReservationStatusInPDF:
 
 @pytest.mark.django_db
 class TestStatusBadgeRendering:
-
     def test_status_badge_class_filter(self, db):
         from apps.reservations.templatetags.reservation_extras import status_badge_class
+
         assert "bg-success" in status_badge_class("reserved")
         assert "bg-primary" in status_badge_class("used")
         assert "bg-secondary" in status_badge_class("unused")
 
-    def test_badge_appears_in_list_view_per_status(self, logged_client, class_slot, equipment_list, client_list, staff_user):
+    def test_badge_appears_in_list_view_per_status(
+        self, logged_client, class_slot, equipment_list, client_list, staff_user
+    ):
         date = "2026-06-15"
         statuses = ["reserved", "used", "unused"]
         for i, status in enumerate(statuses):
@@ -402,14 +422,13 @@ class TestStatusBadgeRendering:
             f"/reservations/?class_slot={class_slot.pk}&date=2026-06-15"
         )
         content = response.content.decode()
-        assert 'bg-success' in content
-        assert 'bg-primary' in content
-        assert 'bg-secondary' in content
+        assert "bg-success" in content
+        assert "bg-primary" in content
+        assert "bg-secondary" in content
 
 
 @pytest.mark.django_db
 class TestFilterStatePreservation:
-
     def test_class_slot_has_selected_attribute_after_filter(
         self, logged_client, class_slot, reservations_for_slot
     ):
@@ -442,19 +461,20 @@ class TestFilterStatePreservation:
     ):
         response = logged_client.get("/reservations/")
         content = response.content.decode()
-        assert 'selected' not in content.split('<select name="class_slot"')[1].split('</select>')[0]
+        assert (
+            "selected"
+            not in content.split('<select name="class_slot"')[1].split("</select>")[0]
+        )
 
     def test_clear_filters_resets_status_to_all(
         self, logged_client, class_slot, reservations_for_slot
     ):
         response = logged_client.get("/reservations/")
         content = response.content.decode()
-        status_section = content.split('<select name="status"')[1].split('</select>')[0]
-        assert 'selected' not in status_section
+        status_section = content.split('<select name="status"')[1].split("</select>")[0]
+        assert "selected" not in status_section
 
-    def test_clear_filters_button_exists(
-        self, logged_client, class_slot
-    ):
+    def test_clear_filters_button_exists(self, logged_client, class_slot):
         response = logged_client.get("/reservations/")
         content = response.content.decode()
         assert "Limpiar Filtros" in content

@@ -12,19 +12,24 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            "--output", "-o", default="./ai_dev_data.csv",
+            "--output",
+            "-o",
+            default="./ai_dev_data.csv",
             help="Output CSV file path",
         )
         parser.add_argument(
-            "--done-dir", default="../ai/features/done",
+            "--done-dir",
+            default="../ai/features/done",
             help="Directory containing completed feature files",
         )
         parser.add_argument(
-            "--specs-dir", default="../specs",
+            "--specs-dir",
+            default="../specs",
             help="Directory containing feature specs",
         )
         parser.add_argument(
-            "--sessions-dir", default="../ai/sessions",
+            "--sessions-dir",
+            default="../ai/sessions",
             help="Directory containing AI session logs",
         )
 
@@ -55,21 +60,23 @@ class Command(BaseCommand):
             minutes = self._calculate_minutes(start_ts, end_ts)
             iterations = self._count_iterations(sessions)
             complexity = self._calculate_complexity(sessions, iterations)
-            rows.append([
-                title,
-                str(complexity),
-                str(minutes) if minutes is not None else "",
-                model or "",
-                start_ts.isoformat() if start_ts else "",
-                end_ts.isoformat() if end_ts else "",
-                str(specs_quality),
-                str(iterations),
-            ])
+            rows.append(
+                [
+                    title,
+                    str(complexity),
+                    str(minutes) if minutes is not None else "",
+                    model or "",
+                    start_ts.isoformat() if start_ts else "",
+                    end_ts.isoformat() if end_ts else "",
+                    str(specs_quality),
+                    str(iterations),
+                ]
+            )
 
         self._write_csv(output_path, rows)
-        self.stdout.write(self.style.SUCCESS(
-            f"Generated {output_path} with {len(rows)} feature(s)"
-        ))
+        self.stdout.write(
+            self.style.SUCCESS(f"Generated {output_path} with {len(rows)} feature(s)")
+        )
 
     def _parse_features(self, done_dir):
         features = []
@@ -128,7 +135,9 @@ class Command(BaseCommand):
                 common = feat_tokens & spec_tokens
                 if len(common) >= 2:
                     score = len(common)
-                elif raw_stem.replace("_", "-") in slug or slug in raw_stem.replace("_", "-"):
+                elif raw_stem.replace("_", "-") in slug or slug in raw_stem.replace(
+                    "_", "-"
+                ):
                     score = 1
             if score:
                 candidates.append((score, spec_file, num, slug))
@@ -147,7 +156,9 @@ class Command(BaseCommand):
         score = 1
         if re.search(r"(?i)##\s*acceptance\s*(criteria|scenarios)", content):
             score = 2
-        if re.search(r"(?i)##\s*constraints", content) or re.search(r"(?i)\*\*Constraints\*\*", content):
+        if re.search(r"(?i)##\s*constraints", content) or re.search(
+            r"(?i)\*\*Constraints\*\*", content
+        ):
             score = 3
         if re.search(r"(?i)##\s*(edge cases|examples)", content):
             score = 4
@@ -156,8 +167,16 @@ class Command(BaseCommand):
         return score
 
     _MODEL_KEYWORDS = {
-        "deepseek", "v4", "flash", "free", "big", "pickle", "opencode",
-        "deepseek-v4", "deepseek-v4-flash", "deepseek-v4-flash-free",
+        "deepseek",
+        "v4",
+        "flash",
+        "free",
+        "big",
+        "pickle",
+        "opencode",
+        "deepseek-v4",
+        "deepseek-v4-flash",
+        "deepseek-v4-flash-free",
     }
 
     def _session_clean_slug(self, stem):
@@ -165,7 +184,9 @@ class Command(BaseCommand):
         slug = re.sub(r"\d{8,}", "", slug)
         slug = re.sub(r"\d{6}z?$", "", slug)
         tokens = slug.replace("_", "-").split("-")
-        clean = [t for t in tokens if t and len(t) > 2 and t not in self._MODEL_KEYWORDS]
+        clean = [
+            t for t in tokens if t and len(t) > 2 and t not in self._MODEL_KEYWORDS
+        ]
         return "-".join(clean)
 
     def _build_session_map(self, sessions_dir):
@@ -243,8 +264,12 @@ class Command(BaseCommand):
         if m:
             try:
                 return datetime(
-                    int(m.group(1)), int(m.group(2)), int(m.group(3)),
-                    int(m.group(4)), int(m.group(5)), int(m.group(6)),
+                    int(m.group(1)),
+                    int(m.group(2)),
+                    int(m.group(3)),
+                    int(m.group(4)),
+                    int(m.group(5)),
+                    int(m.group(6)),
                 )
             except ValueError:
                 pass
@@ -258,7 +283,9 @@ class Command(BaseCommand):
         if m:
             try:
                 return datetime(
-                    int(m.group(1)), int(m.group(2)), int(m.group(3)),
+                    int(m.group(1)),
+                    int(m.group(2)),
+                    int(m.group(3)),
                 )
             except ValueError:
                 pass
@@ -311,9 +338,17 @@ class Command(BaseCommand):
         output_path.parent.mkdir(parents=True, exist_ok=True)
         with open(output_path, "w", newline="", encoding="utf-8") as f:
             writer = csv.writer(f)
-            writer.writerow([
-                "feature", "complexity", "minutes", "model",
-                "start_timestamp", "end_timestamp", "specs_quality", "iterations",
-            ])
+            writer.writerow(
+                [
+                    "feature",
+                    "complexity",
+                    "minutes",
+                    "model",
+                    "start_timestamp",
+                    "end_timestamp",
+                    "specs_quality",
+                    "iterations",
+                ]
+            )
             for row in rows:
                 writer.writerow(row)

@@ -29,7 +29,9 @@ class ReservationForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["equipment"].queryset = Equipment.objects.filter(status="in-service")
+        self.fields["equipment"].queryset = Equipment.objects.filter(
+            status="in-service"
+        )
         self.fields["class_slot"].queryset = ClassSlot.objects.filter(is_active=True)
 
     def clean(self):
@@ -39,16 +41,22 @@ class ReservationForm(forms.ModelForm):
         date = cleaned_data.get("date")
 
         if equipment and class_slot and date:
-            exists = Reservation.objects.filter(
-                equipment=equipment,
-                class_slot=class_slot,
-                date=date,
-                status="reserved",
-            ).exclude(pk=self.instance.pk if self.instance else None).exists()
+            exists = (
+                Reservation.objects.filter(
+                    equipment=equipment,
+                    class_slot=class_slot,
+                    date=date,
+                    status="reserved",
+                )
+                .exclude(pk=self.instance.pk if self.instance else None)
+                .exists()
+            )
 
             if exists:
                 raise ValidationError(
-                    _("%(equipment)s is UNAVAILABLE for %(date)s — %(class_slot)s (already reserved).")
+                    _(
+                        "%(equipment)s is UNAVAILABLE for %(date)s — %(class_slot)s (already reserved)."
+                    )
                     % {"equipment": equipment, "date": date, "class_slot": class_slot}
                 )
         return cleaned_data

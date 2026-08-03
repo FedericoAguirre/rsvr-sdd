@@ -6,16 +6,22 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('reservations', '0003_reservation_status'),
+        ("reservations", "0003_reservation_status"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='reservation',
-            name='updated_by',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='updated_reservations', to=settings.AUTH_USER_MODEL, verbose_name='Updated by'),
+            model_name="reservation",
+            name="updated_by",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="updated_reservations",
+                to=settings.AUTH_USER_MODEL,
+                verbose_name="Updated by",
+            ),
         ),
     ]

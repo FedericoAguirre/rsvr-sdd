@@ -83,15 +83,20 @@ def process_csv_rows(rows: list[dict]) -> ImportResult:
         if not row.get("first_name") or not row.get("last_name"):
             result.errors += 1
             result.error_details.append(
-                {"row": result.total_rows,
-                 "message": "first_name y last_name son requeridos."}
+                {
+                    "row": result.total_rows,
+                    "message": "first_name y last_name son requeridos.",
+                }
             )
             continue
 
         if not row.get("email") and not row.get("mobile"):
             result.errors += 1
             result.error_details.append(
-                {"row": result.total_rows, "message": "Debe proporcionar al menos un email o un móvil."}
+                {
+                    "row": result.total_rows,
+                    "message": "Debe proporcionar al menos un email o un móvil.",
+                }
             )
             continue
 
@@ -108,7 +113,9 @@ def process_csv_rows(rows: list[dict]) -> ImportResult:
                 result.updated += 1
             except IntegrityError as e:
                 result.errors += 1
-                result.error_details.append({"row": result.total_rows, "message": str(e)})
+                result.error_details.append(
+                    {"row": result.total_rows, "message": str(e)}
+                )
         else:
             try:
                 Client.objects.create(
@@ -121,6 +128,8 @@ def process_csv_rows(rows: list[dict]) -> ImportResult:
                 result.created += 1
             except IntegrityError as e:
                 result.errors += 1
-                result.error_details.append({"row": result.total_rows, "message": str(e)})
+                result.error_details.append(
+                    {"row": result.total_rows, "message": str(e)}
+                )
 
     return result
