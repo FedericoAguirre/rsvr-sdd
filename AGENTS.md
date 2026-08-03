@@ -1,7 +1,7 @@
 <!-- SPECKIT START -->
 For additional context about technologies to be used, project structure,
 shell commands, and other important information, read the current plan at
-`specs/051-list-unassociated-reservations/plan.md`
+`specs/061-add-classprice-menu/plan.md`
 <!-- SPECKIT END -->
 
 <!-- CONTEXT7 START -->
@@ -26,12 +26,19 @@ instructions.
 deprecations, security patches, or version-specific behavior.
 <!-- CONTEXT7 END -->
 
-## Session Summary (2026-07-24)
+## Session Summary (2026-08-02)
 
-This session is on branch **051-list-unassociated-reservations** — see `specs/051-list-unassociated-reservations/plan.md`.
+This session is on branch **061-add-classprice-menu** — see `specs/061-add-classprice-menu/plan.md`.
 
 ### Completed
 - Spec written and validated via Spec Kit workflow
 - Plan generated with Technical Context, Constitution Check, and Structure
-- Research artifacts (research.md, data-model.md, quickstart.md) generated
-- All quality checklist items pass
+- Tasks.md with 4 implementation tasks
+
+### Implementation
+- T001: Replaced flat "Schedule" link with dropdown ("Class Schedule" + "Class prices") in `backend/templates/base.html`
+- T002: Verified `{% if perms.classes.view_classslot %}` gate wraps entire dropdown
+- T003: Full test suite passes (320 tests)
+- T004: Bootstrap 5.3 `dropdown-toggle` pattern confirmed (mirrors "Reportes" dropdown)
+- Docker rebuild via `docker compose up -d --build web` to pick up template changes
+- All tasks validated
