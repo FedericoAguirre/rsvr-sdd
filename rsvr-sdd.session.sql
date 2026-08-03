@@ -57,3 +57,5 @@ on r.equipment_id = e.id;
 --delete from payments_paymentreservation;
 --delete from payments_payment;
 --delete from reservations_reservation;
+
+--truncate table classes_classprice;
