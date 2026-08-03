@@ -23,11 +23,11 @@
 
 ### Implementation for User Story 1
 
-- [ ] T001 [US1] Add `from django.utils import timezone` import in `backend/apps/classes/models.py`
-- [ ] T002 [US1] Update `ClassPrice.enter_price()` classmethod in `backend/apps/classes/models.py` to bulk-update all existing `current=True` records to `current=False`, `changed_at=timezone.now()`, `changed_by=changed_by` before creating the new price
-- [ ] T003 [US1] Update existing tests in `backend/tests/test_classes_classprice.py` that assert `enter_price()` does NOT archive previous prices (lines referencing "no swap/retire" behavior) to match the new archiving behavior
-- [ ] T004 [US1] Add new test cases in `backend/tests/test_classes_classprice.py` covering acceptance scenarios: first price (no archiving), second price (single archive), multiple legacy current prices (bulk archive), and transaction atomicity
-- [ ] T005 Run `docker compose exec web pytest backend/tests/test_classes_classprice.py -v` to verify all tests pass
+- [x] T001 [US1] Add `from django.utils import timezone` import in `backend/apps/classes/models.py`
+- [x] T002 [US1] Update `ClassPrice.enter_price()` classmethod in `backend/apps/classes/models.py` to bulk-update all existing `current=True` records to `current=False`, `changed_at=timezone.now()`, `changed_by=changed_by` before creating the new price
+- [x] T003 [US1] Update existing tests in `backend/tests/test_classes_classprice.py` that assert `enter_price()` does NOT archive previous prices (lines referencing "no swap/retire" behavior) to match the new archiving behavior
+- [x] T004 [US1] Add new test cases in `backend/tests/test_classes_classprice.py` covering acceptance scenarios: first price (no archiving), second price (single archive), multiple legacy current prices (bulk archive), and transaction atomicity
+- [x] T005 Run `backend/.venv/bin/pytest backend/tests/test_classes_classprice.py -v` to verify all tests pass
 
 **Checkpoint**: `enter_price()` correctly archives previous current prices. The price history page shows exactly one "Current" record, and all inactive records have populated `changed_at`/`changed_by` fields.
 
@@ -35,8 +35,8 @@
 
 ## Phase 2: Polish & Validation
 
-- [ ] T006 Run full test suite: `docker compose exec web pytest -v` to confirm no regressions
-- [ ] T007 Validate via quickstart.md scenarios (manual walkthrough or automated shell verification)
+- [x] T006 Run full test suite: `backend/.venv/bin/pytest -v` from `backend/` directory to confirm no regressions
+- [x] T007 Validate via quickstart.md scenarios (manual walkthrough or automated shell verification)
 
 ---
 
