@@ -7,8 +7,9 @@ global price views, admin-only create, and quickstart validation scenarios.
 import pytest
 from django.contrib.auth import get_user_model
 from django.core.exceptions import PermissionDenied
-from django.db import IntegrityError
+from django.db import IntegrityError, transaction
 from django.test import Client as HttpClient
+from django.utils import timezone
 
 from apps.classes.models import ClassPrice
 
@@ -192,8 +193,8 @@ class TestClassPriceEnterPrice:
         assert new_price.changed_by is None
         assert new_price.created_by == admin_user
 
-    def test_enter_price_no_swap(self, admin_user):
-        """Without per-class grouping, enter_price creates new records (no retire)."""
+    def test_enter_price_archives_previous(self, admin_user):
+        """enter_price archives existing current prices before creating new."""
         p1 = ClassPrice.objects.enter_price(
             new_price=100.00,
             changed_by=admin_user,
@@ -204,9 +205,10 @@ class TestClassPriceEnterPrice:
         )
         p1.refresh_from_db()
         p2.refresh_from_db()
-        assert p1.current is True  # remains current (no per-class swap)
+        assert p1.current is False
+        assert p1.changed_at is not None
+        assert p1.changed_by == admin_user
         assert p2.current is True
-        assert p1.price == 100.00
         assert p2.price == 150.00
         assert ClassPrice.objects.count() == 2
 
@@ -232,6 +234,54 @@ class TestClassPriceEnterPrice:
         assert ids[0] == p3.pk
         assert ids[1] == p2.pk
         assert ids[2] == p1.pk
+
+    def test_enter_price_bulk_archives_multiple_current(self, admin_user):
+        """All existing current=True records are archived together."""
+        p1 = ClassPrice.objects.create(
+            price=10.00, current=True, created_by=admin_user,
+        )
+        p2 = ClassPrice.objects.create(
+            price=20.00, current=True, created_by=admin_user,
+        )
+        p3 = ClassPrice.objects.create(
+            price=30.00, current=True, created_by=admin_user,
+        )
+        p4 = ClassPrice.objects.enter_price(
+            new_price=50.00,
+            changed_by=admin_user,
+        )
+        p1.refresh_from_db()
+        p2.refresh_from_db()
+        p3.refresh_from_db()
+        assert p1.current is False
+        assert p1.changed_at is not None
+        assert p1.changed_by == admin_user
+        assert p2.current is False
+        assert p2.changed_at is not None
+        assert p3.current is False
+        assert p3.changed_at is not None
+        assert p4.current is True
+        assert ClassPrice.objects.filter(current=True).count() == 1
+
+    def test_enter_price_atomic_rollback_on_failure(self, admin_user):
+        """If create fails, the update must also be rolled back."""
+        p1 = ClassPrice.objects.create(
+            price=100.00, current=True, created_by=admin_user,
+        )
+        assert ClassPrice.objects.filter(current=True).count() == 1
+        try:
+            with transaction.atomic():
+                ClassPrice.objects.filter(current=True).update(
+                    current=False,
+                    changed_at=timezone.now(),
+                    changed_by=admin_user,
+                )
+                raise RuntimeError("Simulated failure")
+        except RuntimeError:
+            pass
+        p1.refresh_from_db()
+        assert p1.current is True
+        assert p1.changed_at is None
 
 
 # ── Phase 4: Global Price List View ──────────────────────────────────────────────
@@ -316,10 +366,7 @@ class TestClassPriceCreateView:
         assert price.created_by == admin_user
 
     def test_add_price_archives_previous(self, logged_client, admin_user):
-        """In decoupled mode, enter_price creates a new standalone record.
-
-        The form view calls enter_price, which creates a new price (no retire).
-        """
+        """enter_price archives existing current prices before creating new one."""
         ClassPrice.objects.enter_price(new_price=100.00, changed_by=admin_user)
         logged_client.post(
             "/classes/prices/add/",
@@ -328,7 +375,9 @@ class TestClassPriceCreateView:
         )
         prices = list(ClassPrice.objects.order_by("created_at"))
         assert len(prices) == 2
-        assert prices[0].current is True  # enter_price doesn't retire
+        assert prices[0].current is False
+        assert prices[0].changed_at is not None
+        assert prices[0].changed_by == admin_user
         assert prices[0].price == 100.00
         assert prices[1].current is True
         assert prices[1].price == 200.00
@@ -438,8 +487,13 @@ class TestQuickstartValidation:
         assert response.status_code in (302, 403)
         assert not ClassPrice.objects.exists()
 
-    def test_scenario_6_multiple_current_allowed(self, admin_user):
-        """SC-006: Without per-class constraint, multiple current prices coexist."""
-        ClassPrice.objects.enter_price(new_price=100.00, changed_by=admin_user)
-        ClassPrice.objects.enter_price(new_price=150.00, changed_by=admin_user)
-        assert ClassPrice.objects.filter(current=True).count() == 2
+    def test_scenario_6_only_one_current_after_enter(self, admin_user):
+        """SC-006: After enter_price, only the newest record is current."""
+        p1 = ClassPrice.objects.enter_price(new_price=100.00, changed_by=admin_user)
+        p2 = ClassPrice.objects.enter_price(new_price=150.00, changed_by=admin_user)
+        p1.refresh_from_db()
+        assert p1.current is False
+        assert p1.changed_at is not None
+        assert p1.changed_by == admin_user
+        assert p2.current is True
+        assert ClassPrice.objects.filter(current=True).count() == 1

@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.db import IntegrityError, models, transaction
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 
@@ -141,6 +142,11 @@ class ClassPrice(models.Model):
     @classmethod
     def enter_price(cls, new_price, changed_by):
         with transaction.atomic():
+            cls.objects.filter(current=True).update(
+                current=False,
+                changed_at=timezone.now(),
+                changed_by=changed_by,
+            )
             return cls.objects.create(
                 price=new_price,
                 current=True,
