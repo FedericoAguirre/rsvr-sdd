@@ -1,6 +1,6 @@
-import re
 import os
 from pathlib import Path
+from urllib.parse import unquote, urlsplit
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -59,16 +59,20 @@ DATABASE_URL = os.environ.get(
     "DATABASE_URL", "postgres://rsvr:rsvr@localhost:5432/rsvr"
 )
 
-match = re.match(r"postgres://(.+):(.+)@(.+):(\d+)/(.+)", DATABASE_URL)
-if match:
+_parts = urlsplit(DATABASE_URL)
+if _parts.scheme in ("postgres", "postgresql"):
+    try:
+        _port = _parts.port
+    except ValueError:
+        _port = None
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
-            "NAME": match.group(5),
-            "USER": match.group(1),
-            "PASSWORD": match.group(2),
-            "HOST": match.group(3),
-            "PORT": match.group(4),
+            "NAME": unquote(_parts.path.lstrip("/")),
+            "USER": unquote(_parts.username or ""),
+            "PASSWORD": unquote(_parts.password or ""),
+            "HOST": _parts.hostname or "localhost",
+            "PORT": _port,
         }
     }
 else:
