@@ -152,6 +152,7 @@ MEDIA_ROOT=C:\projects\rsvr-sdd\media
 
 **Notes**:
 - Replace `your-password-here` with the PostgreSQL `postgres` password you set during installation
+- **Use an ASCII-only password** (letters, digits, and punctuation like `!@#$%^&*`). Non-ASCII characters (accents, `ñ`, emoji) break `psycopg2` with a `UnicodeDecodeError: 'utf-8' codec can't decode byte 0xf3 ...` when running `migrate` (see Troubleshooting below)
 - Generate a `SECRET_KEY` by running:
   ```powershell
   python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
@@ -414,6 +415,41 @@ python manage.py migrate --run-syncdb
 ```
 
 If this fails, check the `DATABASE_URL` in `.env` and ensure PostgreSQL is running.
+
+### `UnicodeDecodeError: 'utf-8' codec can't decode byte 0xf3`
+
+This error occurs during `migrate` when the PostgreSQL password in `.env` contains a non-ASCII character (e.g. an accented letter, `ñ`, or emoji). `psycopg2` builds the connection string using the Windows code page (WIN1252), then tries to decode it as UTF-8, crashing before any migration runs.
+
+**Fix**: Use an ASCII-only password:
+1. In pgAdmin, set an ASCII password for the `postgres` user:
+   ```sql
+   ALTER USER postgres WITH PASSWORD 'ascii-only-password-123';
+   ```
+2. Update `DATABASE_URL` in `.env`:
+   ```ini
+   DATABASE_URL=postgres://postgres:ascii-only-password-123@localhost:5432/rsvr
+   ```
+3. Re-run the migration:
+   ```powershell
+   uv run .\manage.py migrate
+   ```
+
+> **Optional**: PostgreSQL created on Windows defaults to the `WIN1252` encoding. You can verify the cluster encoding with:
+> ```sql
+> SHOW server_encoding;
+> ```
+> If it is not `UTF8`, re-initialize the cluster with `initdb -E UTF8` (back up data first) or keep passwords ASCII-only, which is simpler.
+
+### Admin/Static Files Look Broken (no CSS)
+
+The admin pages load without styles when the collected static files are stale or missing. Re-collect static files:
+
+```powershell
+cd C:\projects\rsvr-sdd\backend
+uv run .\manage.py collectstatic --noinput
+```
+
+Then restart the server and hard-refresh the browser (`Ctrl + F5`).
 
 ### Firewall Rule Already Exists
 

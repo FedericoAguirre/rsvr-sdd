@@ -42,6 +42,31 @@ class TestDocContainsPowerShellEnvLoader:
         )
 
 
+class TestDocTroubleshootingEncoding:
+    """Tests that docs cover the psycopg2 UnicodeDecodeError on Windows."""
+
+    def test_ascii_password_guidance_present(self):
+        md = DOCS_PATH.read_text(encoding="utf-8")
+        assert "ASCII-only password" in md, (
+            "docs/windows11_deployment.md should instruct ASCII-only "
+            "PostgreSQL passwords to avoid the psycopg2 UnicodeDecodeError."
+        )
+
+    def test_unicodedecodeerror_byte_0xf3_mentioned(self):
+        md = DOCS_PATH.read_text(encoding="utf-8")
+        assert "UnicodeDecodeError" in md and "0xf3" in md, (
+            "docs/windows11_deployment.md should document the byte 0xf3 "
+            "UnicodeDecodeError and its fix."
+        )
+
+    def test_collectstatic_recovery_present(self):
+        md = DOCS_PATH.read_text(encoding="utf-8")
+        assert "collectstatic --noinput" in md, (
+            "docs/windows11_deployment.md should document re-collecting "
+            "static files when admin styles are missing."
+        )
+
+
 class TestEnvLoaderRegexLogic:
     """Tests for the .env parsing regex logic."""
 
