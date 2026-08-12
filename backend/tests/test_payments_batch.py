@@ -1,9 +1,11 @@
-import json
 import datetime
+import json
+from zoneinfo import ZoneInfo
 
 import pytest
 from django.contrib.auth.models import User
 from django.test import Client as HttpClient
+from django.utils import timezone
 
 from apps.clients.models import Client
 from apps.payments.models import Payment, PaymentReservation
@@ -92,7 +94,7 @@ class TestBatchModalAppears:
 
 @pytest.mark.django_db
 class TestBatchModalContextData:
-    """T010: Batch modal context data returns correct equipment/class_slot/date range."""
+    """T010: Batch modal context data returns the expected fields."""
 
     def test_batch_data_returns_context(
         self, logged_client, payment, equipment, class_slot
@@ -107,6 +109,179 @@ class TestBatchModalContextData:
         assert "date_range" in data
         assert "start" in data["date_range"]
         assert "end" in data["date_range"]
+        assert isinstance(data["equipment_list"], list)
+        assert isinstance(data["class_slots"], list)
+        assert isinstance(data["reserved_dates"], list)
+
+
+@pytest.mark.django_db
+class TestPaymentDayBatchWindow:
+    """Payment-day slots determine the start of the batch window."""
+
+    @pytest.fixture
+    def payment_day_slots(self, db):
+        from apps.classes.models import ClassSlot
+
+        return [
+            ClassSlot.objects.create(day_of_week=1, time="19:15", is_active=True),
+            ClassSlot.objects.create(day_of_week=1, time="20:15", is_active=True),
+            ClassSlot.objects.create(day_of_week=2, time="19:15", is_active=True),
+            ClassSlot.objects.create(day_of_week=2, time="20:15", is_active=True),
+        ]
+
+    @staticmethod
+    def set_payment_time(payment, hour, minute):
+        created_at = timezone.make_aware(
+            datetime.datetime(2026, 8, 11, hour, minute),
+            ZoneInfo("America/Denver"),
+        )
+        payment.created_at = created_at
+        payment.save(update_fields=["created_at"])
+
+    def test_1700_includes_payment_day_and_ends_august_31(
+        self, logged_client, payment, payment_day_slots
+    ):
+        payment.class_slot_count = 5
+        payment.date = datetime.date(2026, 8, 11)
+        payment.save(update_fields=["class_slot_count", "date"])
+        self.set_payment_time(payment, 17, 0)
+
+        response = logged_client.get(f"/payments/{payment.pk}/batch-data/")
+
+        assert response.json()["date_range"] == {
+            "start": "2026-08-11",
+            "end": "2026-08-31",
+        }
+
+    def test_1900_includes_payment_day_and_ends_august_31(
+        self, logged_client, payment, payment_day_slots
+    ):
+        payment.class_slot_count = 5
+        payment.date = datetime.date(2026, 8, 11)
+        payment.save(update_fields=["class_slot_count", "date"])
+        self.set_payment_time(payment, 19, 0)
+
+        response = logged_client.get(f"/payments/{payment.pk}/batch-data/")
+
+        assert response.json()["date_range"] == {
+            "start": "2026-08-11",
+            "end": "2026-08-31",
+        }
+
+    def test_1920_keeps_only_upcoming_payment_day_time_in_validation(
+        self, logged_client, payment, equipment, payment_day_slots
+    ):
+        payment.class_slot_count = 1
+        payment.date = datetime.date(2026, 8, 11)
+        payment.save(update_fields=["class_slot_count", "date"])
+        self.set_payment_time(payment, 19, 20)
+
+        response = logged_client.post(
+            f"/payments/{payment.pk}/batch-create/",
+            json.dumps(
+                {
+                    "payment_id": payment.pk,
+                    "equipment_id": equipment.id,
+                    "class_slot_id": payment_day_slots[0].id,
+                    "dates": ["2026-08-11"],
+                }
+            ),
+            content_type="application/json",
+        )
+
+        assert response.status_code == 400
+        assert "dates" in response.json()["errors"]
+
+    def test_2020_starts_next_day_and_ends_september_1(
+        self, logged_client, payment, payment_day_slots
+    ):
+        payment.class_slot_count = 5
+        payment.date = datetime.date(2026, 8, 11)
+        payment.save(update_fields=["class_slot_count", "date"])
+        self.set_payment_time(payment, 20, 20)
+
+        response = logged_client.get(f"/payments/{payment.pk}/batch-data/")
+
+        assert response.json()["date_range"] == {
+            "start": "2026-08-12",
+            "end": "2026-09-01",
+        }
+
+    def test_latest_client_reservation_still_moves_window_forward(
+        self, logged_client, payment, payment_day_slots, equipment, staff_user
+    ):
+        from apps.reservations.models import Reservation
+
+        payment.date = datetime.date(2026, 8, 11)
+        payment.save(update_fields=["date"])
+        self.set_payment_time(payment, 17, 0)
+        Reservation.objects.create(
+            client=payment.client,
+            equipment=equipment,
+            class_slot=payment_day_slots[2],
+            date=datetime.date(2026, 8, 20),
+            created_by=staff_user,
+        )
+
+        response = logged_client.get(f"/payments/{payment.pk}/batch-data/")
+
+        assert response.json()["date_range"] == {
+            "start": "2026-08-25",
+            "end": "2026-09-14",
+        }
+
+
+@pytest.mark.django_db
+class TestBatchValidationRegression:
+    def test_duplicate_dates_are_rejected(
+        self, logged_client, payment, equipment, class_slot
+    ):
+        payment.class_slot_count = 2
+        payment.save(update_fields=["class_slot_count"])
+        response = logged_client.post(
+            f"/payments/{payment.pk}/batch-create/",
+            json.dumps(
+                {
+                    "payment_id": payment.pk,
+                    "equipment_id": equipment.id,
+                    "class_slot_id": class_slot.id,
+                    "dates": [
+                        payment.date.isoformat(),
+                        payment.date.isoformat(),
+                    ],
+                }
+            ),
+            content_type="application/json",
+        )
+
+        assert response.status_code == 400
+        assert "dates" in response.json()["errors"]
+
+    def test_inactive_class_slot_is_rejected(
+        self, logged_client, payment, equipment, db
+    ):
+        from apps.classes.models import ClassSlot
+
+        inactive_slot = ClassSlot.objects.create(
+            day_of_week=0,
+            time="20:15",
+            is_active=False,
+        )
+        response = logged_client.post(
+            f"/payments/{payment.pk}/batch-create/",
+            json.dumps(
+                {
+                    "payment_id": payment.pk,
+                    "equipment_id": equipment.id,
+                    "class_slot_id": inactive_slot.id,
+                    "dates": [payment.date.isoformat()] * payment.class_slot_count,
+                }
+            ),
+            content_type="application/json",
+        )
+
+        assert response.status_code == 400
+        assert "class_slot_id" in response.json()["errors"]
 
 
 @pytest.mark.django_db
@@ -214,7 +389,8 @@ class TestBatchPartialFailure:
     ):
         from apps.reservations.models import Reservation
 
-        # Use a different client so the pre-created reservation doesn't shift the date range
+        # Use a different client so the pre-created reservation does not shift
+        # the range.
         other_client = Client.objects.create(
             first_name="Other",
             last_name="Client",
@@ -228,7 +404,7 @@ class TestBatchPartialFailure:
             conflict_date.isoformat(),
             (next_monday + datetime.timedelta(weeks=2)).isoformat(),
         ]
-        # Pre-create reservation for OTHER client with same equipment+class_slot+date → block unique constraint
+        # Same equipment, slot, and date blocks the unique constraint.
         Reservation.objects.create(
             client=other_client,
             equipment=equipment,
@@ -393,7 +569,8 @@ class TestBatchConflictDisplay:
     ):
         from apps.reservations.models import Reservation
 
-        # Use a different client so the pre-created reservation doesn't shift the date range
+        # Use a different client so the pre-created reservation does not shift
+        # the range.
         other_client = Client.objects.create(
             first_name="Other",
             last_name="Client",

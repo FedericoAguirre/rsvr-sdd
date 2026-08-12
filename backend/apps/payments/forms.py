@@ -4,6 +4,7 @@ from django import forms
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
+from .batch_reservations import get_batch_reservation_window
 from .models import Payment
 
 
@@ -133,9 +134,6 @@ class BatchReservationForm(forms.Form):
     def clean_dates(self):
         from apps.classes.models import ClassSlot
         from apps.payments.models import Payment
-        from apps.reservations.models import Reservation
-        from django.db.models import Max
-        from datetime import date, timedelta
 
         raw = self.cleaned_data["dates"]
         pid = self.cleaned_data.get("payment_id")
@@ -157,22 +155,26 @@ class BatchReservationForm(forms.Form):
             raise ValidationError(_("Cannot create more than 20 reservations at once."))
         if len(set(parsed)) != len(parsed):
             raise ValidationError(_("Duplicate dates are not allowed."))
-        raw_start = payment.date
-        latest = Reservation.objects.filter(client=payment.client).aggregate(
-            Max("date")
-        )
-        if latest["date__max"] is not None:
-            raw_start = max(raw_start, latest["date__max"] + timedelta(days=1))
-        next_monday = raw_start + timedelta(days=(7 - raw_start.weekday()) % 7 or 7)
-        end = next_monday + timedelta(weeks=4)
+        window = get_batch_reservation_window(payment)
         for d in parsed:
-            if d < next_monday or d > end:
+            if d < window.start or d > window.end:
                 raise ValidationError(
                     _("Date {} is outside the allowed range.").format(d),
                 )
         slot = self.cleaned_data.get("class_slot_id")
         if isinstance(slot, ClassSlot):
             for d in parsed:
+                if (
+                    d == payment.date
+                    and window.same_day_cutoff is not None
+                    and slot.time <= window.same_day_cutoff
+                ):
+                    raise ValidationError(
+                        _(
+                            "The selected class has already started for the "
+                            "payment date."
+                        ),
+                    )
                 if not ClassSlot.objects.filter(
                     day_of_week=d.weekday(),
                     time=slot.time,
