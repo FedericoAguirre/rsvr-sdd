@@ -11,6 +11,8 @@ from django.utils import timezone
 from apps.classes.models import ClassSlot
 from apps.reservations.models import Reservation
 
+TARGET_WEEKDAY_COUNT = 20
+
 
 @dataclass(frozen=True)
 class BatchReservationWindow:
@@ -36,7 +38,7 @@ def get_batch_reservation_window(payment):
         ClassSlot.objects.filter(is_active=True).values_list("day_of_week", flat=True)
     )
     if not active_weekdays:
-        return BatchReservationWindow(candidate, candidate + timedelta(days=20), cutoff)
+        return BatchReservationWindow(candidate, _end_after_weekdays(candidate), cutoff)
 
     start = candidate
     while True:
@@ -45,7 +47,19 @@ def get_batch_reservation_window(payment):
             break
         start += timedelta(days=1)
 
-    return BatchReservationWindow(start, start + timedelta(days=20), cutoff)
+    return BatchReservationWindow(start, _end_after_weekdays(start), cutoff)
+
+
+def _end_after_weekdays(start):
+    """Return the inclusive end date after the target weekday count."""
+    current = start
+    remaining = TARGET_WEEKDAY_COUNT
+    while remaining:
+        if current.weekday() < 5:
+            remaining -= 1
+        if remaining:
+            current += timedelta(days=1)
+    return current
 
 
 def _same_day_cutoff(payment):
