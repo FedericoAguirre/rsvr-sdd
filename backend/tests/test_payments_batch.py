@@ -112,6 +112,14 @@ class TestBatchModalContextData:
         assert isinstance(data["equipment_list"], list)
         assert isinstance(data["class_slots"], list)
         assert isinstance(data["reserved_dates"], list)
+        assert set(data) == {
+            "payment_id",
+            "block_class_count",
+            "date_range",
+            "equipment_list",
+            "class_slots",
+            "reserved_dates",
+        }
 
 
 @pytest.mark.django_db
@@ -206,6 +214,9 @@ class TestPaymentDayBatchWindow:
             "start": "2026-08-12",
             "end": "2026-09-01",
         }
+        assert datetime.date.fromisoformat(
+            response.json()["date_range"]["start"]
+        ).weekday() == 2
 
     def test_latest_client_reservation_still_moves_window_forward(
         self, logged_client, payment, payment_day_slots, equipment, staff_user
@@ -317,6 +328,39 @@ class TestBatchCreation:
             PaymentReservation.objects.filter(payment=payment).count()
             == payment.class_slot_count
         )
+
+    def test_batch_creation_preserves_exact_dates_across_month_boundary(
+        self, logged_client, payment, equipment, class_slot
+    ):
+        from apps.reservations.models import Reservation
+
+        payment.date = datetime.date(2026, 8, 28)
+        payment.class_slot_count = 2
+        payment.save(update_fields=["date", "class_slot_count"])
+        dates = ["2026-08-31", "2026-09-07"]
+
+        response = logged_client.post(
+            f"/payments/{payment.pk}/batch-create/",
+            json.dumps(
+                {
+                    "payment_id": payment.pk,
+                    "equipment_id": equipment.id,
+                    "class_slot_id": class_slot.id,
+                    "dates": dates,
+                }
+            ),
+            content_type="application/json",
+        )
+
+        assert response.status_code == 200
+        assert list(
+            Reservation.objects.filter(client=payment.client)
+            .order_by("date")
+            .values_list("date", flat=True)
+        ) == [
+            datetime.date(2026, 8, 31),
+            datetime.date(2026, 9, 7),
+        ]
 
 
 @pytest.mark.django_db
