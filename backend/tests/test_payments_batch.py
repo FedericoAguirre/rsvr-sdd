@@ -158,7 +158,7 @@ class TestPaymentDayBatchWindow:
 
         assert response.json()["date_range"] == {
             "start": "2026-08-11",
-            "end": "2026-08-31",
+            "end": "2026-09-07",
         }
 
     def test_1900_includes_payment_day_and_ends_august_31(
@@ -173,7 +173,7 @@ class TestPaymentDayBatchWindow:
 
         assert response.json()["date_range"] == {
             "start": "2026-08-11",
-            "end": "2026-08-31",
+            "end": "2026-09-07",
         }
 
     def test_1920_keeps_only_upcoming_payment_day_time_in_validation(
@@ -212,7 +212,7 @@ class TestPaymentDayBatchWindow:
 
         assert response.json()["date_range"] == {
             "start": "2026-08-12",
-            "end": "2026-09-01",
+            "end": "2026-09-08",
         }
         assert datetime.date.fromisoformat(
             response.json()["date_range"]["start"]
@@ -238,7 +238,56 @@ class TestPaymentDayBatchWindow:
 
         assert response.json()["date_range"] == {
             "start": "2026-08-25",
-            "end": "2026-09-14",
+            "end": "2026-09-21",
+        }
+
+    def test_midweek_start_exposes_20_weekdays(self, logged_client, payment, db):
+        from apps.classes.models import ClassSlot
+
+        for day in (0, 1, 3, 4):
+            ClassSlot.objects.create(day_of_week=day, time="19:15", is_active=True)
+        payment.date = datetime.date(2026, 8, 11)
+        payment.save(update_fields=["date"])
+        self.set_payment_time(payment, 17, 0)
+
+        response = logged_client.get(f"/payments/{payment.pk}/batch-data/")
+        data = response.json()["date_range"]
+        start = datetime.date.fromisoformat(data["start"])
+        end = datetime.date.fromisoformat(data["end"])
+        weekday_count = sum(
+            (start + datetime.timedelta(days=offset)).weekday() < 5
+            for offset in range((end - start).days + 1)
+        )
+
+        assert data == {"start": "2026-08-11", "end": "2026-09-07"}
+        assert weekday_count == 20
+
+    def test_reported_payment_window_reaches_twenty_weekdays(
+        self, logged_client, payment, equipment, staff_user, db
+    ):
+        from apps.classes.models import ClassSlot
+        from apps.reservations.models import Reservation
+
+        for day in range(5):
+            ClassSlot.objects.create(day_of_week=day, time="19:15", is_active=True)
+        payment.payment_identifier = "CASH20260811AC003"
+        payment.date = datetime.date(2026, 8, 11)
+        payment.save(update_fields=["payment_identifier", "date"])
+        self.set_payment_time(payment, 17, 0)
+        for day in range(5):
+            Reservation.objects.create(
+                client=payment.client,
+                equipment=equipment,
+                class_slot=ClassSlot.objects.get(day_of_week=day, time="19:15"),
+                date=datetime.date(2026, 8, 24) + datetime.timedelta(days=day),
+                created_by=staff_user,
+            )
+
+        response = logged_client.get(f"/payments/{payment.pk}/batch-data/")
+
+        assert response.json()["date_range"] == {
+            "start": "2026-08-31",
+            "end": "2026-09-25",
         }
 
 
