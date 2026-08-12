@@ -1,5 +1,4 @@
 import calendar
-import datetime
 import logging
 from datetime import date, timedelta
 
@@ -22,14 +21,13 @@ from django.views.generic import (
     View,
 )
 
-from apps.clients.views import _snake_case_name
-
 from apps.clients.models import Client
+from apps.clients.views import _snake_case_name
+from utils.ical import generate_ics
 
+from .batch_reservations import get_batch_reservation_window
 from .forms import BatchReservationForm, PaymentForm
 from .models import Payment, PaymentReservation
-
-from utils.ical import generate_ics
 
 logger = logging.getLogger(__name__)
 
@@ -280,26 +278,17 @@ class PaymentAssociateView(LoginRequiredMixin, View):
 
 class BatchDataView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
-        from apps.equipment.models import Equipment
         from apps.classes.models import ClassSlot
+        from apps.equipment.models import Equipment
         from apps.reservations.models import Reservation
-        from django.db.models import Max
-        from datetime import date, timedelta
 
         payment = get_object_or_404(Payment, pk=kwargs["pk"])
-        raw_start = payment.date
-        latest = Reservation.objects.filter(client=payment.client).aggregate(
-            Max("date")
-        )
-        if latest["date__max"] is not None:
-            raw_start = max(raw_start, latest["date__max"] + timedelta(days=1))
-        next_monday = raw_start + timedelta(days=(7 - raw_start.weekday()) % 7 or 7)
-        end = next_monday + timedelta(weeks=4)
+        window = get_batch_reservation_window(payment)
         reserved = list(
             Reservation.objects.filter(
                 client=payment.client,
-                date__gte=next_monday,
-                date__lte=end,
+                date__gte=window.start,
+                date__lte=window.end,
             )
             .values_list("date", flat=True)
             .distinct()
@@ -325,8 +314,8 @@ class BatchDataView(LoginRequiredMixin, View):
                 "payment_id": payment.pk,
                 "block_class_count": payment.class_slot_count,
                 "date_range": {
-                    "start": next_monday.isoformat(),
-                    "end": end.isoformat(),
+                    "start": window.start.isoformat(),
+                    "end": window.end.isoformat(),
                 },
                 "equipment_list": equipment_list,
                 "class_slots": deduped,
@@ -341,7 +330,9 @@ class BatchDataView(LoginRequiredMixin, View):
 class BatchCreateView(LoginRequiredMixin, View):
     def post(self, request, *args, **kwargs):
         import json
+
         from django.db import transaction
+
         from apps.reservations.models import Reservation
 
         payment = get_object_or_404(Payment, pk=kwargs["pk"])
