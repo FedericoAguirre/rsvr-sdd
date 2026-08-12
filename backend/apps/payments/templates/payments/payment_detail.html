@@ -157,30 +157,39 @@ function renderBatchForm(data) {
     html += '<div class="mb-3"><label class="form-label">{% translate "Select Dates" %} (<span id="dateCount">0</span>/' + data.block_class_count + ')</label><div id="dateList" class="batch-date-grid">';
     var reservedSet = {};
     (data.reserved_dates || []).forEach(function(rd) { reservedSet[rd] = true; });
-    var validDates = [];
+    var weekGroups = {};
     for (var d = data.date_range.start; d <= data.date_range.end; d = addDays(d, 1)) {
         var pyDow = isoDow(d);
         if (pyDow >= 5) continue;
         if (reservedSet[d]) continue;
-        validDates.push({ date: d, dow: pyDow });
+        var weekStart = addDays(d, -pyDow);
+        if (!weekGroups[weekStart]) weekGroups[weekStart] = Array(5).fill(null);
+        weekGroups[weekStart][pyDow] = { date: d, dow: pyDow };
     }
-    for (var w = 0; w < validDates.length; w += 5) {
-        var weekDates = validDates.slice(w, w + 5);
+    var weekStarts = Object.keys(weekGroups).sort();
+    for (var w = 0; w < weekStarts.length; w++) {
+        var weekStart = weekStarts[w];
+        var weekCells = weekGroups[weekStart];
         html += '<div class="week-group">';
         html += '<div class="week-header">';
-        for (var d2 = 0; d2 < 5; d2++) {
-            html += '<span class="day-label">' + DAY_ABBRS[d2] + '</span>';
+        for (var column = 0; column < 5; column++) {
+            html += '<span class="day-label">' + DAY_ABBRS[column] + '</span>';
         }
         html += '</div>';
         html += '<div class="week-row">';
-        for (var d2 = 0; d2 < weekDates.length; d2++) {
-            var parts = weekDates[d2].date.split('-');
+        for (var column = 0; column < 5; column++) {
+            var cell = weekCells[column];
+            if (!cell) {
+                html += '<span class="date-cell-placeholder" aria-hidden="true"></span>';
+                continue;
+            }
+            var parts = cell.date.split('-');
             var shortDate = parts[2] + '-' + MONTH_ABBRS[parseInt(parts[1], 10) - 1] + '-' + parts[0];
-            html += '<button type="button" class="btn btn-outline-secondary btn-sm date-btn" data-date="' + weekDates[d2].date + '" data-dow="' + weekDates[d2].dow + '" onclick="toggleDate(this)">' + shortDate + '</button>';
+            html += '<button type="button" class="btn btn-outline-secondary btn-sm date-btn" data-date="' + cell.date + '" data-dow="' + cell.dow + '" onclick="toggleDate(this)">' + shortDate + '</button>';
         }
         html += '</div>';
         html += '</div>';
-        if (w + 5 < validDates.length) {
+        if (w + 1 < weekStarts.length) {
             html += '<hr class="week-separator">';
         }
     }

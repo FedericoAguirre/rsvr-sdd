@@ -8,6 +8,7 @@ When an operator creates a payment with class slots, the batch reservation modal
 - If all payment-day classes have started, the window starts on the next date with an active class slot.
 - The window ends 20 calendar days after its first eligible date.
 - Existing client reservation, class count, capacity, availability, weekday, and conflict rules continue to apply.
+- Dates in the batch modal remain under their actual weekday columns, including when the window starts midweek; leading weekday cells are left empty rather than shifting dates left.
 
 ## Example
 
