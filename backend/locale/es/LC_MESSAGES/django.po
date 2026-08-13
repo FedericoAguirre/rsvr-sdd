@@ -1288,6 +1288,42 @@ msgstr "No se encontraron reservaciones para esta clase y fecha."
 msgid "Could not generate the PDF. Please try again."
 msgstr "No se pudo generar el PDF. Intente nuevamente."
 
+#: apps/payments/receipt.py apps/payments/templates/payments/payment_detail.html
+msgid "Payment Receipt"
+msgstr "Comprobante de pago"
+
+#: apps/payments/templates/payments/payment_detail.html
+msgid "Download payment"
+msgstr "Descargar pago"
+
+#: apps/payments/templates/payments/payment_detail.html
+msgid "Generating..."
+msgstr "Generando..."
+
+#: apps/payments/templates/payments/payment_detail.html
+msgid "Copy receipt"
+msgstr "Copiar comprobante"
+
+#: apps/payments/templates/payments/payment_detail.html
+msgid "Could not prepare the receipt. Please try again."
+msgstr "No se pudo preparar el comprobante. Intente nuevamente."
+
+#: apps/payments/templates/payments/payment_detail.html
+msgid "Receipt copied."
+msgstr "Comprobante copiado."
+
+#: apps/payments/templates/payments/payment_detail.html
+msgid "Copy the receipt manually"
+msgstr "Copie el comprobante manualmente"
+
+#: apps/payments/receipt.py
+msgid "No reservations found"
+msgstr "No se encontraron reservaciones"
+
+#: apps/payments/receipt.py
+msgid "Not specified"
+msgstr "No especificado"
+
 #: apps/reservations/views.py:208 apps/reservations/views.py:209
 msgid "Invalid status."
 msgstr "Estado inválido."

@@ -28,8 +28,58 @@ from utils.ical import generate_ics
 from .batch_reservations import get_batch_reservation_window
 from .forms import BatchReservationForm, PaymentForm
 from .models import Payment, PaymentReservation
+from .receipt import build_receipt, render_markdown, render_pdf
 
 logger = logging.getLogger(__name__)
+
+
+@login_required
+def payment_receipt(request, pk):
+    """Return a localized PDF receipt for an authenticated payment viewer."""
+    payment = get_object_or_404(Payment.objects.select_related("client"), pk=pk)
+    try:
+        receipt = build_receipt(payment)
+        pdf = render_pdf(receipt)
+        response = HttpResponse(pdf, content_type="application/pdf")
+        response["Content-Disposition"] = (
+            f'attachment; filename="{receipt["filename"]}"'
+        )
+        logger.info("Payment receipt generated payment_id=%s", payment.pk)
+        return response
+    except Exception:
+        logger.exception("Payment receipt generation failed payment_id=%s", payment.pk)
+        return JsonResponse(
+            {
+                "error": str(
+                    _("Could not generate the payment receipt. Please try again.")
+                )
+            },
+            status=500,
+        )
+
+
+@login_required
+def payment_receipt_markdown(request, pk):
+    """Return a localized Markdown receipt for an authenticated payment viewer."""
+    payment = get_object_or_404(Payment.objects.select_related("client"), pk=pk)
+    try:
+        receipt = build_receipt(payment)
+        content = render_markdown(receipt)
+        response = HttpResponse(content, content_type="text/markdown; charset=utf-8")
+        logger.info("Payment receipt Markdown generated payment_id=%s", payment.pk)
+        return response
+    except Exception:
+        logger.exception(
+            "Payment receipt Markdown generation failed payment_id=%s", payment.pk
+        )
+        return JsonResponse(
+            {
+                "error": str(
+                    _("Could not prepare the payment receipt. Please try again.")
+                )
+            },
+            status=500,
+        )
 
 
 @login_required

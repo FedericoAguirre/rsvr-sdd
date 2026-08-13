@@ -19,6 +19,11 @@
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h3 class="mb-0">{{ payment.payment_identifier }}</h3>
                 <div>
+                    <button type="button" id="paymentReceiptButton" class="btn btn-sm btn-outline-danger" data-pdf-url="{% url 'receipt' payment.pk %}">
+                        <span class="receipt-label">{% translate "Download payment" %}</span>
+                        <span id="receiptLoading" class="d-none" aria-live="polite">{% translate "Generating..." %}</span>
+                    </button>
+                    <button type="button" id="paymentMarkdownButton" class="btn btn-sm btn-outline-secondary" data-markdown-url="{% url 'receipt-markdown' payment.pk %}">{% translate "Copy receipt" %}</button>
                     <a href="{% url 'payments:calendar' payment.pk %}" class="btn btn-sm btn-outline-success">{% translate "Download calendar" %}</a>
                     <a href="{% url 'payments:associate' payment.pk %}" class="btn btn-sm btn-outline-info">{% translate "Associate" %}</a>
                     <a href="{% url 'payments:edit' payment.pk %}" class="btn btn-sm btn-outline-primary">{% translate "Edit" %}</a>
@@ -249,4 +254,88 @@ function submitBatch(paymentId, blockClassCount) {
 }
 </script>
 {% endif %}
+<div id="receiptError" class="alert alert-danger d-none mt-3" role="alert" aria-live="assertive">
+    {% translate "Could not prepare the receipt. Please try again." %}
+</div>
+<div id="receiptCopied" class="alert alert-success d-none mt-3" role="status" aria-live="polite">
+    {% translate "Receipt copied." %}
+</div>
+<div id="receiptFallback" class="d-none mt-3">
+    <label for="receiptFallbackText" class="form-label">{% translate "Copy the receipt manually" %}</label>
+    <textarea id="receiptFallbackText" class="form-control" rows="10" readonly></textarea>
+</div>
+<script>
+var receiptButton = document.getElementById("paymentReceiptButton");
+var markdownButton = document.getElementById("paymentMarkdownButton");
+var receiptLoading = document.getElementById("receiptLoading");
+var receiptError = document.getElementById("receiptError");
+var receiptCopied = document.getElementById("receiptCopied");
+var receiptFallback = document.getElementById("receiptFallback");
+var receiptFallbackText = document.getElementById("receiptFallbackText");
+
+function setReceiptError(visible) {
+    receiptError.classList.toggle("d-none", !visible);
+}
+
+function setReceiptLoading(loading) {
+    receiptButton.disabled = loading;
+    markdownButton.disabled = loading;
+    receiptLoading.classList.toggle("d-none", !loading);
+    receiptButton.querySelector(".receipt-label").classList.toggle("d-none", loading);
+}
+
+function receiptFilename(response) {
+    var disposition = response.headers.get("Content-Disposition") || "";
+    var match = disposition.match(/filename="([^"]+)"/);
+    return match ? match[1] : "payment_receipt.pdf";
+}
+
+receiptButton.addEventListener("click", function() {
+    setReceiptError(false);
+    setReceiptLoading(true);
+    fetch(receiptButton.dataset.pdfUrl)
+        .then(function(response) {
+            if (!response.ok) throw new Error("receipt");
+            return Promise.all([response.blob(), Promise.resolve(response)]);
+        })
+        .then(function(result) {
+            var link = document.createElement("a");
+            link.href = URL.createObjectURL(result[0]);
+            link.download = receiptFilename(result[1]);
+            link.click();
+            URL.revokeObjectURL(link.href);
+        })
+        .catch(function() { setReceiptError(true); })
+        .finally(function() { setReceiptLoading(false); });
+});
+
+markdownButton.addEventListener("click", function() {
+    setReceiptError(false);
+    receiptCopied.classList.add("d-none");
+    setReceiptLoading(true);
+    fetch(markdownButton.dataset.markdownUrl)
+        .then(function(response) {
+            if (!response.ok) throw new Error("receipt");
+            return response.text();
+        })
+        .then(function(content) {
+            receiptFallbackText.value = content;
+            if (!navigator.clipboard || !navigator.clipboard.writeText) {
+                receiptFallback.classList.remove("d-none");
+                receiptFallbackText.focus();
+                receiptFallbackText.select();
+                return;
+            }
+            return navigator.clipboard.writeText(content).then(function() {
+                receiptCopied.classList.remove("d-none");
+            }).catch(function() {
+                receiptFallback.classList.remove("d-none");
+                receiptFallbackText.focus();
+                receiptFallbackText.select();
+            });
+        })
+        .catch(function() { setReceiptError(true); })
+        .finally(function() { setReceiptLoading(false); });
+});
+</script>
 {% endblock %}
