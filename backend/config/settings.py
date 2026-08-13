@@ -6,7 +6,17 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret-key-change-in-production")
 DEBUG = os.environ.get("DEBUG", "True").lower() in ("true", "1")
-ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "*").split(",")
+ALLOWED_HOSTS = [
+    host.strip()
+    for host in os.environ.get("ALLOWED_HOSTS", "*").split(",")
+    if host.strip()
+]
+if DEBUG:
+    ALLOWED_HOSTS.extend(
+        host
+        for host in ("localhost", "127.0.0.1", "[::1]")
+        if host not in ALLOWED_HOSTS
+    )
 
 INSTALLED_APPS = [
     "django.contrib.admin",

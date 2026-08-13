@@ -26,3 +26,22 @@ def test_batch_date_grid_preserves_translated_weekday_headers_and_reserved_filte
 
     assert "DAY_ABBRS[column]" in source
     assert "reservedSet[d]" in source
+
+
+def test_payment_receipt_actions_are_adjacent_to_calendar_download():
+    source = TEMPLATE.read_text()
+
+    receipt_idx = source.find('{% translate "Download payment" %}')
+    calendar_idx = source.find('{% translate "Download calendar" %}')
+    assert receipt_idx != -1
+    assert calendar_idx != -1
+    assert receipt_idx < calendar_idx
+
+
+def test_payment_receipt_ui_contains_loading_and_clipboard_fallback_hooks():
+    source = TEMPLATE.read_text()
+
+    assert "receiptLoading" in source
+    assert "navigator.clipboard" in source
+    assert "receiptFallback" in source
+    assert "receiptError" in source
