@@ -52,7 +52,7 @@ def build_receipt(payment):
         ).order_by("reservation__date", "reservation__class_slot__time")
     )
     client_name = _client_name(payment.client)
-    reference = payment.reference or payment.pk
+    identifier = str(payment.payment_identifier)
     rows = [
         {
             "class_slot": str(link.reservation.class_slot),
@@ -66,6 +66,7 @@ def build_receipt(payment):
     ]
     labels = {
         "title": str(_("Payment Receipt")),
+        "identifier": str(_("Payment identifier")),
         "client": str(_("Client")),
         "amount": str(_("Amount")),
         "payment_type": str(_("Payment type")),
@@ -83,10 +84,10 @@ def build_receipt(payment):
         "payment_type": str(payment.get_payment_type_display()),
         "date": date_format(payment.date, "SHORT_DATE_FORMAT"),
         "class_slot_count": str(payment.class_slot_count),
-        "reference": str(reference),
+        "identifier": identifier,
         "filename": (
             f"payment_{_safe_filename_part(client_name)}_"
-            f"{_safe_filename_part(reference)}.pdf"
+            f"{_safe_filename_part(identifier)}.pdf"
         ),
         "reservations": rows,
     }
@@ -99,6 +100,7 @@ def render_markdown(receipt):
         f"# {labels['title']}",
         "",
         f"- **{labels['client']}:** {receipt['client']}",
+        f"- **{labels['identifier']}:** {receipt['identifier']}",
         f"- **{labels['amount']}:** {receipt['amount']}",
         f"- **{labels['payment_type']}:** {receipt['payment_type']}",
         f"- **{labels['date']}:** {receipt['date']}",
@@ -153,6 +155,7 @@ def render_pdf(receipt):
     elements = [Paragraph(escape(labels["title"]), heading), Spacer(1, 0.4 * cm)]
     header_rows = [
         (labels["client"], receipt["client"]),
+        (labels["identifier"], receipt["identifier"]),
         (labels["amount"], receipt["amount"]),
         (labels["payment_type"], receipt["payment_type"]),
         (labels["date"], receipt["date"]),

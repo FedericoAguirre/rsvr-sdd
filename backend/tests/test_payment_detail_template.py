@@ -36,6 +36,8 @@ def test_payment_receipt_actions_are_adjacent_to_calendar_download():
     assert receipt_idx != -1
     assert calendar_idx != -1
     assert receipt_idx < calendar_idx
+    assert 'data-pdf-url="{% url \'receipt\' payment.pk %}"' in source
+    assert "{% url 'payments:calendar' payment.pk %}" in source
 
 
 def test_payment_receipt_ui_contains_loading_and_clipboard_fallback_hooks():

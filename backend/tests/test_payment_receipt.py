@@ -11,6 +11,7 @@ from apps.classes.models import ClassSlot
 from apps.clients.models import Client
 from apps.equipment.models import Equipment
 from apps.payments.models import Payment, PaymentReservation
+from apps.payments.receipt import build_receipt
 from apps.reservations.models import Reservation
 
 pytestmark = pytest.mark.django_db
@@ -60,6 +61,7 @@ def payment(client, operator):
         date=datetime.date(2026, 7, 16),
         class_slot_count=4,
         created_by=operator,
+        payment_identifier="PAY-2026-001",
         reference="REF/2026:7",
     )
 
@@ -93,12 +95,15 @@ class TestPaymentReceiptPDF:
         assert response.status_code == 200
         assert response["Content-Type"] == "application/pdf"
         assert response["Content-Disposition"].startswith("attachment;")
-        assert "payment_José_Álvarez_REF_2026_7.pdf" in response[
+        assert "payment_José_Álvarez_PAY-2026-001.pdf" in response[
             "Content-Disposition"
         ]
 
         text = extract_text(io.BytesIO(response.content))
         assert "José Álvarez" in text
+        assert "Identificador de pago" in text
+        assert linked_payment.payment_identifier in text
+        assert linked_payment.reference not in text
         assert "200.00" in text
         assert "Efectivo" in text
         assert "16/07/2026" in text
@@ -106,6 +111,13 @@ class TestPaymentReceiptPDF:
         assert str(reservation.class_slot) in text
         assert "Cuerda / A" in text
         assert "Reservado" in text
+
+    def test_receipt_projection_uses_payment_identifier(self, payment):
+        payment.refresh_from_db()
+        receipt = build_receipt(payment)
+
+        assert receipt["identifier"] == payment.payment_identifier
+        assert payment.reference not in receipt.values()
 
     def test_empty_payment_includes_localized_empty_state(
         self, logged_client, payment
@@ -116,7 +128,7 @@ class TestPaymentReceiptPDF:
         text = extract_text(io.BytesIO(response.content))
         assert "No se encontraron reservaciones" in text
 
-    def test_missing_reference_uses_payment_id_and_sanitizes_client_name(
+    def test_missing_reference_keeps_identifier_and_sanitizes_client_name(
         self, logged_client, payment
     ):
         payment.reference = None
@@ -125,9 +137,19 @@ class TestPaymentReceiptPDF:
         response = logged_client.get(f"/api/payments/{payment.pk}/receipt/")
 
         assert response.status_code == 200
-        assert f"payment_José_Álvarez_{payment.pk}.pdf" in response[
+        assert "payment_José_Álvarez_PAY-2026-001.pdf" in response[
             "Content-Disposition"
         ]
+
+    def test_filename_sanitizes_payment_identifier(self, payment):
+        payment.refresh_from_db()
+        payment.payment_identifier = "PAY/2026 001\x00"
+
+        receipt = build_receipt(payment)
+
+        assert receipt["filename"] == "payment_José_Álvarez_PAY_2026_001.pdf"
+        assert "/" not in receipt["filename"]
+        assert payment.reference not in receipt["filename"]
 
     def test_missing_payment_returns_not_found(self, logged_client):
         response = logged_client.get("/api/payments/999999/receipt/")
@@ -190,6 +212,8 @@ class TestPaymentReceiptMarkdown:
         assert response["Content-Type"] == "text/markdown; charset=utf-8"
         text = response.content.decode()
         assert "José Álvarez" in text
+        assert "**Identificador de pago:** PAY-2026-001" in text
+        assert "REF/2026:7" not in text
         assert "Cuerda / A" in text
         assert str(reservation.class_slot) in text
         assert "| Bloque de clase | Fecha | Equipo | Estado |" in text
@@ -200,4 +224,6 @@ class TestPaymentReceiptMarkdown:
         )
 
         assert response.status_code == 200
-        assert "No se encontraron reservaciones" in response.content.decode()
+        text = response.content.decode()
+        assert "**Identificador de pago:** PAY-2026-001" in text
+        assert "No se encontraron reservaciones" in text

@@ -1,6 +1,9 @@
 .git/
+Dockerfile*
 __pycache__/
 *.pyc
+*.log*
+coverage/
 .env
 .venv/
 *.md
